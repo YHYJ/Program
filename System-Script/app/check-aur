@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+: << !
+Name: check-aur
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2021-01-09 18:00:25
+
+Description: 检查本地安装的AUR包是否和源保持同步
+
+Attentions:
+-
+
+Depends:
+- parallel
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.1.1
+readonly minor_version=20211109
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于检查本地安装的AUR包是否和源保持同步，适用于Arch Linux发行版"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() { # 打印帮助信息
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name"
+}
+
+function versionInfo() { # 打印版本信息
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+echo -e 'Waiting...'
+pacman -Qmq | parallel 'result=$(package-query -AQ -f "%v" "{}" | uniq -d | wc -l); [ $result -eq 0  ] && echo "{}"'

@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+
+: << !
+Name: polybar-script_system-info
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2021-11-17 08:49:08
+
+Description: 输出系统信息
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.1.1
+readonly minor_version=20211117
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_unknown=255    # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="是Polybar脚本，用于显示系统信息"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -k, --kernel      显示内核版本"
+  echo -e "     -p, --package     显示可用更新"
+  echo -e "     --package-service 显示更新检测状态"
+  echo -e "     -s, --startup     显示系统启动用时"
+  echo -e "     -t, --time        显示最近开机时间"
+  echo -e "     -u, --user        显示当前登录用户"
+  echo -e ""
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+#------------------------- Feature Function
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+case $1 in
+  -k | --kernel)
+    notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '内核版本' "$(uname -sr)"
+    exit $normal
+    ;;
+  -s | --startup)
+    notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '系统启动用时' "$(systemd-analyze | head -1 | awk '{print $NF}')"
+    exit $normal
+    ;;
+  -p | --package)
+    notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '可用更新' "$(cat /tmp/polybar-script_checkupdates.log)"
+    exit $normal
+    ;;
+  --package-service)
+    notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '更新检测状态' "$(systemctl is-active polybar-checkupdates)"
+    exit $normal
+    ;;
+  -t | --time)
+    notify-send --urgency=normal --icon=system-users --app-name='Login info' '最近开机时间' "$(uptime -s)"
+    exit $normal
+    ;;
+  -u | --user)
+    notify-send --urgency=normal --icon=system-users --app-name='Login info' '当前登录用户' "$(who -q | sed 's/# //')"
+    exit $normal
+    ;;
+  -h | --help)
+    helpInfo
+    exit $normal
+    ;;
+  -v | --version)
+    versionInfo
+    exit $normal
+    ;;
+  *)
+    helpInfo
+    exit $err_unknown
+    ;;
+esac

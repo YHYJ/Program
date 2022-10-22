@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+: << !
+Name: get-vim-hotkey-doc
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2021-06-11 17:06:32
+
+Description: 提取vim快捷键文档
+
+Attentions:
+-
+
+Depends:
+-
+
+TODO:
+- 尚未完善参数识别
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.2.1
+readonly minor_version=20211109
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_param=2        # 参数错误
+readonly err_fetch=48       # checkupdate错误
+readonly err_permission=110 # 权限错误
+readonly err_range=122      # 取值范围错误
+readonly err_ctrl_c=130     # 接收到INT(Ctrl+C)指令
+readonly err_unknown=255    # 未知错误
+readonly err_no_program=127 # 未找到命令
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于提取vim快捷键说明以生成文档"
+
+# path variable
+readonly conf_file="$HOME/.space-vim/private/config.vim"
+readonly doc_file="$HOME/.cache/mycache/Vim-Hotkey.md"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e ""
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+#------------------------- Feature Function
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+# 提取快捷键说明
+grep -r 'Hotkey' "$conf_file" > "$doc_file"
+# 格式化文档
+sed -i 's/--/|/g' "$doc_file" # 替换'--'为'|'
+sed -i 's/^"//' "$doc_file"   # 删除行首的'"'
+sed -i 's/^/|/' "$doc_file"   # 在行首添加'|'
+sed -i 's/$/|/' "$doc_file"   # 在行尾添加'|'
+# 添加文件头
+line1='|	关键字	|	归属	|	快捷键	|	说明	|'
+line2='|---|---|---|---'
+sed -i "1i\\$line2" "$doc_file"
+sed -i "1i\\$line1" "$doc_file"

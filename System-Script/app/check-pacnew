@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+: << !
+Name: check-pacnew
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2021-05-08 10:27:45
+
+Description: 检查pacman所安装软件包的配置文件（包括.pacnew和.pacsave）
+
+Attentions:
+-
+
+Depends:
+- pacman
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.1.0
+readonly minor_version=20211109
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于检查pacman所安装软件包的配置文件"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e ""
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+#------------------------- Feature Function
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+if [[ -z $1 ]]; then
+  pacdiff
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
+fi

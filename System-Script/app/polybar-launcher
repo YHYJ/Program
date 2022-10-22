@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+
+: << !
+Name: polybar-launcher
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2021-07-12 09:22:54
+
+Description: Polybar启动器
+
+Attentions:
+-
+
+Depends:
+- polybar
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.2.1
+readonly minor_version=20211109
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="是Polybar的启动器"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -s, --start       启动Polybar"
+  echo -e "     -r, --restart     重启Polybar"
+  echo -e ""
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+#------------------------- Feature Function
+function startPolybar() { # 启动Polybar
+  # 创建日志文件
+  echo "---" | tee -a /tmp/polybar.log
+  echo -e "<$(date '+%Y.%m.%d %H:%M:%S')> Polybar launched..." >> /tmp/polybar.log 2>&1 &
+
+  # 启动polybar实例
+  polybar --reload mypolybar >> /tmp/polybar.log 2>&1 &
+}
+
+function restartPolybar() { # 重启Polybar
+  # 终止正在运行的polybar实例
+  # 因为bar启用了ipc，也可以直接使用`polybar-msg`命令重启
+  # killall -q polybar
+  pkill polybar
+
+  # 创建日志文件
+  echo "---" | tee -a /tmp/polybar.log
+  echo -e "<$(date '+%Y.%m.%d %H:%M:%S')> Polybar launched..." >> /tmp/polybar.log 2>&1 &
+
+  # 启动polybar实例
+  polybar --reload mypolybar >> /tmp/polybar.log 2>&1 &
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+case $1 in
+  -s | --start)
+    startPolybar
+    ;;
+  -r | --restart)
+    restartPolybar
+    ;;
+  -h | --help)
+    helpInfo
+    exit $normal
+    ;;
+  -v | --version)
+    versionInfo
+    exit $normal
+    ;;
+  *)
+    helpInfo
+    exit $err_unknown
+    ;;
+esac
