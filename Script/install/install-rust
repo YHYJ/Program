@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+: << !
+Name: install-rust
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2020-04-27 11:09:04
+
+Description: 安装配置rust开发环境
+
+Attentions:
+- 通过Arch Linux package安装
+
+Depends:
+- pacman
+!
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+if command -v rustup &> /dev/null; then
+  echo -e "\nrustup已安装，退出\n"
+  exit
+else
+  yay -S rustup rust-racer
+fi
+
+rustup default stable
+rustup show
+
+rustup component add rls rust-analysis rust-src rustfmt
+rustup component add clippy
+
+if racer complete std::io::B; then
+  echo -e "\nrust插件依赖测试无误\n"
+fi

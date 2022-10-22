@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+: << !
+Name: install-zsh
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2021-05-08 08:33:20
+
+Description: 安装配置zsh
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Exit Code Variable
+readonly normal=0 # 一切正常
+
+#------------------------- Parameter Variable
+# description variable
+readonly zsh_path="/usr/bin/zsh"
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+if [[ -x $zsh_path ]]; then
+  echo -e "\nZSH已安装，直接进行配置\n\n"
+else
+  echo -e "\n正在安装ZSH\n\n"
+  # 官方源
+  yay -S zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
+  # AUR
+  yay -S oh-my-zsh-git zsh-theme-powerlevel10k-git
+fi
+
+echo -e "\n正在配置ZSH\n\n"
+cp /usr/share/oh-my-zsh/zshrc ~/.zshrc
+exit $normal

@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+: << !
+Name: git-clone
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2020-04-27 11:03:49
+
+Description: Clone my repositories
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Exit Code Variable
+readonly err_permission=110 # 权限错误
+
+#------------------------- Parameter Variable
+# path variable
+readonly path="$HOME/Documents/MyRepos"
+readonly repos=(
+  System-Conf
+  Program-module LogWrapper TimeNote
+  MyBlogs MyDocker MyDockerfile MyShell MyWiki MyRaspberry
+  Linux-learn Python-learn C-learn Go-learn Rust-learn Nim-learn
+  Database-learn Data-Analyze-learn TensorFlow-learn BlockChain-learn Flask-learn
+  DataWizard DataCollector SystemMonitor Sniffer OPC2Socket Devicer WeatherStation
+)
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Feature Function
+function check_user() {
+  if [[ $USER == "$1" ]]; then
+    echo -e "\n\\e[31m[✘]\\e[0m 当前用户是$1，拒绝执行！！！"
+    exit $err_permission
+  fi
+}
+
+function clone() {
+  echo -e "正在clone..."
+  echo ""
+  for repo in ${repos[*]}; do
+    if [[ ! -e "$path/$repo" ]]; then
+      git clone git@github.com:YHYJ/"$repo".git "$path/$repo"
+    else
+      echo -e "<$repo> 同名文件夹已存在，不会clone该仓库\n"
+    fi
+  done
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+check_user "root"
+
+if [[ -d "$path" ]]; then
+  echo -e "\n$path目录已存在\n"
+  clone
+else
+  mkdir -p "$path"
+  echo -e "\n已创建MyRepos\n"
+  clone
+fi
