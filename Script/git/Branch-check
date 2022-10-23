@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+: << !
+Name: Branch-check
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2022-10-23 02:52:30
+
+Description: 检查确认父模块和子模块的分支一致性
+
+Attentions:
+1. 获取父模块当前分支名
+2. 获取父模块下文件夹名
+3. 判断每个文件夹是不是git仓库
+4. 如果是git仓库并且有和当前父模块分支名同名的分支，则将子模块切换到该分支
+6. 显示检查后的父模块和各个子模块分支信息并退回到父模块跟路径下
+7. 退出
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.0.2
+readonly minor_version=20221024
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0   # 一切正常
+readonly err_file=1 # 文件/路径类错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于检查确认父模块和子模块的分支一致性"
+# 父模块名
+parent_module_name=$(basename "$PWD")
+# 父模块路径 —— 用于检索其下的文件夹
+parent_module_path=$(dirname "$(realpath "$0")")
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+#------------------------- Feature Function
+function isGitrepo() {
+  # 判断给定的文件夹是不是git仓库
+  if [ -a "$1"/.git ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+function haveBranch() {
+  # 判断git仓库是否有指定名字的分支
+  cd "$1" || exit "$err_file"
+  if git show-ref --quiet --heads "$parent_module_branch"; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+function checkoutBranch() {
+  # 切换分支
+  cd "$1" || exit "$err_file"
+  git checkout --quiet "$2"
+}
+
+function getInfo() {
+  # 获取当前文件夹名和其（如果是git仓库）所在分支
+  cd "$1" || exit "$err_file"
+  sub_module_name=$(basename "$(realpath "$1")")
+  sub_module_next_branch=$(git symbolic-ref --short HEAD)
+}
+
+function main() {
+  # 获取父模块当前所在分支
+  parent_module_branch=$(git symbolic-ref --short HEAD)
+  echo -e "\e[1m$parent_module_name\e[0m: \e[32;40;1m$parent_module_branch\e[0m"
+  # 获取父模块下文件夹名
+  for file in "$parent_module_path"/*; do
+    # 判断是否是文件夹
+    if [[ -d $file ]]; then
+      # 判断是否是git仓库
+      if isGitrepo "$file"; then
+        # 判断有没有指定的分支
+        if haveBranch "$file"; then
+          # 切换分支前查询子模块现在所在分支
+          sub_module_before_branch=$(git symbolic-ref --short HEAD)
+          # 切换子模块的分支
+          checkoutBranch "$file" "$parent_module_branch"
+          # 查询子模块名及其当前所在分支
+          getInfo "$file"
+          # 输出信息
+          echo -e "    \e[1m$sub_module_name\e[0m: \e[36m$sub_module_before_branch\e[0m -> \e[32;40;1m$sub_module_next_branch\e[0m"
+        fi
+      fi
+    fi
+  done
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+case $1 in
+  -h | --help)
+    helpInfo
+    exit $normal
+    ;;
+  -v | --version)
+    versionInfo
+    exit $normal
+    ;;
+  *)
+    main
+    ;;
+esac
