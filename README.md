@@ -11,9 +11,12 @@
 
 <!-- vim-markdown-toc GFM -->
 
-* [Script](#script)
-* [Software](#software)
-* [System-Script](#system-script)
+* [父模块列表](#父模块列表)
+* [各文件夹简介](#各文件夹简介)
+    * [Script](#script)
+    * [Software](#software)
+    * [System-Script](#system-script)
+    * [doc](#doc)
 
 <!-- vim-markdown-toc -->
 
@@ -30,7 +33,15 @@
 
 ---
 
-## Script
+## 父模块列表
+
+| 父模块                                   | 简介     |
+|------------------------------------------|----------|
+| [System](https://github.com/YHYJ/System) | 我的系统 |
+
+## 各文件夹简介
+
+### Script
 
 - backup：备份工具
 - check：家测工具
@@ -40,13 +51,17 @@
 - tool：暂未定义作用的小工具
 - wrapper：其他程序的包装器
 
-## Software
+### Software
 
 - http-server：开启Http Server的软件
 - picture_conversion：图片转换软件
 - polybar-script：Polybar的脚本插件
 
-## System-Script
+### System-Script
 
 - app：系统个性化工具
 - init：系统初始化工具
+
+### doc
+
+存放相关文档
