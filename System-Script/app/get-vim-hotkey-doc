@@ -26,20 +26,11 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.2.1
-readonly minor_version=20211109
+readonly major_version=0.2.2
+readonly minor_version=20221024
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_param=2        # 参数错误
-readonly err_fetch=48       # checkupdate错误
-readonly err_permission=110 # 权限错误
-readonly err_range=122      # 取值范围错误
-readonly err_ctrl_c=130     # 接收到INT(Ctrl+C)指令
-readonly err_unknown=255    # 未知错误
-readonly err_no_program=127 # 未找到命令
 
 #------------------------- Parameter Variable
 # description variable
@@ -47,7 +38,7 @@ readonly desc="用于提取vim快捷键说明以生成文档"
 
 # path variable
 readonly conf_file="$HOME/.space-vim/private/config.vim"
-readonly doc_file="$HOME/.cache/mycache/Vim-Hotkey.md"
+readonly doc_file="$HOME/.cache/SpiderData/App/vim/Vim-Hotkey.md"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
