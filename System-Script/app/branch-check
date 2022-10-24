@@ -46,7 +46,7 @@ readonly desc="用于检查确认父模块和子模块的分支一致性"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -63,7 +63,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
-  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 #------------------------- Feature Function
 function isGitrepo() {
@@ -115,7 +115,7 @@ function main() {
       cd "$dir" || exit "$err_file"
       # 获取父模块当前所在分支
       parent_module_branch=$(git symbolic-ref --short HEAD)
-      echo -e "\e[1m$dirname\e[0m: \e[32;40;1m$parent_module_branch\e[0m"
+      echo -e "\033[1m$dirname\033[0m: \033[32;40;1m$parent_module_branch\033[0m"
       # 获取父模块下文件夹名
       for file in "$dirpath"/*; do
         # 判断是否是文件夹
@@ -131,16 +131,16 @@ function main() {
               # 查询子模块名及其当前所在分支
               getInfo "$file"
               # 输出信息
-              echo -e "    \e[1m$sub_module_name\e[0m: \e[36m$sub_module_before_branch\e[0m -> \e[32;40;1m$sub_module_next_branch\e[0m"
+              echo -e "    \033[1m$sub_module_name\033[0m: \033[36m$sub_module_before_branch\033[0m -> \033[32;40;1m$sub_module_next_branch\033[0m"
             fi
           fi
         fi
       done
     else
-      echo -e "\e[36m$dirname\e[0m is not a git repository"
+      echo -e "\033[36m$dirname\033[0m is not a git repository"
     fi
   else
-    echo -e "\e[37m$dirname\e[0m is not a folder"
+    echo -e "\033[37m$dirname\033[0m is not a folder"
   fi
 }
 
