@@ -1,3 +1,5 @@
+- [ ] 因为仓库更换，需要更新脚本：
+  - [ ] ! 重点是backup、program-manager (2022-10-24 13:32)
 - [ ] 完善git/git-clone脚本：根据hostname确定克隆方式(HTTPS/SSH) (2022-05-13 17:35)
 - [ ] ! 完善脚本：增加版本号、help和version（三位）信息 (2021-11-09 10:10)
   - [ ] checkupdates-notify (2021-11-09 10:11)
