@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: program-manager
+Name: manager
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:19:32
@@ -26,8 +26,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.2.1
-readonly minor_version=20211109
+readonly major_version=3.3.0
+readonly minor_version=20221024
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -37,12 +37,12 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于安装自定义程序文件和脚本"
+readonly desc="用于安装自定义程序和脚本"
 
 # path variable
 username=$(id -nu "$PKEXEC_UID" 2> /dev/null || id -nu)
 readonly username
-readonly source_path="/home/$username/Documents/MyRepos/System-Conf/source/MySource"
+readonly source_path="/home/$username/Documents/MyRepos/System/Program/System-Script/app"
 readonly target_path="/usr/local/bin"
 readonly confile="/home/$username/.config/myprogram/$name.conf"
 # list variable
