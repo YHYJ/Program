@@ -13,7 +13,7 @@
 
 * [父模块列表](#父模块列表)
 * [各文件夹简介](#各文件夹简介)
-    * [Script](#script)
+    * [System-Script](#system-script)
 
 <!-- vim-markdown-toc -->
 
@@ -38,6 +38,8 @@
 
 ## 各文件夹简介
 
-### Script
+### System-Script
 
-- git：git工具
+存放系统级别工具
+
+- app：工具类程序
