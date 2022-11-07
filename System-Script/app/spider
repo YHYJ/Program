@@ -28,15 +28,14 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.0
-readonly minor_version=20221124
+readonly major_version=0.1.1
+readonly minor_version=20221107
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
 readonly err_param=2        # 参数错误
 readonly err_unknown=255    # 未知错误
-readonly err_permission=110 # 权限错误
 
 #------------------------- Parameter Variable
 # description variable
