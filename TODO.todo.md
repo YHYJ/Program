@@ -1,4 +1,4 @@
-- [ ] 完善git/git-clone脚本：根据hostname确定克隆方式(HTTPS/SSH) (2022-05-13 17:35)
+- [ ] 完善clone-my-repos脚本：根据hostname确定克隆方式(HTTPS/SSH) (2022-05-13 17:35)
 - [ ] ! 完善脚本：增加版本号、help和version（三位）信息 (2021-11-09 10:10)
   - [ ] lock-screen (2021-11-09 10:13)
   - [ ] polybar-script_uptime-info (2021-11-09 10:14)
