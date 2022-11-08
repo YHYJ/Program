@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+: << !
+Name: clone-my-repos
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2020-04-27 11:03:49
+
+Description: 克隆我的GitHub仓库
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.2.0
+readonly minor_version=20221108
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_param=2        # 参数错误
+readonly err_permission=110 # 权限错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于克隆我的GitHub仓库"
+
+#------------------------- Parameter Variable
+# path variable
+readonly path="$HOME/Documents/MyRepos"
+readonly repos=(
+  YHYJ
+  System TimeNote
+  LearningCenter
+  Program-module LogWrapper
+  MyBlogs MyDocker MyDockerfile MyRaspberry MyShell MyWiki
+  DataCollector DataWizard SystemMonitor Sniffer OPC2Socket Devicer WeatherStation
+  Test
+)
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function checkUser() {
+  if [[ $USER == "$1" ]]; then
+    echo -e "\n\\e[31m[✘]\\e[0m 当前用户是$1，拒绝执行！！！"
+    exit $err_permission
+  fi
+}
+
+function checkPath() {
+  if [[ -d "$path" ]]; then
+    echo -e "\n$path目录已存在\n"
+  else
+    mkdir -p "$path"
+    echo -e "\n已创建MyRepos\n"
+  fi
+}
+
+function cloneRepo() {
+  echo -e "正在clone..."
+  echo ""
+  for repo in ${repos[*]}; do
+    if [[ ! -e "$path/$repo" ]]; then
+      git clone --recurse-submodules git@github.com:YHYJ/"$repo".git "$path/$repo"
+    else
+      echo -e "<$repo> 同名文件夹已存在，不会克隆该仓库\n"
+    fi
+  done
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+TEMP=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$TEMP"
+
+if [[ ${#@} -lt 2 ]]; then
+  checkUser "root"
+  checkPath
+  cloneRepo
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        exit $normal
+        ;;
+      -v | --version)
+        versionInfo
+        exit $normal
+        ;;
+      *)
+        helpInfo
+        exit $err_param
+        ;;
+    esac
+  done
+fi
