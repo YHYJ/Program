@@ -19,6 +19,23 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.1.1
+readonly minor_version=20221108
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_param=2        # 参数错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于锁定/解锁屏幕"
+
 #------------------------- Parameter Variable
 # color variable
 readonly color_time='#000000BF'         # 黑色     75%不透明度
@@ -53,36 +70,84 @@ readonly radius=90
 readonly ring_width=2.0
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function i3Lock() {
+  i3lock \
+    --clock \
+    --image="$image_path/$1" \
+    --screen="$screen" \
+    --time-str="$time_str" \
+    --date-str="$date_str" \
+    --keylayout="$keylayout" \
+    --time-color=$color_time \
+    --date-color=$color_date \
+    --layout-color=$color_key_layout \
+    --line-color=$color_line \
+    --inside-color=$color_inside \
+    --insidever-color=$color_inside_ver \
+    --insidewrong-color=$color_inside_wrong \
+    --ring-color=$color_ring \
+    --ringver-color=$color_ring_ver \
+    --ringwrong-color=$color_ring_wrong \
+    --separator-color=$color_separator \
+    --keyhl-color=$color_keyhl \
+    --bshl-color=$color_bshl \
+    --verif-color=$color_verif \
+    --wrong-color=$color_wrong \
+    --verif-text="$veriftext" \
+    --wrong-text="$wrongtext" \
+    --noinput-text="$noinputtext" \
+    --lock-text="$locktext" \
+    --lockfailed-text="$lockfailedtext" \
+    --radius="$radius" \
+    --ring-width="$ring_width" \
+    --ignore-empty-password \
+    --show-failed-attempts
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-i3lock \
-  --clock \
-  --image="$image_path/$1" \
-  --screen="$screen" \
-  --time-str="$time_str" \
-  --date-str="$date_str" \
-  --keylayout="$keylayout" \
-  --time-color=$color_time \
-  --date-color=$color_date \
-  --layout-color=$color_key_layout \
-  --line-color=$color_line \
-  --inside-color=$color_inside \
-  --insidever-color=$color_inside_ver \
-  --insidewrong-color=$color_inside_wrong \
-  --ring-color=$color_ring \
-  --ringver-color=$color_ring_ver \
-  --ringwrong-color=$color_ring_wrong \
-  --separator-color=$color_separator \
-  --keyhl-color=$color_keyhl \
-  --bshl-color=$color_bshl \
-  --verif-color=$color_verif \
-  --wrong-color=$color_wrong \
-  --verif-text="$veriftext" \
-  --wrong-text="$wrongtext" \
-  --noinput-text="$noinputtext" \
-  --lock-text="$locktext" \
-  --lockfailed-text="$lockfailedtext" \
-  --radius="$radius" \
-  --ring-width="$ring_width" \
-  --ignore-empty-password \
-  --show-failed-attempts
+TEMP=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$TEMP"
+
+if [[ ${#@} -lt 2 ]]; then
+  i3Lock
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        exit $normal
+        ;;
+      -v | --version)
+        versionInfo
+        exit $normal
+        ;;
+      *)
+        helpInfo
+        exit $err_param
+        ;;
+    esac
+  done
+fi
