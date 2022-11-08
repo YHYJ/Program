@@ -26,11 +26,10 @@ readonly name
 # program nversion
 readonly major_version=0.1.1
 readonly minor_version=20221108
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
-readonly err_param=2        # 参数错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -92,62 +91,57 @@ function versionInfo() {
 
 #------------------------- Feature Function
 function i3Lock() {
-  i3lock \
-    --clock \
-    --image="$image_path/$1" \
-    --screen="$screen" \
-    --time-str="$time_str" \
-    --date-str="$date_str" \
-    --keylayout="$keylayout" \
-    --time-color=$color_time \
-    --date-color=$color_date \
-    --layout-color=$color_key_layout \
-    --line-color=$color_line \
-    --inside-color=$color_inside \
-    --insidever-color=$color_inside_ver \
-    --insidewrong-color=$color_inside_wrong \
-    --ring-color=$color_ring \
-    --ringver-color=$color_ring_ver \
-    --ringwrong-color=$color_ring_wrong \
-    --separator-color=$color_separator \
-    --keyhl-color=$color_keyhl \
-    --bshl-color=$color_bshl \
-    --verif-color=$color_verif \
-    --wrong-color=$color_wrong \
-    --verif-text="$veriftext" \
-    --wrong-text="$wrongtext" \
-    --noinput-text="$noinputtext" \
-    --lock-text="$locktext" \
-    --lockfailed-text="$lockfailedtext" \
-    --radius="$radius" \
-    --ring-width="$ring_width" \
-    --ignore-empty-password \
-    --show-failed-attempts
+  if [ -f "$image_path/$1" ]; then
+    i3lock \
+      --clock \
+      --image="$image_path/$1" \
+      --screen="$screen" \
+      --time-str="$time_str" \
+      --date-str="$date_str" \
+      --keylayout="$keylayout" \
+      --time-color=$color_time \
+      --date-color=$color_date \
+      --layout-color=$color_key_layout \
+      --line-color=$color_line \
+      --inside-color=$color_inside \
+      --insidever-color=$color_inside_ver \
+      --insidewrong-color=$color_inside_wrong \
+      --ring-color=$color_ring \
+      --ringver-color=$color_ring_ver \
+      --ringwrong-color=$color_ring_wrong \
+      --separator-color=$color_separator \
+      --keyhl-color=$color_keyhl \
+      --bshl-color=$color_bshl \
+      --verif-color=$color_verif \
+      --wrong-color=$color_wrong \
+      --verif-text="$veriftext" \
+      --wrong-text="$wrongtext" \
+      --noinput-text="$noinputtext" \
+      --lock-text="$locktext" \
+      --lockfailed-text="$lockfailedtext" \
+      --radius="$radius" \
+      --ring-width="$ring_width" \
+      --ignore-empty-password \
+      --show-failed-attempts
+  else
+    notify-send --urgency=normal --icon=system-lock-screen --app-name='Lock Screen' "屏幕锁定" "指定锁屏壁纸不存在"
+  fi
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-TEMP=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
-eval set -- "$TEMP"
-
-if [[ ${#@} -lt 2 ]]; then
-  i3Lock
-else
-  while true; do
-    case $1 in
-      -h | --help)
-        helpInfo
-        exit $normal
-        ;;
-      -v | --version)
-        versionInfo
-        exit $normal
-        ;;
-      *)
-        helpInfo
-        exit $err_param
-        ;;
-    esac
-  done
-fi
+case $1 in
+  -h | --help)
+    helpInfo
+    exit $normal
+    ;;
+  -v | --version)
+    versionInfo
+    exit $normal
+    ;;
+  *)
+    i3Lock "$1"
+    exit $normal
+    ;;
+esac
