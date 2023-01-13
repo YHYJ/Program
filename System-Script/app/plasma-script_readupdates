@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+: << !
+Name: plasma-script_readupdates
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-01-13 13:56:43
+
+Description: 从polybar-checkupdates.service读取系统更新信息
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+if [ -f /tmp/polybar-script_checkupdates.log ]; then
+  cat /tmp/polybar-script_checkupdates.log
+fi
