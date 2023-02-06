@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:45:57
 
-Description: 统计系统自安装以来更新的次数
+Description: 统计系统安装/更新信息
 
 Attentions:
 -
@@ -22,16 +22,18 @@ Depends:
 # statistics variable
 installation_time=$(head -n1 /var/log/pacman.log | cut -d " " -f 1,2)
 readonly installation_time # 系统安装时间
+now_time=$(date '+%Y-%m-%d %H:%M')
+readonly now_time # 当前时间
 installation_date=$(echo "$installation_time" | cut -d " " -f 1 | sed 's/[][]//g')
 readonly installation_date # 系统安装日期
 days=$((($(date +%s) - $(date +%s -d "$installation_date")) / 86400))
 readonly days # 系统安装天数
 
 ## System upgrade
-system_upgrade_count=$(grep -c "starting full system upgrade" /var/log/pacman.log)
-readonly system_upgrade_count # 系统更新计次数
-system_upgrade_mean=$(awk 'BEGIN{printf "%.2f",'"$system_upgrade_count"'/'"$days"'}')
-readonly system_upgrade_mean # 系统更新频率
+system_update_count=$(grep -c "starting full system upgrade" /var/log/pacman.log)
+readonly system_update_count # 系统更新计次数
+system_update_mean=$(awk 'BEGIN{printf "%.2f",'"$system_update_count"'/'"$days"'}')
+readonly system_update_mean # 系统更新频率
 
 ## Kernel update
 kernel_update_count=$(grep -c "upgraded linux " /var/log/pacman.log)
@@ -47,11 +49,11 @@ readonly latest_kernel_version # 最近安装的内核版本
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-echo -e "自\\e[35m$installation_time\\e[0m开始："
-echo -e "- 系统已安装\\e[37m$days\\e[0m天，在此期间："
-echo -e "  - 初始内核版本\\e[37m$oldest_kernel_version\\e[0m"
-echo -e "  - 最新内核版本\\e[37m$latest_kernel_version\\e[0m"
-echo -e "  - 系统更新\\e[37m$system_upgrade_count\\e[0m次，平均每天\\e[37m$system_upgrade_mean\\e[0m次"
-echo -e "  - 内核更新\\e[37m$kernel_update_count\\e[0m次，平均每\\e[37m$kernel_update_mean\\e[0m天一次"
-echo -e ""
+printf "\\e[36m%18s\\e[0m %-2s \\e[36m%-18s\\e[0m\n" "$installation_time" "--" "[$now_time]"
+printf "\\e[35m%18s\\e[0m %-2s \\e[35m%-18s\\e[0m\n" "$oldest_kernel_version" "--" "$latest_kernel_version"
+printf "%23s %-2s \\e[37m%-6s\\e[0m\n" "系统寿命(天)" "--" "$days"
+printf "%23s %-2s \\e[37m%-6s\\e[0m\n" "系统更新(次)" "--" "$system_update_count"
+printf "%22s %-2s \\e[37m%-6s\\e[0m\n" "频率(次/天)" "--" "$system_update_mean"
+printf "%23s %-2s \\e[37m%-6s\\e[0m\n" "内核更新(次)" "--" "$kernel_update_count"
+printf "%22s %-2s \\e[37m%-6s\\e[0m\n" "频率(天/次)" "--" "$kernel_update_mean"
 repo-elephant
