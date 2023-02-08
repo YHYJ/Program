@@ -51,9 +51,9 @@ readonly latest_kernel_version # 最近安装的内核版本
 ####################################################################
 printf "\\e[36m%18s\\e[0m %-2s \\e[36m%-18s\\e[0m\n" "$installation_time" "--" "[$now_time]"
 printf "\\e[35m%18s\\e[0m %-2s \\e[35m%-18s\\e[0m\n" "$oldest_kernel_version" "--" "$latest_kernel_version"
-printf "%23s %-2s \\e[37m%-6s\\e[0m\n" "系统寿命(天)" "--" "$days"
-printf "%23s %-2s \\e[37m%-6s\\e[0m\n" "系统更新(次)" "--" "$system_update_count"
-printf "%22s %-2s \\e[37m%-6s\\e[0m\n" "频率(次/天)" "--" "$system_update_mean"
-printf "%23s %-2s \\e[37m%-6s\\e[0m\n" "内核更新(次)" "--" "$kernel_update_count"
-printf "%22s %-2s \\e[37m%-6s\\e[0m\n" "频率(天/次)" "--" "$kernel_update_mean"
+printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统使用时长" "--" "$days 天"
+printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新次数" "--" "$system_update_count 次"
+printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新频率" "--" "$system_update_mean 次/天"
+printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新次数" "--" "$kernel_update_count 次"
+printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新频率" "--" "$kernel_update_mean 天/次"
 repo-elephant
