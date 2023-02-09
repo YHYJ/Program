@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+
+: << !
+Name: virtualenv-tool
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-02-09 11:00:29
+
+Description: Virtualenv工具
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.0.1
+readonly minor_version=20230209
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于同步Virtualenv"
+# environment variable
+readonly storage="$HOME/.cache/SpiderData/App/virtualenv"
+readonly virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
+readonly virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -d, --delete      保存虚拟环境"
+  echo -e "     -m, --make        创建虚拟环境"
+  echo -e "     -s, --save        保存虚拟环境"
+  echo -e ""
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+}
+#------------------------- Feature Function
+if [ -s "$virtualenvwrapper_lazy" ]; then
+  # shellcheck source=/dev/null
+  source "$virtualenvwrapper_lazy"
+else
+  # shellcheck source=/dev/null
+  source "$virtualenvwrapper"
+fi
+venvs=$(workon)
+
+function deleteVirtualenvFile() {
+  rm -rf "${storage:?}/"*
+}
+
+function saveVirtualenv() {
+  echo -e "虚拟环境文件存储路径：$storage"
+  for venv in ${venvs[*]}; do
+    workon "$venv"
+    pyversion=$(python -V | tr ' ' '-')
+    filepath="$storage"/requirements_"$pyversion"_"$venv".txt
+    pip freeze > "$filepath"
+    echo -e "已保存虚拟环境：\033[37m$venv\033[0m"
+  done
+}
+
+function makeVirtualenv() {
+  # 遍历存储的requirements*.txt，得到绝对路径表示的文件名
+  if [ "$(ls -A "$storage")" ]; then
+    for filepath in "$storage"/*.txt; do
+      # 获取文件名并切分得到虚拟环境名
+      filename=$(basename "$filepath")
+      envname=$(echo "$filename" | cut -d "_" -f 3 | cut -d "." -f 1)
+      # 将切分得到的虚拟环境名和现有虚拟环境名做对比
+      if [[ ! "${venvs[*]}" =~ $envname ]]; then
+        # 名字不同则创建并搭建环境
+        mkvirtualenv -p python3 "$envname"
+        workon "$envname"
+        pip install -r "$filepath"
+      fi
+    done
+  fi
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+mkdir -p "$storage"
+case $1 in
+  -d | --delete)
+    deleteVirtualenvFile
+    exit $normal
+    ;;
+  -s | --save)
+    saveVirtualenv
+    exit $normal
+    ;;
+  -m | --make)
+    makeVirtualenv
+    exit $normal
+    ;;
+  -h | --help)
+    helpInfo
+    exit $normal
+    ;;
+  -v | --version)
+    versionInfo
+    exit $normal
+    ;;
+  *)
+    helpInfo
+    exit $err_unknown
+    ;;
+esac
