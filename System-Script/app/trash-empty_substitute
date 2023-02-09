@@ -23,20 +23,13 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.2
-readonly minor_version=20220517
+readonly major_version=0.0.3
+readonly minor_version=20230209
 readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_param=2        # 参数错误
-readonly err_fetch=48       # checkupdate错误
-readonly err_permission=110 # 权限错误
-readonly err_range=122      # 取值范围错误
-readonly err_ctrl_c=130     # 接收到INT(Ctrl+C)指令
 readonly err_unknown=255    # 未知错误
-readonly err_no_program=127 # 未找到命令
 
 #------------------------- Parameter Variable
 # description variable

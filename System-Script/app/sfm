@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.1
-readonly minor_version=20221108
+readonly major_version=0.2.2
+readonly minor_version=20230209
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -80,6 +80,5 @@ case $1 in
     ;;
   *)
     getArgType "$1"
-    exit $normal
     ;;
 esac

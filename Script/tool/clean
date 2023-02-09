@@ -68,7 +68,7 @@ function makeClean() {
   # 垃圾文件清理
   case $1 in
     pyinstaller)   # 在此添加compiler名
-      rm -rf ${!1} # 不能加双引号；使用!引用间接变量
+      rm -rf $pyinstaller
       echo -e "\nFinished"
       ;;
     -h | --help)
