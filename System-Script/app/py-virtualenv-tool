@@ -78,13 +78,13 @@ function deleteVirtualenvFile() {
 }
 
 function saveVirtualenv() {
-  echo -e "虚拟环境文件存储路径：$storage"
+  echo -e "    虚拟环境文件存储路径：$storage"
   for venv in ${venvs[*]}; do
     workon "$venv"
     pyversion=$(python -V | tr ' ' '-')
     filepath="$storage"/requirements_"$pyversion"_"$venv".txt
     pip freeze > "$filepath"
-    echo -e "已保存虚拟环境：\033[37m$venv\033[0m"
+    echo -e "    已保存虚拟环境：\033[37m$venv\033[0m"
   done
 }
 
