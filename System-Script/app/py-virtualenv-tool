@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 : << !
-Name: virtualenv-tool
+Name: py-virtualenv-tool
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2023-02-09 11:00:29
 
-Description: Virtualenv工具
+Description: Python Virtualenv工具
 
 Attentions:
 -

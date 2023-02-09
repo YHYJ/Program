@@ -14,6 +14,7 @@ Attentions: 搜集如下信息
 - User
 - Vim
 - Guake
+- Virtualenv
 
 Depends:
 - coreutils
@@ -28,14 +29,14 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.1
-readonly minor_version=20221107
+readonly major_version=0.1.2
+readonly minor_version=20230209
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_param=2        # 参数错误
-readonly err_unknown=255    # 未知错误
+readonly normal=0        # 一切正常
+readonly err_param=2     # 参数错误
+readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -66,10 +67,11 @@ function helpInfo() {
   echo -e ""
   echo -e "Modules:"
   echo -e "     all                   搜集全部模块"
+  echo -e "     app                   搜集特定软件信息"
+  echo -e "     env                   搜集开发工具虚拟环境信息"
   echo -e "     package               搜集安装包信息"
   echo -e "     service               搜集服务信息"
   echo -e "     user                  搜集用户信息"
-  echo -e "     app                   搜集特定软件信息"
 }
 
 function versionInfo() {
@@ -86,6 +88,17 @@ function Check() {
   if [[ ! -d $datadir ]]; then
     mkdir "$datadir"
   fi
+}
+
+function getAppInfo() {
+  echo -e "正在搜集\e[1;34;47mApp\e[0m信息"
+  /usr/local/bin/get-vim-hotkey-doc                        # vim的快捷键文档
+  guake --save-preferences="$datadir/App/guake/guake.conf" # guake的配置文件
+}
+
+function getVirtualenvInfo() {
+  echo -e "正在搜集\e[1;34;47mVirtualenv\e[0m信息"
+  /usr/local/bin/py-virtualenv-tool -s # Python Virtualenv
 }
 
 function getPackageInfo() {
@@ -105,12 +118,6 @@ function getUserInfo() {
   id root yj > "$datadir/UserList/ID.list" # 当前$USER的id信息
 }
 
-function getAppInfo() {
-  echo -e "正在搜集\e[1;34;47mApp\e[0m信息"
-  /usr/local/bin/get-vim-hotkey-doc                        # vim的快捷键文档
-  guake --save-preferences="$datadir/App/guake/guake.conf" # guake的配置文件
-}
-
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
@@ -127,10 +134,21 @@ else
         case $2 in
           all)
             Check
+            getAppInfo
+            getVirtualenvInfo
             getPackageInfo
             getServiceInfo
             getUserInfo
+            finish
+            ;;
+          app)
+            Check
             getAppInfo
+            finish
+            ;;
+          env)
+            Check
+            getVirtualenvInfo
             finish
             ;;
           package)
@@ -146,11 +164,6 @@ else
           user)
             Check
             getUserInfo
-            finish
-            ;;
-          app)
-            Check
-            getAppInfo
             finish
             ;;
           *)
