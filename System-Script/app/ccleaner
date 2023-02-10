@@ -23,9 +23,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.1
-readonly minor_version=20220611
-readonly rel_version=1
+readonly major_version=0.0.2
+readonly minor_version=20230210
+readonly rel_version=4
 
 #------------------------- Exit Code Variable
 readonly normal=0        # 一切正常
@@ -58,11 +58,20 @@ function versionInfo() {
 #------------------------- Feature Function
 function cacheCleaner() {
   # 清除pip缓存
-  pip cache purge
-  # 清除yarn缓存
-  yarn cache clean
+  if command -v pip &> /dev/null; then
+    pip cache purge
+    echo -e "    --> Cleared pip cache\n"
+  fi
   # 清除npm缓存
-  npm cache clean --force
+  if command -v npm &> /dev/null; then
+    npm cache clean --force
+    echo -e "    --> Cleared npm cache\n"
+  fi
+  # 清除yarn缓存
+  if command -v yarn &> /dev/null; then
+    yarn cache clean
+    echo -e "    --> Cleared yarn cache"
+  fi
 }
 
 ####################################################################
