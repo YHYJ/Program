@@ -18,21 +18,81 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.2
+readonly minor_version=20230213
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
+
 #------------------------- Parameter Variable
+# description variable
+readonly desc="用于检测Pacman系统外文件"
+# path variable
 readonly tmp=${TMPDIR-/tmp}/pacman-disowned-$UID-$$
 readonly db=$tmp/db
 readonly fs=$tmp/fs
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  mkdir "$tmp"
+  trap 'rm -rf "$tmp"' EXIT
+
+  pacman -Qlq | sort -u > "$db"
+
+  find /bin /etc /lib /sbin /usr \
+    ! -name lost+found \
+    \( -type d -printf '%p/\n' -o -print \) | sort > "$fs"
+
+  comm -23 "$fs" "$db"
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-mkdir "$tmp"
-trap 'rm -rf "$tmp"' EXIT
-
-pacman -Qlq | sort -u > "$db"
-
-find /bin /etc /lib /sbin /usr \
-  ! -name lost+found \
-  \( -type d -printf '%p/\n' -o -print \) | sort > "$fs"
-
-comm -23 "$fs" "$db"
+if [[ ${#@} -lt 1 ]]; then
+  main
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
+fi

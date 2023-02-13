@@ -16,7 +16,71 @@ Depends:
 !
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.3
+readonly minor_version=20230213
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="是Polybar的脚本，用于获取天气信息"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  notify-send --urgency=low --icon=weather --app-name="Weather info" '天气预报' '正在查询...'
+  notify-send --urgency=normal --icon=weather --app-name="Weather info" '今日天气' "$(curl 'wttr.in/?format=%l:+|++气温+%t++|++降水量+%p++|++湿度+%h')"
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-notify-send --urgency=low --icon=weather --app-name="Weather info" '天气预报' '正在查询...'
-notify-send --urgency=normal --icon=weather --app-name="Weather info" '今日天气' "$(curl 'wttr.in/?format=%l:+|++气温+%t++|++降水量+%p++|++湿度+%h')"
+if [[ ${#@} -lt 1 ]]; then
+  main
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
+fi

@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=1.1.0
-readonly minor_version=20211109
+readonly major_version=1.1.1
+readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -64,6 +64,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
 }
 #------------------------- Feature Function

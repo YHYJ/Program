@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.0
-readonly minor_version=20211109
+readonly major_version=0.1.1
+readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -33,7 +33,7 @@ readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于检查pacman所安装软件包的配置文件"
+readonly desc="用于检查Pacman所安装软件包的新旧配置文件"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -54,6 +54,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
 }
 #------------------------- Feature Function

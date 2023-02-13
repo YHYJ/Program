@@ -29,8 +29,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.3.2
-readonly minor_version=20221111
+readonly major_version=3.3.3
+readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -88,6 +88,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
 }
 
@@ -193,8 +194,8 @@ function startServer() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-TEMP=$(getopt --options "d:p:chv" --longoptions "dir:,port:,card,help,version" -n "$name" -- "$@")
-eval set -- "$TEMP"
+ARGS=$(getopt --options "d:p:chv" --longoptions "dir:,port:,card,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
 
 fileDetection
 

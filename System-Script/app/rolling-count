@@ -18,7 +18,22 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.3
+readonly minor_version=20230213
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
+
 #------------------------- Parameter Variable
+# description variable
+readonly desc="用于统计系统安装和更新信息"
 # statistics variable
 installation_time=$(head -n1 /var/log/pacman.log | cut -d " " -f 1,2)
 readonly installation_time # 系统安装时间
@@ -28,13 +43,11 @@ installation_date=$(echo "$installation_time" | cut -d " " -f 1 | sed 's/[][]//g
 readonly installation_date # 系统安装日期
 days=$((($(date +%s) - $(date +%s -d "$installation_date")) / 86400))
 readonly days # 系统安装天数
-
 ## System upgrade
 system_update_count=$(grep -c "starting full system upgrade" /var/log/pacman.log)
 readonly system_update_count # 系统更新计次数
 system_update_mean=$(awk 'BEGIN{printf "%.2f",'"$system_update_count"'/'"$days"'}')
 readonly system_update_mean # 系统更新频率
-
 ## Kernel update
 kernel_update_count=$(grep -c "upgraded linux " /var/log/pacman.log)
 readonly kernel_update_count # 内核更新次数
@@ -47,13 +60,57 @@ latest_kernel_version=$(uname -r)
 readonly latest_kernel_version # 最近安装的内核版本
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  printf "\\e[36m%18s\\e[0m %-2s \\e[36m%-18s\\e[0m\n" "$installation_time" "--" "[$now_time]"
+  printf "\\e[35m%18s\\e[0m %-2s \\e[35m%-18s\\e[0m\n" "$oldest_kernel_version" "--" "$latest_kernel_version"
+  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统使用时长" "--" "$days 天"
+  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新次数" "--" "$system_update_count 次"
+  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新频率" "--" "$system_update_mean 次/天"
+  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新次数" "--" "$kernel_update_count 次"
+  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新频率" "--" "$kernel_update_mean 天/次"
+  repo-elephant
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-printf "\\e[36m%18s\\e[0m %-2s \\e[36m%-18s\\e[0m\n" "$installation_time" "--" "[$now_time]"
-printf "\\e[35m%18s\\e[0m %-2s \\e[35m%-18s\\e[0m\n" "$oldest_kernel_version" "--" "$latest_kernel_version"
-printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统使用时长" "--" "$days 天"
-printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新次数" "--" "$system_update_count 次"
-printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新频率" "--" "$system_update_mean 次/天"
-printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新次数" "--" "$kernel_update_count 次"
-printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新频率" "--" "$kernel_update_mean 天/次"
-repo-elephant
+if [[ ${#@} -lt 1 ]]; then
+  main
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
+fi

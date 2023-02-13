@@ -23,12 +23,14 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.2
-readonly minor_version=20200730
-readonly rel_version=2
+readonly major_version=0.2.1
+readonly minor_version=20230213
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_param=2 # 参数错误
+readonly normal=0        # 一切正常
+readonly err_param=2     # 参数错误
+readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # filename variable
@@ -54,20 +56,21 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
 }
 
+#------------------------- Feature Function
 function whichCompiler() {
   # 编译类型：当参数不对的时候询问用户要清理的垃圾文件的正确
   echo -e "\n你想清理哪个编译器留下的垃圾？"
   echo -e "   - pyinstaller"
 }
 
-#------------------------- Feature Function
 function makeClean() {
   # 垃圾文件清理
   case $1 in
-    pyinstaller)   # 在此添加compiler名
+    pyinstaller) # 在此添加compiler名
       rm -rf $pyinstaller
       echo -e "\nFinished"
       ;;
@@ -87,4 +90,21 @@ function makeClean() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-makeClean "$1"
+if [[ ${#@} -lt 1 ]]; then
+  makeClean "$1"
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
+fi

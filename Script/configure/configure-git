@@ -21,13 +21,47 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.3
+readonly minor_version=20230213
+readonly rel_version=1
+
 #------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
 readonly err_permission=110 # 权限错误
+readonly err_unknown=255    # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="用于配置Git"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
 function getEditor() {
   if [[ -z $EDITOR ]]; then
     # $EDITOR变量为空
@@ -50,7 +84,6 @@ function getEditor() {
   fi
 }
 
-#------------------------- Feature Function
 function checkUser() {
   if [[ $USER == "$1" ]]; then
     echo -e "\n\\e[31m[✘]\\e[0m 当前用户是$1，拒绝执行！！！"
@@ -58,21 +91,42 @@ function checkUser() {
   fi
 }
 
+function main() {
+  checkUser "root"
+  getEditor
+
+  git config --global user.name "$(hostname)"
+  git config --global user.email "yj1516268@outlook.com"
+  git config --global core.editor "$editor"
+  git config --global core.autocrlf input
+  git config --global merge.tool "$merge_tool"
+  git config --global color.ui true
+  git config --global pull.rebase false
+  echo -e "git配置完成\n\n"
+
+  ssh-keygen -t rsa -C "yj1516268@outlook.com"
+  xsel < "$HOME/.ssh/id_rsa.pub" --clipboard --input
+  echo -e "公钥已复制到粘贴板，请到https://github.com/settings/keys进行设置\n\n"
+}
+
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-checkUser "root"
-getEditor
-
-git config --global user.name "$(hostname)"
-git config --global user.email "yj1516268@outlook.com"
-git config --global core.editor "$editor"
-git config --global core.autocrlf input
-git config --global merge.tool "$merge_tool"
-git config --global color.ui true
-git config --global pull.rebase false
-echo -e "git配置完成\n\n"
-
-ssh-keygen -t rsa -C "yj1516268@outlook.com"
-xsel < "$HOME/.ssh/id_rsa.pub" --clipboard --input
-echo -e "公钥已复制到粘贴板，请到https://github.com/settings/keys进行设置\n\n"
+if [[ ${#@} -lt 1 ]]; then
+  main
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
+fi

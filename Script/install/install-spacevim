@@ -19,41 +19,97 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.3
+readonly minor_version=20230213
+readonly rel_version=1
+
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
 readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
+# description variable
+readonly desc="用于安装Space-Vim"
 # path variable
 readonly spacevim_path="$HOME/.space-vim"
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  if [[ -d $spacevim_path ]]; then
+    echo -e "\nSpace-vim已存在，不执行任何操作\n\n"
+    exit $normal
+  else
+    git clone https://github.com/liuchengxu/space-vim.git "$spacevim_path"
+    if [[ -x /usr/bin/nvim ]]; then
+      cd "$spacevim_path" || exit $err_file
+      if make neovim; then
+        echo -e "\nSpace-vim for neovim安装完成\n\n"
+      else
+        echo -e "\nSpace-vim for neovim安装失败\n\n"
+      fi
+    elif [[ -x /usr/bin/vim ]]; then
+      cd "$spacevim_path" || exit $err_file
+      if make vim; then
+        echo -e "\nSpace-vim for vim安装完成\n\n"
+      else
+        echo -e "\nSpace-vim for vim安装失败\n\n"
+      fi
+    else
+      echo -e "\n可能未安装neovim/gvim/vim，退出\n\n"
+      exit $err_no_program
+    fi
+  fi
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-if [[ -d $spacevim_path ]]; then
-  echo -e "\nSpace-vim已存在，不执行任何操作\n\n"
-  exit $normal
+if [[ ${#@} -lt 1 ]]; then
+  main
 else
-  git clone https://github.com/liuchengxu/space-vim.git "$spacevim_path"
-  if [[ -x /usr/bin/nvim ]]; then
-    cd "$spacevim_path" || exit $err_file
-    if make neovim; then
-      echo -e "\nSpace-vim for neovim安装完成\n\n"
-    else
-      echo -e "\nSpace-vim for neovim安装失败\n\n"
-    fi
-  elif [[ -x /usr/bin/vim ]]; then
-    cd "$spacevim_path" || exit $err_file
-    if make vim; then
-      echo -e "\nSpace-vim for vim安装完成\n\n"
-    else
-      echo -e "\nSpace-vim for vim安装失败\n\n"
-    fi
-  else
-    echo -e "\n可能未安装neovim/gvim/vim，退出\n\n"
-    exit $err_no_program
-  fi
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
 fi
 
 # vim:ft=sh

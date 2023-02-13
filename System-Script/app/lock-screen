@@ -24,9 +24,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.1
-readonly minor_version=20221108
-readonly rel_version=2
+readonly major_version=0.1.2
+readonly minor_version=20230213
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -86,6 +86,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
 }
 

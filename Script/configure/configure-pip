@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 10:55:34
 
-Description: 将pip源配置成豆瓣源
+Description: 配置pip源
 
 Attentions:
 - 提高pip下载速度
@@ -19,12 +19,24 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.3
+readonly minor_version=20230213
+readonly rel_version=1
+
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
 readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
+# description variable
+readonly desc="用于配置pip源"
 # path variable
 readonly pip_confile="/etc/pip.conf"
 # content variable
@@ -34,18 +46,63 @@ readonly trusted_host='mirrors.aliyun.com'
 readonly conf_content="[global]\nindex-url = $index_url\ntrusted-host = $trusted_host"
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  if [[ ! -e "$pip_confile" ]]; then
+    if command -v pip &> /dev/null; then
+      echo -e "$conf_content" > $pip_confile
+      echo -e "现在pip使用$source_name镜像源"
+      exit $normal
+    else
+      echo -e "\n未找到pip命令，请先安装pip"
+      exit $err_no_program
+    fi
+  else
+    echo -e "pip源配置文件$pip_confile已存在"
+    exit $err_file
+  fi
+
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-if [[ ! -e "$pip_confile" ]]; then
-  if command -v pip &> /dev/null; then
-    echo -e "$conf_content" > $pip_confile
-    echo -e "现在pip使用$source_name镜像源"
-    exit $normal
-  else
-    echo -e "\n未找到pip命令，请先安装pip"
-    exit $err_no_program
-  fi
+if [[ ${#@} -lt 1 ]]; then
+  main
 else
-  echo -e "pip源配置文件$pip_confile已存在"
-  exit $err_file
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
 fi

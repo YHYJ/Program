@@ -18,26 +18,82 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.3
+readonly minor_version=20230213
+readonly rel_version=1
+
 #------------------------- Exit Code Variable
-readonly normal=0 # 一切正常
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
+readonly desc="用于安装配置zsh"
+# path variable
 readonly zsh_path="/usr/bin/zsh"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  if [[ -x $zsh_path ]]; then
+    echo -e "\nZSH已安装，直接进行配置\n\n"
+  else
+    echo -e "\n正在安装ZSH\n\n"
+    # 官方源
+    yay -S zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
+    # AUR
+    yay -S oh-my-zsh-git zsh-theme-powerlevel10k-git
+  fi
+
+  echo -e "\n正在配置ZSH\n\n"
+  cp /usr/share/oh-my-zsh/zshrc ~/.zshrc
+  exit $normal
+}
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-if [[ -x $zsh_path ]]; then
-  echo -e "\nZSH已安装，直接进行配置\n\n"
+if [[ ${#@} -lt 1 ]]; then
+  main
 else
-  echo -e "\n正在安装ZSH\n\n"
-  # 官方源
-  yay -S zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
-  # AUR
-  yay -S oh-my-zsh-git zsh-theme-powerlevel10k-git
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
 fi
-
-echo -e "\n正在配置ZSH\n\n"
-cp /usr/share/oh-my-zsh/zshrc ~/.zshrc
-exit $normal

@@ -18,7 +18,22 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=2.1.2
+readonly minor_version=20230213
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
+
 #------------------------- Parameter Variable
+# description variable
+readonly desc="是Polybar的脚本，用于获取色温信息"
 # language variable
 if [[ $LANG == 'zh_CN.UTF-8' ]]; then
   color_temp='色温'
@@ -27,18 +42,65 @@ else
 fi
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -c, --check       检测软件包更新"
+  echo -e "     -e, --empty       清空tmp文件内容"
+  echo -e ""
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  if [ "$(pgrep -x redshift)" ]; then
+    temp=$(redshift -p 2> /dev/null | grep "$color_temp" | cut -d ":" -f 2 | tr -dc "[:digit:]")
+
+    if [ -z "$temp" ]; then
+      echo "%{F#65737E}"
+    elif [ "$temp" -ge 5000 ]; then
+      echo "%{F#8FA1B3}"
+    elif [ "$temp" -ge 4000 ]; then
+      echo "%{F#EBCB8B}"
+    else
+      echo "%{F#D08770}"
+    fi
+  fi
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-if [ "$(pgrep -x redshift)" ]; then
-  temp=$(redshift -p 2> /dev/null | grep "$color_temp" | cut -d ":" -f 2 | tr -dc "[:digit:]")
-
-  if [ -z "$temp" ]; then
-    echo "%{F#65737E}"
-  elif [ "$temp" -ge 5000 ]; then
-    echo "%{F#8FA1B3}"
-  elif [ "$temp" -ge 4000 ]; then
-    echo "%{F#EBCB8B}"
-  else
-    echo "%{F#D08770}"
-  fi
+if [[ ${#@} -lt 1 ]]; then
+  main
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
 fi

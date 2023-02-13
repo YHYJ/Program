@@ -23,32 +23,64 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.1
-readonly minor_version=20211109
+readonly major_version=0.1.2
+readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
+readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于检查本地安装的AUR包是否和源保持同步，适用于Arch Linux发行版"
+readonly desc="用于检查本地安装的AUR包是否和源保持同步"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Info Function
-function helpInfo() { # 打印帮助信息
+function helpInfo() {
   echo -e ""
   echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name"
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
 }
 
-function versionInfo() { # 打印版本信息
+function versionInfo() {
+  echo -e ""
   echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
 }
 
-echo -e 'Waiting...'
-pacman -Qmq | parallel 'result=$(package-query -AQ -f "%v" "{}" | uniq -d | wc -l); [ $result -eq 0  ] && echo "{}"'
+#------------------------- Feature Function
+function main() {
+  echo -e 'Waiting...'
+  pacman -Qmq | parallel 'result=$(package-query -AQ -f "%v" "{}" | uniq -d | wc -l); [ $result -eq 0  ] && echo "{}"'
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+if [[ ${#@} -lt 1 ]]; then
+  main
+else
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
+fi

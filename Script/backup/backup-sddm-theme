@@ -18,11 +18,24 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.3
+readonly minor_version=20230213
+readonly rel_version=1
+
 #------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
 readonly err_file=1         # 文件/路径类错误
 readonly err_permission=110 # 权限错误
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
+# description variable
+readonly desc="用于备份SDDM的主题文件"
 # path variable
 readonly themepath="/usr/share/sddm/themes"
 readonly backupdir="$HOME/Documents/MyRepos/System-Conf/confile/usr/share/sddm"
@@ -30,6 +43,25 @@ readonly backupdir="$HOME/Documents/MyRepos/System-Conf/confile/usr/share/sddm"
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
 #------------------------- Feature Function
 function checkUser() {
   if [[ $USER == "$1" ]]; then
@@ -38,21 +70,41 @@ function checkUser() {
   fi
 }
 
+function main() {
+  if [[ -d $backupdir ]]; then
+    # sddm-themes
+    cd "$backupdir" || exit $err_file
+    cp -r "$themepath" "$backupdir" && tar -czv --file="$PWD/themes.tgz" ./themes && rm -r "$PWD/themes"
+    echo -e "\nsddm Theme备份完成\n"
+  else
+    mkdir -p "$backupdir"
+    # sddm-themes
+    cp -r "$themepath" "$backupdir" && tar -czv --file="$PWD/themes.tgz" ./themes && rm -r "$PWD/themes"
+    echo -e "\nsddm Theme备份完成\n"
+  fi
+
+  echo -e "备份文件夹: $backupdir\n"
+}
+
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-checkUser "root"
-
-if [[ -d $backupdir ]]; then
-  # sddm-themes
-  cd "$backupdir" || exit $err_file
-  cp -r "$themepath" "$backupdir" && tar -czv --file="$PWD/themes.tgz" ./themes && rm -r "$PWD/themes"
-  echo -e "\nsddm Theme备份完成\n"
+if [[ ${#@} -lt 1 ]]; then
+  checkUser "root"
+  main
 else
-  mkdir -p "$backupdir"
-  # sddm-themes
-  cp -r "$themepath" "$backupdir" && tar -czv --file="$PWD/themes.tgz" ./themes && rm -r "$PWD/themes"
-  echo -e "\nsddm Theme备份完成\n"
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
 fi
-
-echo -e "备份文件夹: $backupdir\n"

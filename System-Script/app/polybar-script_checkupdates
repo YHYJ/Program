@@ -27,8 +27,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=2.1.1
-readonly minor_version=20211109
+readonly major_version=2.1.2
+readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -39,7 +39,6 @@ readonly err_unknown=255 # 未知错误
 #------------------------- Parameter Variable
 # description variable
 readonly desc="是Polybar的脚本，用于自动检测系统软件包更新"
-
 # path variable
 readonly tmp_file="/tmp/$name.log"
 readonly check_tool="/usr/bin/checkupdates"
@@ -65,6 +64,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
 }
 

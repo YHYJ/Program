@@ -18,12 +18,24 @@ Depends:
 ####################################################################
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program nversion
+readonly major_version=0.0.5
+readonly minor_version=20230213
+readonly rel_version=1
+
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
 readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
+# description variable
+readonly desc="用于配置Docker"
 # path variable
 readonly dockerd_exec_file="/usr/bin/dockerd"
 readonly dockerd_confile="/etc/systemd/system/docker.service.d/override.conf"
@@ -32,19 +44,63 @@ readonly docker_root="$HOME/Documents/MyDockeroot"
 readonly override_content="[Service]\nExecStart= \nExecStart=$dockerd_exec_file --data-root=$docker_root -H fd://"
 
 ####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name OPTIONS"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+}
+
+#------------------------- Feature Function
+function main() {
+  if [[ ! -e $dockerd_confile ]]; then
+    if command -v $dockerd_exec_file &> /dev/null; then
+      echo -e "$override_content" > $dockerd_confile
+      echo -e "Docker Root Dir已配置为$docker_root"
+      echo -e "请重启docker服务"
+      exit $normal
+    else
+      echo -e "\n未安装docker"
+      exit $err_no_program
+    fi
+  else
+    echo -e "dockerd配置文件$dockerd_confile已存在"
+    exit $err_file
+  fi
+}
+
+####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-if [[ ! -e $dockerd_confile ]]; then
-  if command -v $dockerd_exec_file &> /dev/null; then
-    echo -e "$override_content" > $dockerd_confile
-    echo -e "Docker Root Dir已配置为$docker_root"
-    echo -e "请重启docker服务"
-    exit $normal
-  else
-    echo -e "\n未安装docker"
-    exit $err_no_program
-  fi
+if [[ ${#@} -lt 1 ]]; then
+  main
 else
-  echo -e "dockerd配置文件$dockerd_confile已存在"
-  exit $err_file
+  case $1 in
+    -h | --help)
+      helpInfo
+      exit $normal
+      ;;
+    -v | --version)
+      versionInfo
+      exit $normal
+      ;;
+    *)
+      helpInfo
+      exit $err_unknown
+      ;;
+  esac
 fi
