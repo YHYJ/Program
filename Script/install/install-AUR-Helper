@@ -49,7 +49,7 @@ readonly helper_path="/usr/bin/$helper_name"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -62,7 +62,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
 #------------------------- Feature Function
@@ -83,7 +83,7 @@ function askQuestion() {
 
 function checkUser() {
   if [[ $USER == "$1" ]]; then
-    echo -e "\n\\e[31m[✘]\\e[0m 当前用户是$1，拒绝执行！！！"
+    echo -e "\n\033[31m[✘]\033[0m 当前用户是$1，拒绝执行！！！"
     exit $err_permission
   fi
 }
@@ -96,18 +96,18 @@ function installPkg() {
 
   if wget "$url" -O "$down_dir$cfile" &> /dev/null; then
     echo
-    echo -e "\\e[32m安装包下载成功\\[0m"
+    echo -e "\033[32m安装包下载成功\\[0m"
     cd "$down_dir" || exit $err_file
     if tar -xzvf "$cfile" &> /dev/null; then
       cd "$file" || exit $err_file
       if makepkg -rsi; then
-        echo -e "\\e[32m$helper_name安装成功\\[0m"
+        echo -e "\033[32m$helper_name安装成功\\[0m"
       fi
     else
-      echo -e "\\e[31m解压失败\\[0m"
+      echo -e "\033[31m解压失败\\[0m"
     fi
   else
-    echo -e "\\e[31m网络故障，下载失败\\[0m"
+    echo -e "\033[31m网络故障，下载失败\\[0m"
   fi
 }
 

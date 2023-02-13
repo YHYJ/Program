@@ -72,7 +72,7 @@ service_dir=$default_dir
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -89,7 +89,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
 function askQuestion() {
@@ -101,7 +101,7 @@ function askQuestion() {
     your_choice=$REPLY
   else
     # 未给定参数，使用默认值
-    echo -e "\n\e[36m<info>\e[0m 网卡/IP设置错误，使用默认值 $default_ip\n"
+    echo -e "\n\033[36m<info>\033[0m 网卡/IP设置错误，使用默认值 $default_ip\n"
   fi
 }
 
@@ -131,7 +131,7 @@ function getIP() {
       service_ip=$(ifconfig "$1" | grep "inet " | awk '{print $2}')
       if [[ -z $service_ip ]]; then
         # 如果根据网卡名得到的IP为空
-        echo -e "\n\e[36m<info>\e[0m 指定网卡未启用，使用默认值 $default_ip\n"
+        echo -e "\n\033[36m<info>\033[0m 指定网卡未启用，使用默认值 $default_ip\n"
         service_ip=$default_ip
       fi
       ;;
@@ -152,10 +152,10 @@ function getDir() {
     esac
   elif [[ ! -d $1 ]]; then
     # 路径参数错误
-    echo -e "\n\e[31m[✘]\e[0m 指定的路径不存在"
+    echo -e "\n\033[31m[✘]\033[0m 指定的路径不存在"
     exit $err_file
   else
-    echo -e "\n\e[31m[✘]\e[0m 未知的路径参数：$1"
+    echo -e "\n\033[31m[✘]\033[0m 未知的路径参数：$1"
     exit $err_param
   fi
 }
@@ -167,7 +167,7 @@ function getPort() {
       if [[ $port_min -le $1 ]] && [[ $1 -le $port_max ]]; then
         service_port=$1
       else
-        echo -e "\n\e[31m[✘]\e[0m 端口取值范围为[$port_min, $port_max]"
+        echo -e "\n\033[31m[✘]\033[0m 端口取值范围为[$port_min, $port_max]"
         exit $err_range
       fi
       ;;
@@ -176,7 +176,7 @@ function getPort() {
       service_port=$default_port
       ;;
     *)
-      echo -e "\n\e[31m[✘]\e[0m 非法的端口参数 $1"
+      echo -e "\n\033[31m[✘]\033[0m 非法的端口参数 $1"
       exit $err_param
       ;;
   esac
@@ -187,7 +187,7 @@ function startServer() {
   echo -e "-------------------------\n"
   echo -e " -> 服务位置: $service_dir"
   echo -e " -> 服务地址: $service_ip:$service_port"
-  echo -e "\n\e[35m[✔]\e[0m HTTP服务已开启"
+  echo -e "\n\033[35m[✔]\033[0m HTTP服务已开启"
   python -m http.server --bind "$service_ip" --directory "$service_dir" "$service_port"
 }
 
@@ -215,7 +215,7 @@ else
         ;;
       -c | --card)
         echo -e "本机可用网卡/IP有："
-        echo -e "\e[1;37m$all_nic\e[0m"
+        echo -e "\033[1;37m$all_nic\033[0m"
         askQuestion "请指定网卡/IP，默认为$default_ip(等待$time_out秒): "
         getIP "$your_choice"
         shift 1

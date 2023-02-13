@@ -51,9 +51,9 @@ readonly datadir="$HOME/.cache/SpiderData"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
-  echo -e "\e[1;33m搜集结果存储于\e[0m: \e[34m$datadir\e[0m"
+  echo -e "\033[1;33m搜集结果存储于\033[0m: \033[34m$datadir\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -76,11 +76,11 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
 function finish() {
-  echo -e "\n\e[35m[✔]\e[0m 信息搜集完成"
+  echo -e "\n\033[35m[✔]\033[0m 信息搜集完成"
   exit $normal
 }
 
@@ -92,30 +92,30 @@ function Check() {
 }
 
 function getAppInfo() {
-  echo -e "正在搜集\e[1;34;47mApp\e[0m信息"
+  echo -e "正在搜集\033[1;34;47mApp\033[0m信息"
   /usr/local/bin/get-vim-hotkey-doc                        # vim的快捷键文档
   guake --save-preferences="$datadir/App/guake/guake.conf" # guake的配置文件
 }
 
 function getVirtualenvInfo() {
-  echo -e "正在搜集\e[1;34;47mVirtualenv\e[0m信息"
+  echo -e "正在搜集\033[1;34;47mVirtualenv\033[0m信息"
   /usr/local/bin/py-virtualenv-tool -s # Python Virtualenv
 }
 
 function getPackageInfo() {
-  echo -e "正在搜集\e[1;34;47mPackage\e[0m信息"
+  echo -e "正在搜集\033[1;34;47mPackage\033[0m信息"
   pacman -Qenq > "$datadir/PackageList/Pacman.list" # 官方源中单独指定安装的软件包
   pacman -Qemq > "$datadir/PackageList/AUR.list"    # AUR中单独指定安装的软件包
 }
 
 function getServiceInfo() {
-  echo -e "正在搜集\e[1;34;47mService\e[0m信息"
+  echo -e "正在搜集\033[1;34;47mService\033[0m信息"
   systemctl list-unit-files > "$datadir/ServiceList/System.list"      # System service
   systemctl --user list-unit-files > "$datadir/ServiceList/User.list" # User service
 }
 
 function getUserInfo() {
-  echo -e "正在搜集\e[1;34;47mUser\e[0m信息"
+  echo -e "正在搜集\033[1;34;47mUser\033[0m信息"
   id root yj > "$datadir/UserList/ID.list" # 当前$USER的id信息
 }
 
@@ -168,7 +168,7 @@ else
             finish
             ;;
           *)
-            echo -e "\n\e[31m[✘]\e[0m 无法搜集该内容"
+            echo -e "\n\033[31m[✘]\033[0m 无法搜集该内容"
             exit $err_unknown
             ;;
         esac

@@ -46,7 +46,7 @@ readonly myrepos="$HOME/Documents/MyRepos"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -59,7 +59,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
 #------------------------- Feature Function
@@ -80,7 +80,7 @@ function askQuestion() {
 
 function checkUser() {
   if [[ $USER == "$1" ]]; then
-    echo -e "\n\\e[31m[✘]\\e[0m 当前用户是$1，拒绝执行！！！"
+    echo -e "\n\033[31m[✘]\033[0m 当前用户是$1，拒绝执行！！！"
     exit $err_permission
   fi
 }
@@ -103,11 +103,11 @@ function addTags() {
       fi
     done
   else
-    echo -e "\\e[31m$myrepos目录不存在\\e[0m\n"
+    echo -e "\033[31m$myrepos目录不存在\033[0m\n"
     exit $err_file
   fi
 
-  echo -e "\\e[34m已创建/存在共\\e[0m\\e[32m$num\\e[0m\\e[34m个dtags.\\e[0m\n"
+  echo -e "\033[34m已创建/存在共\033[0m\033[32m$num\033[0m\033[34m个dtags.\033[0m\n"
   exit $normal
 }
 

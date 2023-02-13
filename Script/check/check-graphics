@@ -42,7 +42,7 @@ readonly desc="用于检测系统显卡信息"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -55,19 +55,19 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
 #------------------------- Feature Function
 function main() {
-  echo -e "\\e[35m显卡信息 ----\\e[0m\n"
+  echo -e "\033[35m显卡信息 ----\033[0m\n"
 
   lspci -k | grep --color=auto -A 2 -E "(VGA|3D)"
 
-  echo -e "\n\\e[33m已加载的显卡驱动:\\e[0m"
+  echo -e "\n\033[33m已加载的显卡驱动:\033[0m"
   xrandr --listproviders # 系统中已加载的显卡驱动程序
 
-  echo -e "\n\\e[33m默认显卡:\\e[0m"
+  echo -e "\n\033[33m默认显卡:\033[0m"
   glxinfo | grep "OpenGL renderer" # 查看默认显卡
 }
 

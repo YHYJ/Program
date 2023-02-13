@@ -65,7 +65,7 @@ readonly latest_kernel_version # 最近安装的内核版本
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -78,18 +78,18 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\e[1m$name\e[0m version (\e[1m$major_version-$minor_version.$rel_version\e[0m)"
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
 #------------------------- Feature Function
 function main() {
-  printf "\\e[36m%18s\\e[0m %-2s \\e[36m%-18s\\e[0m\n" "$installation_time" "--" "[$now_time]"
-  printf "\\e[35m%18s\\e[0m %-2s \\e[35m%-18s\\e[0m\n" "$oldest_kernel_version" "--" "$latest_kernel_version"
-  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统使用时长" "--" "$days 天"
-  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新次数" "--" "$system_update_count 次"
-  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "系统更新频率" "--" "$system_update_mean 次/天"
-  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新次数" "--" "$kernel_update_count 次"
-  printf "%24s %-2s \\e[37m%-10s\\e[0m\n" "内核更新频率" "--" "$kernel_update_mean 天/次"
+  printf "\033[36m%18s\033[0m %-2s \033[36m%-18s\033[0m\n" "$installation_time" "--" "[$now_time]"
+  printf "\033[35m%18s\033[0m %-2s \033[35m%-18s\033[0m\n" "$oldest_kernel_version" "--" "$latest_kernel_version"
+  printf "%24s %-2s \033[37m%-10s\033[0m\n" "系统使用时长" "--" "$days 天"
+  printf "%24s %-2s \033[37m%-10s\033[0m\n" "系统更新次数" "--" "$system_update_count 次"
+  printf "%24s %-2s \033[37m%-10s\033[0m\n" "系统更新频率" "--" "$system_update_mean 次/天"
+  printf "%24s %-2s \033[37m%-10s\033[0m\n" "内核更新次数" "--" "$kernel_update_count 次"
+  printf "%24s %-2s \033[37m%-10s\033[0m\n" "内核更新频率" "--" "$kernel_update_mean 天/次"
   repo-elephant
 }
 
