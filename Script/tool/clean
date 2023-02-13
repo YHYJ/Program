@@ -33,6 +33,8 @@ readonly err_param=2     # 参数错误
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
+# description variable
+readonly desc="用于清理编译器生成的垃圾文件"
 # filename variable
 pyinstaller='build dist *.spec __pycache__'
 
@@ -42,7 +44,7 @@ pyinstaller='build dist *.spec __pycache__'
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\e[32m$name\e[0m\e[1m用于清理编译器生成的垃圾文件\e[0m"
+  echo -e "\e[32m$name\e[0m\e[1m$desc\e[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
