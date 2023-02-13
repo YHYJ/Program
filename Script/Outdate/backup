@@ -863,8 +863,8 @@ function backupUserConfig() { # 备份`$HOME`文件
 ####################################################################
 checkPermission "root"
 
-TEMP=$(getopt --options "s:hv" --longoptions "sync:,help,version" -n "$name" -- "$@")
-eval set -- "$TEMP"
+ARGS=$(getopt --options "s:hv" --longoptions "sync:,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
