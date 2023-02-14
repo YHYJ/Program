@@ -23,12 +23,12 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.3
+readonly major_version=0.2.4
 readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0    # 一切正常
+readonly normal=0 # 一切正常
 
 #------------------------- Parameter Variable
 # description variable
@@ -70,16 +70,29 @@ function getArgType() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    getArgType "$1"
-    ;;
-esac
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        getArgType "$1"
+        ;;
+    esac
+  done
+fi

@@ -29,13 +29,12 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.3
+readonly major_version=0.1.4
 readonly minor_version=20230213
-readonly rel_version=2
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0        # 一切正常
-readonly err_param=2     # 参数错误
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
@@ -127,7 +126,6 @@ eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
-  exit $err_param
 else
   while true; do
     case $1 in
@@ -169,17 +167,17 @@ else
             ;;
           *)
             echo -e "\n\033[31m[✘]\033[0m 无法搜集该内容"
-            exit $err_unknown
             ;;
         esac
+        shift 1
         ;;
       -h | --help)
         helpInfo
-        exit $normal
+        shift 1
         ;;
       -v | --version)
         versionInfo
-        exit $normal
+        shift 1
         ;;
       --)
         shift 1

@@ -28,12 +28,11 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.1
+readonly major_version=0.1.2
 readonly minor_version=20230213
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
-readonly normal=0   # 一切正常
 readonly err_file=1 # 文件/路径类错误
 
 #------------------------- Parameter Variable
@@ -148,16 +147,29 @@ function main() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    main "$1"
-    ;;
-esac
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        main "$1"
+        ;;
+    esac
+  done
+fi

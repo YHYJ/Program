@@ -23,12 +23,11 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.1
+readonly major_version=0.2.2
 readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
 readonly err_param=2        # 参数错误
 readonly err_permission=110 # 权限错误
 
@@ -115,11 +114,15 @@ else
     case $1 in
       -h | --help)
         helpInfo
-        exit $normal
+        shift 1
         ;;
       -v | --version)
         versionInfo
-        exit $normal
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
         ;;
       *)
         helpInfo

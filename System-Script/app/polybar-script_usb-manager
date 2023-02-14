@@ -23,12 +23,12 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=1.1.1
+readonly major_version=1.1.2
 readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0 # 一切正常
+readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -139,49 +139,66 @@ function usb_print() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  --update)
-    usb_update
-    ;;
-  --mount)
-    usb_mount
-    usb_update
-    result=$?
-    if [ $result -eq 0 ]; then
-      notify-send --urgency=normal --icon=usbguard-icon --app-name='USB Storage info' '挂载' "完成"
-    else
-      notify-send --urgency=critical --icon=usbguard-icon --app-name='USB Storage info' '挂载' "失败"
-    fi
-    ;;
-  --unmount)
-    usb_unmount
-    usb_update
-    result=$?
-    if [ $result -eq 0 ]; then
-      notify-send --urgency=normal --icon=usbguard-icon --app-name='USB Storage info' '卸载' "完成"
-    else
-      notify-send --urgency=critical --icon=usbguard-icon --app-name='USB Storage info' '卸载' "失败"
-    fi
-    ;;
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    echo $$ > "$pid_file"
+ARGS=$(getopt --options "umdhv" --longoptions "update,mount,unmount,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
 
-    trap exit INT
-    trap "echo" USR1
+if [[ ${#@} -lt 2 ]]; then
+  echo $$ > "$pid_file"
 
-    while true; do
-      usb_print
+  trap exit INT
+  trap "echo" USR1
 
-      sleep $time_out &
-      wait
-    done
-    ;;
-esac
+  while true; do
+    usb_print
+
+    sleep $time_out &
+    wait
+  done
+else
+  while true; do
+    case $1 in
+      -u | --update)
+        usb_update
+        shift 1
+        ;;
+      -m | --mount)
+        usb_mount
+        usb_update
+        result=$?
+        if [ $result -eq 0 ]; then
+          notify-send --urgency=normal --icon=usbguard-icon --app-name='USB Storage info' '挂载' "完成"
+        else
+          notify-send --urgency=critical --icon=usbguard-icon --app-name='USB Storage info' '挂载' "失败"
+        fi
+        shift 1
+        ;;
+      -d | --unmount)
+        usb_unmount
+        usb_update
+        result=$?
+        if [ $result -eq 0 ]; then
+          notify-send --urgency=normal --icon=usbguard-icon --app-name='USB Storage info' '卸载' "完成"
+        else
+          notify-send --urgency=critical --icon=usbguard-icon --app-name='USB Storage info' '卸载' "失败"
+        fi
+        shift 1
+        ;;
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi

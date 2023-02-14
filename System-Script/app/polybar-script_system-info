@@ -23,13 +23,12 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.2
+readonly major_version=0.1.3
 readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_unknown=255    # 未知错误
+readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -49,10 +48,10 @@ function helpInfo() {
   echo -e ""
   echo -e "Options:"
   echo -e "     -k, --kernel      显示内核版本"
+  echo -e "     -l, --login       显示最近开机时间"
   echo -e "     -p, --package     显示可用更新"
-  echo -e "     --package-service 显示更新检测状态"
-  echo -e "     -s, --startup     显示系统启动用时"
-  echo -e "     -t, --time        显示最近开机时间"
+  echo -e "     -s, --service     显示更新检测状态"
+  echo -e "     -t, --time        显示系统启动用时"
   echo -e "     -u, --user        显示当前登录用户"
   echo -e ""
   echo -e "     -h, --help        显示帮助信息"
@@ -68,41 +67,54 @@ function versionInfo() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  -k | --kernel)
-    notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '内核版本' "$(uname -sr)"
-    exit $normal
-    ;;
-  -s | --startup)
-    notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '系统启动用时' "$(systemd-analyze | head -1 | awk '{print $NF}')"
-    exit $normal
-    ;;
-  -p | --package)
-    notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '可用更新' "$(cat /tmp/polybar-script_checkupdates.log)"
-    exit $normal
-    ;;
-  --package-service)
-    notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '更新检测状态' "$(systemctl is-active polybar-checkupdates)"
-    exit $normal
-    ;;
-  -t | --time)
-    notify-send --urgency=normal --icon=system-users --app-name='Login info' '最近开机时间' "$(uptime -s)"
-    exit $normal
-    ;;
-  -u | --user)
-    notify-send --urgency=normal --icon=system-users --app-name='Login info' '当前登录用户' "$(who -q | sed 's/# //')"
-    exit $normal
-    ;;
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    helpInfo
-    exit $err_unknown
-    ;;
-esac
+ARGS=$(getopt --options "klpstuhv" --longoptions "kernel,login,package,service,time,user,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -k | --kernel)
+        notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '内核版本' "$(uname -sr)"
+        shift 1
+        ;;
+      -l | --login)
+        notify-send --urgency=normal --icon=system-users --app-name='Login info' '最近开机时间' "$(uptime -s)"
+        shift 1
+        ;;
+      -p | --package)
+        notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '可用更新' "$(cat /tmp/polybar-script_checkupdates.log)"
+        shift 1
+        ;;
+      -s | --service)
+        notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '更新检测状态' "$(systemctl is-active polybar-checkupdates)"
+        shift 1
+        ;;
+      -t | --time)
+        notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '系统启动用时' "$(systemd-analyze | head -1 | awk '{print $NF}')"
+        shift 1
+        ;;
+      -u | --user)
+        notify-send --urgency=normal --icon=system-users --app-name='Login info' '当前登录用户' "$(who -q | sed 's/# //')"
+        shift 1
+        ;;
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi

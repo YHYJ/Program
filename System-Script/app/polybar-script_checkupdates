@@ -32,7 +32,6 @@ readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0        # 一切正常
 readonly err_fetch=48    # checkupdate错误
 readonly err_unknown=255 # 未知错误
 
@@ -80,22 +79,38 @@ function checkUpdate() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  -c | --check)
-    checkUpdate
-    ;;
-  -e | --empty) # 使用'--empty'参数将tmp文件内容清空
-    : > "$tmp_file"
-    ;;
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    exit $err_unknown
-    ;;
-esac
+ARGS=$(getopt --options "cehv" --longoptions "check,empty,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -c | --check)
+        checkUpdate
+        shift 1
+        ;;
+      -e | --empty) # 使用'--empty'参数将tmp文件内容清空
+        : > "$tmp_file"
+        shift 1
+        ;;
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi

@@ -28,7 +28,6 @@ readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0        # 一切正常
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
@@ -67,21 +66,30 @@ function main() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-if [[ ${#@} -lt 1 ]]; then
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
   main
 else
-  case $1 in
-    -h | --help)
-      helpInfo
-      exit $normal
-      ;;
-    -v | --version)
-      versionInfo
-      exit $normal
-      ;;
-    *)
-      helpInfo
-      exit $err_unknown
-      ;;
-  esac
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
 fi

@@ -23,12 +23,11 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.2
+readonly major_version=0.0.3
 readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0        # 一切正常
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
@@ -111,29 +110,43 @@ function makeVirtualenv() {
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
 mkdir -p "$storage"
-case $1 in
-  -d | --delete)
-    deleteVirtualenvFile
-    exit $normal
-    ;;
-  -s | --save)
-    saveVirtualenv
-    exit $normal
-    ;;
-  -m | --make)
-    makeVirtualenv
-    exit $normal
-    ;;
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    helpInfo
-    exit $err_unknown
-    ;;
-esac
+
+ARGS=$(getopt --options "dsmhv" --longoptions "delete,save,make,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -d | --delete)
+        deleteVirtualenvFile
+        shift 1
+        ;;
+      -s | --save)
+        saveVirtualenv
+        shift 1
+        ;;
+      -m | --make)
+        makeVirtualenv
+        shift 1
+        ;;
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi

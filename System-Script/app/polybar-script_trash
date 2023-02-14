@@ -29,7 +29,6 @@ readonly minor_version=20230213
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0    # 一切正常
 readonly err_param=2 # 参数错误
 
 #------------------------- Parameter Variable
@@ -56,9 +55,9 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -n, --number      回收站文件计数"
-  echo -e "     -l, --list        列出回收站文件"
   echo -e "     -e, --empty       清空回收站"
+  echo -e "     -l, --list        列出回收站文件"
+  echo -e "     -n, --number      回收站文件计数"
   echo -e ""
   echo -e "     -h, --help        显示帮助信息"
   echo -e "     -v, --version     显示版本信息"
@@ -77,7 +76,6 @@ function number() {
   else
     echo ""
   fi
-  exit $normal
 }
 
 function listFile() {
@@ -87,27 +85,41 @@ function listFile() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  -n | --number)
-    number
-    ;;
-  -l | --list)
-    listFile
-    exit $normal
-    ;;
-  -e | --empty)
-    /usr/local/bin/trash-empty_substitute --force
-    exit $normal
-    ;;
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    exit $err_param
-    ;;
-esac
+ARGS=$(getopt --options "elnhv" --longoptions "empty,list,number,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -e | --empty)
+        /usr/local/bin/trash-empty_substitute --force
+        shift 1
+        ;;
+      -l | --list)
+        listFile
+        shift 1
+        ;;
+      -n | --number)
+        number
+        shift 1
+        ;;
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        exit $err_param
+        ;;
+    esac
+  done
+fi

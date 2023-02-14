@@ -27,8 +27,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=3.3.4
-readonly minor_version=20230213
+readonly major_version=3.3.5
+readonly minor_version=20230214
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -952,17 +952,17 @@ else
             ;;
           *)
             echo -e "\n\033[31m[✘]\033[0m 未知的备份内容"
-            exit $err_unknown
             ;;
         esac
+        shift 1
         ;;
       -h | --help)
         helpInfo
-        exit $normal
+        shift 1
         ;;
       -v | --version)
         versionInfo
-        exit $normal
+        shift 1
         ;;
       --)
         shift 1
