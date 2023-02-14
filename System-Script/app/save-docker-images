@@ -27,8 +27,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=1.1.1
-readonly minor_version=20230213
+readonly major_version=1.1.2
+readonly minor_version=20230214
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -61,7 +61,7 @@ function helpInfo() {
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [options]"
+  echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "options:"
   echo -e "     /path/to/save.file     备份文件路径"

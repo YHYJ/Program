@@ -53,9 +53,6 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -c, --check       检测软件包更新"
-  echo -e "     -e, --empty       清空tmp文件内容"
-  echo -e ""
   echo -e "     -h, --help        显示帮助信息"
   echo -e "     -v, --version     显示版本信息"
 }

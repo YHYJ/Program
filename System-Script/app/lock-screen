@@ -24,8 +24,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.3
-readonly minor_version=20230213
+readonly major_version=0.1.4
+readonly minor_version=20230214
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -52,8 +52,6 @@ readonly color_keyhl='#696969FF'        # 暗灰色   100%不透明度
 readonly color_bshl='#87CEFAFF'         # 淡蓝色   100%不透明度
 readonly color_verif='#40E0D0FF'        # 黑色     100%不透明度
 readonly color_wrong='#FF0000FF'        # 纯红     100%不透明度
-# path variable
-readonly image_path="$HOME/Pictures/Wallpapers"
 # time variable
 readonly time_str='%H:%M:%S'
 readonly date_str='%Y.%m.%d %A'
@@ -78,7 +76,12 @@ function helpInfo() {
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTIONS]"
+  echo -e "     $name File [OPTION]"
+  echo -e ""
+  echo -e "Examples:"
+  echo -e ""
+  echo -e "    指定壁纸图片路径"
+  echo -e "    lock-screen /Path/to/Picture.jpg"
   echo -e ""
   echo -e "Options:"
   echo -e "     -h, --help            显示帮助信息"
@@ -92,10 +95,10 @@ function versionInfo() {
 
 #------------------------- Feature Function
 function i3Lock() {
-  if [ -f "$image_path/$1" ]; then
+  if [ -f "$1" ]; then
     i3lock \
       --clock \
-      --image="$image_path/$1" \
+      --image="$1" \
       --screen="$screen" \
       --time-str="$time_str" \
       --date-str="$date_str" \

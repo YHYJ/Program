@@ -47,7 +47,7 @@ function helpInfo() {
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTIONs]"
+  echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -a, --all         完整的构建-上传-清除流程"
