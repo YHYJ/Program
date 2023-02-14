@@ -250,7 +250,7 @@ function helpInfo() { # 打印帮助信息
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name OPTIONS"
+  echo -e "     $name [OPTIONS]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -s, --sync [MODULE]   指定备份的模块"

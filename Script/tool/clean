@@ -47,7 +47,7 @@ function helpInfo() {
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTION]"
+  echo -e "     $name [OPTIONS]"
   echo -e ""
   echo -e "Options:"
   echo -e "     pyinstaller       清理pyinstaller编译生成的垃圾文件"

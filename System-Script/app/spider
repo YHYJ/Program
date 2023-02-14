@@ -56,7 +56,7 @@ function helpInfo() {
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name OPTIONS"
+  echo -e "     $name [OPTIONS]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -g, --get [MODULE]    指定搜集的模块"
