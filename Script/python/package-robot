@@ -95,7 +95,7 @@ function uploader() {
   # 上传
   python3 -m twine upload --repository pypi dist/*
 
-  echo -e "\nUpload completed"
+  echo -e "\nUpload complete"
 }
 
 function cleaner() {
