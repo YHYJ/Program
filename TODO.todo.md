@@ -1,3 +1,6 @@
+- [ ] Software/rolling-count/go-version/rolling-count (2023-02-15 16:42)
+  - [ ] 需要添加help和version的输出内容 (2023-02-15 16:43)
+  - [ ] 需要添加参数解析系统 (2023-02-15 16:43)
 - [ ] script (2020-05-13 14:32)
   - [ ] 尝试使用go重建所有script (2020-07-31 14:15)
   - [ ] 把polybar-script_mail.py用golang重构 (2020-05-20 09:24)
