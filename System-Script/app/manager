@@ -26,12 +26,11 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.3.2
-readonly minor_version=20221113
-readonly rel_version=2
+readonly major_version=3.3.3
+readonly minor_version=20230215
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
 readonly err_permission=110 # 权限错误
 readonly err_unknown=255    # 未知错误
 
@@ -65,9 +64,8 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -d, --dir <string>     指定需要安装的程序文件的路径（暂不可用）"
-  echo -e ""
   echo -e "     -c, --check            检查是否有更新"
+  echo -e "     -d, --dir <string>     指定需要安装的程序文件的路径（暂不可用）"
   echo -e "     -i, --install          执行程序安装操作"
   echo -e "     -u, --uninstall        执行程序卸载操作（暂不可用）"
   echo -e ""
@@ -76,6 +74,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
@@ -137,37 +136,53 @@ function uninstallOperation() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  -c | --check)
-    checkUpdate
-    if [[ ${#diff_programs[@]} -gt 0 ]]; then
-      if ! diff "$source_path/$name" "$target_path/$name" &> /dev/null; then
-        "$source_path/$name" --install
-      else
-        "$target_path/$name" --install
-      fi
-    else
-      update_num=0
-      install_num=0
-      notifyInfo
-    fi
-    ;;
-  -i | --install)
-    installOperation
-    ;;
-  -u | --uninstall)
-    uninstallOperation
-    ;;
-  -h | --help)
-    helpInfo
-    exit $normal
-    ;;
-  -v | --version)
-    versionInfo
-    exit $normal
-    ;;
-  *)
-    helpInfo
-    exit $err_unknown
-    ;;
-esac
+ARGS=$(getopt --options "ciuhv" --longoptions "check,install,uninstall,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -c | --check)
+        checkUpdate
+        if [[ ${#diff_programs[@]} -gt 0 ]]; then
+          if ! diff "$source_path/$name" "$target_path/$name" &> /dev/null; then
+            "$source_path/$name" --install
+          else
+            "$target_path/$name" --install
+          fi
+        else
+          update_num=0
+          install_num=0
+          notifyInfo
+        fi
+        shift 1
+        ;;
+      -i | --install)
+        installOperation
+        shift 1
+        ;;
+      -u | --uninstall)
+        uninstallOperation
+        shift 1
+        ;;
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi
