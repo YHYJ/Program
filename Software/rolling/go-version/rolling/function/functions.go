@@ -5,7 +5,7 @@
 
 // Description:
 
-package main
+package function
 
 import (
 	"bufio"
@@ -18,8 +18,16 @@ import (
 	"time"
 )
 
+// 检索的Pacman日志文件
 var fileName = "/var/log/pacman.log"
-var line = "--------------------------------------------------"
+
+// 程序信息
+var (
+	name    string = "rolling"
+	major   string = "0.1.0"
+	minor   string = "20230216"
+	release string = "1"
+)
 
 // 获取系统安装时间和当前时间
 var lineText = ReadFileLine(fileName, 1)
@@ -48,12 +56,6 @@ var kernelUpdateMean = float32(systemDays) / float32(kernelUpdateCount)
 
 // 获取吉祥物
 var mascot = RunCommand("repo-elephant", "")
-
-// 参数变量
-var (
-	h, help    bool
-	v, version bool
-)
 
 // 读取文件指定行
 func ReadFileLine(file string, line int) string {
@@ -143,24 +145,26 @@ func RunCommand(command, args string) string {
 	return strings.TrimRight(outStr, "\n")
 }
 
-func Output() {
-	fmt.Printf("[%16v] %-2v [%-16v]\n", startTimeStr, "--", currentTimeStr)
-	fmt.Printf("%18v %-2v %-18v\n", firstKernel, "--", latestKernel)
-	fmt.Printf("%12v %-2v %-4.3v %v\n", "系统使用时长", "--", systemDays, "天")
-	fmt.Printf("%12v %-2v %-4.3v %v\n", "系统更新次数", "--", systemUpdateCount, "次")
-	fmt.Printf("%12v %-2v %-4.3v %v\n", "系统更新频率", "--", systemUpdateMean, "次/天")
-	fmt.Printf("%12v %-2v %-4.3v %v\n", "内核更新次数", "--", kernelUpdateCount, "次")
-	fmt.Printf("%12v %-2v %-4.3v %v\n", "内核更新频率", "--", kernelUpdateMean, "天/次")
-	fmt.Println(mascot)
+// 输出程序名称
+func ProgramName() string {
+	name := name
+	return name
 }
 
-// func FlagUsage() {
-//     fmt.Fprint(os.Stdout, "rolling-count用于统计系统安装和更新信息\n"+line+"\nUsage: \n\n  rolling-count [-hv]\n\nOptions:\n")
-//     flag.BoolVar(&h, "h", false, "显示此帮助信息并退出")
-//     flag.BoolVar(&v, "v", false, "显示版本信息并退出")
-// }
+// 输出程序版本
+func ProgramVersion() string {
+	version := major + "." + minor + "-" + release
+	return version
+}
 
-
-func main() {
-	Output()
+// 输出系统信息
+func SystemInfo() {
+	fmt.Printf("\033[36m[%16v]\033[0m %-2v \033[36m[%-16v]\033[0m\n", startTimeStr, "--", currentTimeStr)
+	fmt.Printf("\033[35m%18v\033[0m %-2v \033[35m%-18v\033[0m\n", firstKernel, "--", latestKernel)
+	fmt.Printf("\033[37m%12v\033[0m %-2v \033[37m%-4.3v\033[0m \033[34m%v\033[0m\n", "系统使用时长", "--", systemDays, "天")
+	fmt.Printf("\033[37m%12v\033[0m %-2v \033[37m%-4.3v\033[0m \033[34m%v\033[0m\n", "系统更新次数", "--", systemUpdateCount, "次")
+	fmt.Printf("\033[37m%12v\033[0m %-2v \033[37m%-4.3v\033[0m \033[34m%v\033[0m\n", "系统更新频率", "--", systemUpdateMean, "次/天")
+	fmt.Printf("\033[37m%12v\033[0m %-2v \033[37m%-4.3v\033[0m \033[34m%v\033[0m\n", "内核更新次数", "--", kernelUpdateCount, "次")
+	fmt.Printf("\033[37m%12v\033[0m %-2v \033[37m%-4.3v\033[0m \033[34m%v\033[0m\n", "内核更新频率", "--", kernelUpdateMean, "天/次")
+	fmt.Println(mascot)
 }
