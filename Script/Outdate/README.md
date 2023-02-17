@@ -11,12 +11,18 @@
 
 <!-- vim-markdown-toc GFM -->
 
+* [退役](#退役)
+
 <!-- vim-markdown-toc -->
 
 ---
 
 <!-- Object info -->
+存放因各种原因过时或归档的程序
 
 ---
 
-存放已经因为大版本迭代等原因而过时的程序
+## 退役
+
+- 'backup'：已被spider + chezmoi的组合取代
+- 'rolling-count'：已被rolling (go)取代
