@@ -1,7 +1,12 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+File: root.go
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-02-20 16:15:52
 
+Description: 程序未带子命令或参数时执行
 */
+
 package cmd
 
 import (
@@ -10,9 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
-
-// rootCmd represents the base command when called without any subcommands
+// 在没有任何子命令的情况下调用时的基本命令
 var rootCmd = &cobra.Command{
 	Use:   "scleaner",
 	Short: "A brief description of your application",
