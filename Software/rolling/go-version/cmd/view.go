@@ -1,6 +1,12 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+File: view.go
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-02-17 16:08:21
+
+Description: 程序子命令'view'时执行
 */
+
 package cmd
 
 import (

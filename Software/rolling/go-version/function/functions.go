@@ -1,9 +1,11 @@
-/* File: rolling-count.go */
-/* Author: YJ */
-/* Email: yj1516268@outlook.com */
-/* Created Time: 2023-02-15 10:24:11 */
+/*
+File: functions.go
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-02-15 10:24:11
 
-// Description:
+Description: 自定义功能函数
+*/
 
 package function
 

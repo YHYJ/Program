@@ -1,6 +1,12 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+File: version.go
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-02-17 16:08:20
+
+Description: 程序子命令'version'时执行
 */
+
 package cmd
 
 import (

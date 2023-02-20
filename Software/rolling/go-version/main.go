@@ -1,6 +1,12 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+File: main.go
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-02-17 16:08:22
+
+Description: 主函数
 */
+
 package main
 
 import "rolling/cmd"
