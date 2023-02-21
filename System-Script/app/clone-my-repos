@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.2
-readonly minor_version=20230213
+readonly major_version=0.2.3
+readonly minor_version=20230221
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -42,7 +42,8 @@ readonly repos=(
   YHYJ
   System TimeNote
   LearningCenter
-  Program-module LogWrapper
+  LogWrapper Program-module
+  Rolling Scleaner
   MyBlogs MyDocker MyDockerfile MyRaspberry MyShell MyWiki
   DataCollector DataWizard SystemMonitor Sniffer OPC2Socket Devicer WeatherStation
   Test
