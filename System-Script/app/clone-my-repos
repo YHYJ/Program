@@ -23,12 +23,11 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.1
-readonly minor_version=20221113
-readonly rel_version=1
+readonly major_version=0.2.3
+readonly minor_version=20230221
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
 readonly err_param=2        # 参数错误
 readonly err_permission=110 # 权限错误
 
@@ -43,7 +42,8 @@ readonly repos=(
   YHYJ
   System TimeNote
   LearningCenter
-  Program-module LogWrapper
+  LogWrapper Program-module
+  Rolling Scleaner
   MyBlogs MyDocker MyDockerfile MyRaspberry MyShell MyWiki
   DataCollector DataWizard SystemMonitor Sniffer OPC2Socket Devicer WeatherStation
   Test
@@ -59,7 +59,7 @@ function helpInfo() {
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name OPTIONS"
+  echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -h, --help            显示帮助信息"
@@ -67,6 +67,7 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 
@@ -88,13 +89,14 @@ function checkPath() {
 }
 
 function cloneRepo() {
-  echo -e "正在clone..."
+  echo -e "正在Clone..."
   echo ""
   for repo in ${repos[*]}; do
     if [[ ! -e "$path/$repo" ]]; then
       git clone --recurse-submodules git@github.com:YHYJ/"$repo".git "$path/$repo"
     else
-      echo -e "<$repo> 同名文件夹已存在，不会克隆该仓库\n"
+      # length=${#repo}
+      printf "同名文件夹\033[37m%-s\033[0m已存在，不克隆该仓库\n" "$repo"
     fi
   done
 }
@@ -102,8 +104,8 @@ function cloneRepo() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-TEMP=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
-eval set -- "$TEMP"
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
   checkUser "root"
@@ -114,11 +116,15 @@ else
     case $1 in
       -h | --help)
         helpInfo
-        exit $normal
+        shift 1
         ;;
       -v | --version)
         versionInfo
-        exit $normal
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
         ;;
       *)
         helpInfo
