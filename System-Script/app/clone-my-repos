@@ -45,7 +45,6 @@ readonly repos=(
   LogWrapper Program-module
   Rolling Scleaner
   MyBlogs MyDocker MyDockerfile MyRaspberry MyShell MyWiki
-  DataCollector DataWizard SystemMonitor Sniffer OPC2Socket Devicer WeatherStation
   Test
 )
 
