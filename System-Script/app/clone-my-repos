@@ -25,7 +25,7 @@ readonly name
 # program nversion
 readonly major_version=0.2.3
 readonly minor_version=20230221
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly err_param=2        # 参数错误
@@ -89,13 +89,14 @@ function checkPath() {
 }
 
 function cloneRepo() {
-  echo -e "正在clone..."
+  echo -e "正在Clone..."
   echo ""
   for repo in ${repos[*]}; do
     if [[ ! -e "$path/$repo" ]]; then
       git clone --recurse-submodules git@github.com:YHYJ/"$repo".git "$path/$repo"
     else
-      echo -e "<$repo> 同名文件夹已存在，不会克隆该仓库\n"
+      # length=${#repo}
+      printf "同名文件夹\033[37m%-s\033[0m已存在，不克隆该仓库\n" "$repo"
     fi
   done
 }
