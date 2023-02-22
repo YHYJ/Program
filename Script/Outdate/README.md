@@ -26,3 +26,4 @@
 
 - 'backup'：已被spider + chezmoi的组合取代
 - 'rolling-count'：已被rolling (go)取代
+- 'scleaner'：已被scleaner (go)取代
