@@ -24,8 +24,8 @@ name=$(basename "$0")
 readonly name
 # program nversion
 readonly major_version=0.2.3
-readonly minor_version=20230221
-readonly rel_version=2
+readonly minor_version=20230222
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly err_param=2        # 参数错误
@@ -43,7 +43,7 @@ readonly repos=(
   System TimeNote
   LearningCenter
   LogWrapper Program-module
-  Rolling Scleaner
+  rolling scleaner
   MyBlogs MyDocker MyDockerfile MyRaspberry MyShell MyWiki
   DataCollector DataWizard SystemMonitor Sniffer OPC2Socket Devicer WeatherStation
   Test
