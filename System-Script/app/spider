@@ -29,12 +29,11 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.4
-readonly minor_version=20230213
+readonly major_version=0.1.5
+readonly minor_version=20230223
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0        # 一切正常
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
@@ -80,7 +79,6 @@ function versionInfo() {
 
 function finish() {
   echo -e "\n\033[35m[✔]\033[0m 信息搜集完成"
-  exit $normal
 }
 
 #------------------------- Feature Function
@@ -139,31 +137,41 @@ else
             getServiceInfo
             getUserInfo
             finish
+            shift 1
             ;;
           app)
             Check
             getAppInfo
             finish
+            shift 1
             ;;
           env)
             Check
             getVirtualenvInfo
             finish
+            shift 1
             ;;
           package)
             Check
             getPackageInfo
             finish
+            shift 1
             ;;
           service)
             Check
             getServiceInfo
             finish
+            shift 1
             ;;
           user)
             Check
             getUserInfo
             finish
+            shift 1
+            ;;
+          --)
+            shift 1
+            break
             ;;
           *)
             echo -e "\n\033[31m[✘]\033[0m 无法搜集该内容"
