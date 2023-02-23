@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: benchmarker
+Name: benchmarking
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:35:24
@@ -13,6 +13,7 @@ Attentions:
 
 Depends:
 - hdparm
+- coreutils
 
 TODO List:
 - TODO(2020-06-19 17:37)：添加设备检测，自动检测是HDD还是SSD
@@ -27,8 +28,8 @@ TODO List:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.0.4
-readonly minor_version=20230214
+readonly major_version=0.1.0
+readonly minor_version=20230223
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -51,6 +52,8 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
+  echo -e "     -c, --choose          选择测试方法"
+  echo -e ""
   echo -e "     -h, --help            显示帮助信息"
   echo -e "     -v, --version         显示版本信息"
 }
@@ -61,21 +64,65 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
-function main() {
-  hdparm -Tt --direct /dev/nvme*
+function hdparmTest() {
+  devices=$(lsblk -Jplno NAME,TYPE)
+  for disk in $(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | .name'); do
+    for ((i = 1; i <= 3; i++)); do
+      echo -e "\n$disk第$i次测试 -->"
+      hdparm -Tt "$disk"
+    done
+  done
+}
+
+function ddTest() {
+  for ((i = 1; i <= 5; i++)); do
+    # 测试写入速度
+    dd if=/dev/zero of=tempfile bs=1M count=1024 conv=fdatasync,notrunc status=progress
+    # 测试无缓冲的读取速度
+    echo 3 > /proc/sys/vm/drop_caches
+    dd if=tempfile of=/dev/null bs=1M count=1024 status=progress
+    # 测试有缓冲的读取速度
+    dd if=tempfile of=/dev/null bs=1M count=1024 status=progress
+  done
+  rm tempfile
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "c:hv" --longoptions "choose:,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  main
+  helpInfo
 else
   while true; do
     case $1 in
+      -c | --choose)
+        case $2 in
+          all)
+            hdparmTest
+            ddTest
+            shift 1
+            ;;
+          dd)
+            ddTest
+            shift 1
+            ;;
+          hdparm)
+            hdparmTest
+            shift 1
+            ;;
+          --)
+            shift 1
+            break
+            ;;
+          *)
+            echo -e "\n\033[31m[✘]\033[0m 未知的测试方法 $2"
+            ;;
+        esac
+        shift 1
+        ;;
       -h | --help)
         helpInfo
         shift 1
