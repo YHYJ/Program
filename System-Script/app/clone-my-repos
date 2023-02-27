@@ -23,9 +23,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.3
+readonly major_version=0.2.4
 readonly minor_version=20230227
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly err_param=2        # 参数错误
@@ -37,7 +37,7 @@ readonly desc="用于克隆我的GitHub仓库"
 
 #------------------------- Parameter Variable
 # path variable
-readonly path="$HOME/Documents/MyRepos"
+readonly storage="$HOME/Documents/MyRepos"
 readonly repos=(
   YHYJ
   System TimeNote
@@ -79,11 +79,11 @@ function checkUser() {
 }
 
 function checkPath() {
-  if [[ -d "$path" ]]; then
-    echo -e "\n$path目录已存在\n"
+  if [[ -d "$storage" ]]; then
+    echo -e "$storage 已存在\n"
   else
-    mkdir -p "$path"
-    echo -e "\n已创建MyRepos\n"
+    mkdir -p "$storage"
+    echo -e "\n已创建$storage\n"
   fi
 }
 
@@ -91,11 +91,11 @@ function cloneRepo() {
   echo -e "正在Clone..."
   echo ""
   for repo in ${repos[*]}; do
-    if [[ ! -e "$path/$repo" ]]; then
-      git clone --recurse-submodules git@github.com:YHYJ/"$repo".git "$path/$repo"
+    if [[ ! -e "$storage/$repo" ]]; then
+      git clone --recurse-submodules git@github.com:YHYJ/"$repo".git "$storage/$repo"
     else
       # length=${#repo}
-      printf "同名文件夹\033[37m%-s\033[0m已存在，不克隆该仓库\n" "$repo"
+      printf "同名文件夹\033[36m%-s\033[0m已存在，不克隆该仓库\n" "$repo"
     fi
   done
 }
