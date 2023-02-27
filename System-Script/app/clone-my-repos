@@ -43,7 +43,7 @@ readonly repos=(
   System TimeNote
   LearningCenter
   LogWrapper Program-module
-  rolling scleaner
+  checker rolling scleaner
   MyBlogs MyDocker MyDockerfile MyRaspberry MyShell MyWiki
   DataCollector DataWizard SystemMonitor Sniffer OPC2Socket Devicer WeatherStation
   Test
