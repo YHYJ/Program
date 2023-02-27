@@ -26,8 +26,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.3.3
-readonly minor_version=20230215
+readonly major_version=3.3.4
+readonly minor_version=20230227
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -67,7 +67,6 @@ function helpInfo() {
   echo -e "     -c, --check            检查是否有更新"
   echo -e "     -d, --dir <string>     指定需要安装的程序文件的路径（暂不可用）"
   echo -e "     -i, --install          执行程序安装操作"
-  echo -e "     -u, --uninstall        执行程序卸载操作（暂不可用）"
   echo -e ""
   echo -e "     -h, --help             显示帮助信息"
   echo -e "     -v, --version          显示版本信息"
@@ -129,14 +128,10 @@ function installOperation() {
   notifyInfo
 }
 
-function uninstallOperation() {
-  echo "TODO"
-}
-
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "ciuhv" --longoptions "check,install,uninstall,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "cihv" --longoptions "check,install,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -161,10 +156,6 @@ else
         ;;
       -i | --install)
         installOperation
-        shift 1
-        ;;
-      -u | --uninstall)
-        uninstallOperation
         shift 1
         ;;
       -h | --help)
