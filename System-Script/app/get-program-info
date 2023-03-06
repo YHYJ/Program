@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
 
 : << !
-Name: get-vim-hotkey-doc
+Name: get-program-info
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2021-06-11 17:06:32
 
-Description: 提取vim快捷键文档
+Description: 获取指定包的信息
 
 Attentions:
 -
 
 Depends:
 -
-
-TODO:
-- 尚未完善参数识别
 !
 
 ####################################################################
@@ -26,8 +23,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.2.3
-readonly minor_version=20230213
+readonly major_version=0.3.0
+readonly minor_version=20230306
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -35,11 +32,16 @@ readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于提取vim快捷键说明以生成文档"
+# readonly desc="用于提取vim快捷键说明以生成文档"
+readonly desc="用于获取指定包的信息"
 
 # path variable
-readonly conf_file="$HOME/.space-vim/private/config.vim"
-readonly doc_file="$HOME/.cache/SpiderData/App/vim/Vim-Hotkey.md"
+readonly storage="$HOME/.cache/SpiderData"
+# Vim Path variable
+readonly vim_conf="$HOME/.space-vim/private/config.vim"
+readonly vim_hotkey_doc="$storage/App/vim/Vim-Hotkey.md"
+# Guake Path variable
+readonly guake_conf="$storage/App/guake/guake.conf"
 
 # printf variable
 readonly space='    '
@@ -57,8 +59,14 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -h, --help        显示帮助信息"
-  echo -e "     -v, --version     显示版本信息"
+  echo -e "     -n, --name [PROGRAM]  指定要获取信息的包"
+  echo -e ""
+  echo -e "     -h, --help            显示帮助信息"
+  echo -e "     -v, --version         显示版本信息"
+  echo -e ""
+  echo -e "Programs:"
+  echo -e "     all                   获取全部包信息"
+  echo -e "     guake                 获取Guake信息"
 }
 
 function versionInfo() {
@@ -66,34 +74,59 @@ function versionInfo() {
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 #------------------------- Feature Function
-function main() {
-  # 输出提示信息
-  printf "%s %s %s %s\n" "$space" "Vim-Hotkey" "-->" "$doc_file"
+function getVimInfo() {
+  printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Vim-Hotkey" "-->" "$vim_hotkey_doc"
   # 提取快捷键说明
-  grep -r 'Hotkey' "$conf_file" > "$doc_file"
+  grep -r 'Hotkey' "$vim_conf" > "$vim_hotkey_doc"
   # 格式化文档
-  sed -i 's/--/|/g' "$doc_file" # 替换'--'为'|'
-  sed -i 's/^"//' "$doc_file"   # 删除行首的'"'
-  sed -i 's/^/|/' "$doc_file"   # 在行首添加'|'
-  sed -i 's/$/|/' "$doc_file"   # 在行尾添加'|'
+  sed -i 's/--/|/g' "$vim_hotkey_doc" # 替换'--'为'|'
+  sed -i 's/^"//' "$vim_hotkey_doc"   # 删除行首的'"'
+  sed -i 's/^/|/' "$vim_hotkey_doc"   # 在行首添加'|'
+  sed -i 's/$/|/' "$vim_hotkey_doc"   # 在行尾添加'|'
   # 添加文件头
   line1='|	关键字	|	归属	|	快捷键	|	说明	|'
   line2='|---|---|---|---'
-  sed -i "1i\\$line2" "$doc_file"
-  sed -i "1i\\$line1" "$doc_file"
+  sed -i "1i\\$line2" "$vim_hotkey_doc"
+  sed -i "1i\\$line1" "$vim_hotkey_doc"
+}
+
+function getGuakeInfo() {
+  printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
+  guake --save-preferences="$guake_conf" # guake的配置文件
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "n:hv" --longoptions "name:,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  main
+  helpInfo
 else
   while true; do
     case $1 in
+      -n | --name)
+        case $2 in
+          all)
+            getVimInfo
+            getGuakeInfo
+            shift 1
+            ;;
+          guake)
+            getGuakeInfo
+            shift 1
+            ;;
+          --)
+            shift 1
+            break
+            ;;
+          *)
+            echo -e "\n\033[31m[✘]\033[0m 未找到指定的包"
+            ;;
+        esac
+        shift 1
+        ;;
       -h | --help)
         helpInfo
         shift 1

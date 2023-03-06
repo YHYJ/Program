@@ -29,9 +29,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.5
-readonly minor_version=20230223
-readonly rel_version=1
+readonly major_version=0.2.0
+readonly minor_version=20230306
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly err_unknown=255 # 未知错误
@@ -88,32 +88,29 @@ function Check() {
   fi
 }
 
-function getAppInfo() {
-  echo -e "正在搜集\033[1;34;47mApp\033[0m信息"
-  /usr/local/bin/get-vim-hotkey-doc                        # vim的快捷键文档
-  guake --save-preferences="$datadir/App/guake/guake.conf" # guake的配置文件
+function AppInfo() {
+  echo -e "\033[1;34mApp\033[0m"
+  /usr/local/bin/get-program-info --name all
 }
 
-function getVirtualenvInfo() {
-  echo -e "正在搜集\033[1;34;47mVirtualenv\033[0m信息"
-  /usr/local/bin/py-virtualenv-tool -s # Python Virtualenv
+function VirtualenvInfo() {
+  echo -e "\033[1;34mVirtualenv\033[0m"
+  /usr/local/bin/py-virtualenv-tool --save # Python Virtualenv
 }
 
-function getPackageInfo() {
-  echo -e "正在搜集\033[1;34;47mPackage\033[0m信息"
-  pacman -Qenq > "$datadir/PackageList/Pacman.list" # 官方源中单独指定安装的软件包
-  pacman -Qemq > "$datadir/PackageList/AUR.list"    # AUR中单独指定安装的软件包
+function PackageInfo() {
+  echo -e "\033[1;34mPackage\033[0m"
+  /usr/local/bin/get-system-info --name package # Package List
 }
 
-function getServiceInfo() {
-  echo -e "正在搜集\033[1;34;47mService\033[0m信息"
-  systemctl list-unit-files > "$datadir/ServiceList/System.list"      # System service
-  systemctl --user list-unit-files > "$datadir/ServiceList/User.list" # User service
+function ServiceInfo() {
+  echo -e "\033[1;34mService\033[0m"
+  /usr/local/bin/get-system-info --name service # Service List
 }
 
-function getUserInfo() {
-  echo -e "正在搜集\033[1;34;47mUser\033[0m信息"
-  id root yj > "$datadir/UserList/ID.list" # 当前$USER的id信息
+function UserInfo() {
+  echo -e "\033[1;34mUser\033[0m"
+  /usr/local/bin/get-system-info --name user # User List
 }
 
 ####################################################################
@@ -131,41 +128,41 @@ else
         case $2 in
           all)
             Check
-            getAppInfo
-            getVirtualenvInfo
-            getPackageInfo
-            getServiceInfo
-            getUserInfo
+            AppInfo
+            PackageInfo
+            ServiceInfo
+            UserInfo
+            VirtualenvInfo
             finish
             shift 1
             ;;
           app)
             Check
-            getAppInfo
+            AppInfo
             finish
             shift 1
             ;;
           env)
             Check
-            getVirtualenvInfo
+            VirtualenvInfo
             finish
             shift 1
             ;;
           package)
             Check
-            getPackageInfo
+            PackageInfo
             finish
             shift 1
             ;;
           service)
             Check
-            getServiceInfo
+            ServiceInfo
             finish
             shift 1
             ;;
           user)
             Check
-            getUserInfo
+            UserInfo
             finish
             shift 1
             ;;

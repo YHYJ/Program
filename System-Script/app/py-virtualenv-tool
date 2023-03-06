@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.3
-readonly minor_version=20230213
+readonly major_version=0.0.5
+readonly minor_version=20230306
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -81,13 +81,13 @@ function deleteVirtualenvFile() {
 }
 
 function saveVirtualenv() {
-  printf "%s %s %s %s\n" "$space" "Virtualenv" "-->" "$storage"
+  printf "%s %-11s \033[36m%s\033[0m %s\n" "$space" "Python-Venv" "-->" "$storage/*"
   for venv in ${venvs[*]}; do
     workon "$venv"
     pyversion=$(python -V | tr ' ' '-')
     filepath="$storage"/requirements_"$pyversion"_"$venv".txt
     pip freeze > "$filepath"
-    printf "%s%s已保存虚拟环境：\033[37m$venv\033[0m\n" "$space" "$space"
+    printf "%s%s Venv: \033[37m%s\033[0m \033[35m%2s\033[0m\n" "$space" "$space" "$venv" "✔"
   done
 }
 
