@@ -25,14 +25,14 @@ readonly name
 # program version
 readonly major_version=0.0.5
 readonly minor_version=20230306
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于同步Virtualenv"
+readonly desc="用于操作Python Virtualenv"
 # environment variable
 readonly storage="$HOME/.cache/SpiderData/App/virtualenv"
 readonly virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"

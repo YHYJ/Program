@@ -23,7 +23,7 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.3.0
+readonly major_version=0.3.1
 readonly minor_version=20230306
 readonly rel_version=1
 
@@ -32,7 +32,6 @@ readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-# readonly desc="用于提取vim快捷键说明以生成文档"
 readonly desc="用于获取指定包的信息"
 
 # path variable
@@ -66,6 +65,7 @@ function helpInfo() {
   echo -e ""
   echo -e "Programs:"
   echo -e "     all                   获取全部包信息"
+  echo -e "     vim                   获取Vim信息"
   echo -e "     guake                 获取Guake信息"
 }
 
@@ -111,6 +111,10 @@ else
           all)
             getVimInfo
             getGuakeInfo
+            shift 1
+            ;;
+          vim)
+            getVimInfo
             shift 1
             ;;
           guake)
