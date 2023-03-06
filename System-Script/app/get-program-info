@@ -85,7 +85,7 @@ function getVimInfo() {
   sed -i 's/$/|/' "$vim_hotkey_doc"   # 在行尾添加'|'
   # 添加文件头
   line1='|	关键字	|	归属	|	快捷键	|	说明	|'
-  line2='|---|---|---|---'
+  line2='|---|---|---|---|'
   sed -i "1i\\$line2" "$vim_hotkey_doc"
   sed -i "1i\\$line1" "$vim_hotkey_doc"
 }
