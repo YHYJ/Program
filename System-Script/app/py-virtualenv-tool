@@ -38,6 +38,9 @@ readonly storage="$HOME/.cache/SpiderData/App/virtualenv"
 readonly virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
 readonly virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
 
+# printf variable
+readonly space='    '
+
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
 ####################################################################
@@ -51,9 +54,9 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -d, --delete      保存虚拟环境"
-  echo -e "     -m, --make        创建虚拟环境"
-  echo -e "     -s, --save        保存虚拟环境"
+  echo -e "     -d, --delete      删除虚拟环境文件"
+  echo -e "     -m, --make        使用文件创建虚拟环境"
+  echo -e "     -s, --save        保存虚拟环境文件"
   echo -e ""
   echo -e "     -h, --help        显示帮助信息"
   echo -e "     -v, --version     显示版本信息"
@@ -78,13 +81,13 @@ function deleteVirtualenvFile() {
 }
 
 function saveVirtualenv() {
-  echo -e "    虚拟环境文件存储路径：$storage"
+  printf "%s %s %s %s\n" "$space" "Virtualenv" "-->" "$storage"
   for venv in ${venvs[*]}; do
     workon "$venv"
     pyversion=$(python -V | tr ' ' '-')
     filepath="$storage"/requirements_"$pyversion"_"$venv".txt
     pip freeze > "$filepath"
-    echo -e "    已保存虚拟环境：\033[37m$venv\033[0m"
+    printf "%s%s已保存虚拟环境：\033[37m$venv\033[0m\n" "$space" "$space"
   done
 }
 

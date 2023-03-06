@@ -41,6 +41,9 @@ readonly desc="用于提取vim快捷键说明以生成文档"
 readonly conf_file="$HOME/.space-vim/private/config.vim"
 readonly doc_file="$HOME/.cache/SpiderData/App/vim/Vim-Hotkey.md"
 
+# printf variable
+readonly space='    '
+
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
 ####################################################################
@@ -64,6 +67,8 @@ function versionInfo() {
 }
 #------------------------- Feature Function
 function main() {
+  # 输出提示信息
+  printf "%s %s %s %s\n" "$space" "Vim-Hotkey" "-->" "$doc_file"
   # 提取快捷键说明
   grep -r 'Hotkey' "$conf_file" > "$doc_file"
   # 格式化文档
