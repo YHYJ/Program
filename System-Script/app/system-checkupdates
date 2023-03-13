@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: polybar-script_checkupdates
+Name: system-checkupdates
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-05-31 00:00:00
@@ -27,8 +27,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=2.1.2
-readonly minor_version=20230213
+readonly major_version=3.0.0
+readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -37,7 +37,7 @@ readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="是Polybar的脚本，用于自动检测系统软件包更新"
+readonly desc="用于检测系统软件包更新"
 # path variable
 readonly tmp_file="/tmp/$name.log"
 readonly check_tool="/usr/bin/checkupdates"

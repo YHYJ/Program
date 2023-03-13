@@ -29,8 +29,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.3.3
-readonly minor_version=20230213
+readonly major_version=3.4.0
+readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -45,7 +45,7 @@ readonly err_unknown=255 # 未知错误
 readonly desc="用于开启一个临时的HTTP服务"
 
 # file variable
-readonly conf_dir="$HOME/.config/myprogram"
+readonly conf_dir="$HOME/.config/yj"
 readonly confile="$conf_dir/$name.conf"
 # time variable
 readonly time_out=60

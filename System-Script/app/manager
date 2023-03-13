@@ -46,7 +46,7 @@ readonly attribution
 # path variable
 readonly source_path="/home/$username/Documents/MyRepos/System/Program/System-Script/app"
 readonly target_path="/usr/local/bin"
-readonly confile="/home/$username/.config/myprogram/$name.conf"
+readonly confile="/home/$username/.config/yj/$name.conf"
 # list variable
 source_programs=$(ls "$source_path")
 readonly source_programs
