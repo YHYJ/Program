@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 : << !
-Name: polybar-script_trash
+Name: trash-manager
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-05-30 21:00:27
 
-Description: 操作回收站
+Description: 回收站管理器
 
 Attentions:
 - 根据参数确定操作
@@ -24,8 +24,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=2.1.4
-readonly minor_version=20230213
+readonly major_version=2.2.0
+readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -33,7 +33,7 @@ readonly err_param=2 # 参数错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="是Polybar的脚本，用于操作回收站文件"
+readonly desc="用于控制回收站"
 
 # path variable
 readonly trash_path="$HOME/.local/share/Trash/files"

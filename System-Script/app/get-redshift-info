@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 : << !
-Name: polybar-script_system-info
+Name: get-redshift-info
 Author: YJ
 Email: yj1516268@outlook.com
-Created Time: 2021-11-17 08:49:08
+Created Time: 2020-04-27 13:25:28
 
-Description: 输出系统信息
+Description: 获取色温信息
 
 Attentions:
 -
 
 Depends:
--
+- grep
 !
 
 ####################################################################
@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.3
-readonly minor_version=20230213
+readonly major_version=2.2.0
+readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -32,7 +32,13 @@ readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="是Polybar脚本，用于显示系统信息"
+readonly desc="用于获取色温信息"
+# language variable
+if [[ $LANG == 'zh_CN.UTF-8' ]]; then
+  color_temp='色温'
+else
+  color_temp='temp'
+fi
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -47,13 +53,6 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -k, --kernel      显示内核版本"
-  echo -e "     -l, --login       显示最近开机时间"
-  echo -e "     -p, --package     显示可用更新"
-  echo -e "     -s, --service     显示更新检测状态"
-  echo -e "     -t, --time        显示系统启动用时"
-  echo -e "     -u, --user        显示当前登录用户"
-  echo -e ""
   echo -e "     -h, --help        显示帮助信息"
   echo -e "     -v, --version     显示版本信息"
 }
@@ -62,12 +61,28 @@ function versionInfo() {
   echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
+
 #------------------------- Feature Function
+function main() {
+  if [ "$(pgrep -x redshift)" ]; then
+    temp=$(redshift -p 2> /dev/null | grep "$color_temp" | cut -d ":" -f 2 | tr -dc "[:digit:]")
+
+    if [ -z "$temp" ]; then
+      echo "%{F#65737E}"
+    elif [ "$temp" -ge 5000 ]; then
+      echo "%{F#8FA1B3}"
+    elif [ "$temp" -ge 4000 ]; then
+      echo "%{F#EBCB8B}"
+    else
+      echo "%{F#D08770}"
+    fi
+  fi
+}
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "klpstuhv" --longoptions "kernel,login,package,service,time,user,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -75,30 +90,6 @@ if [[ ${#@} -lt 2 ]]; then
 else
   while true; do
     case $1 in
-      -k | --kernel)
-        notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '内核版本' "$(uname -sr)"
-        shift 1
-        ;;
-      -l | --login)
-        notify-send --urgency=normal --icon=system-users --app-name='Login info' '最近开机时间' "$(uptime -s)"
-        shift 1
-        ;;
-      -p | --package)
-        notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '可用更新' "$(cat /tmp/polybar-script_checkupdates.log)"
-        shift 1
-        ;;
-      -s | --service)
-        notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '更新检测状态' "$(systemctl is-active polybar-checkupdates)"
-        shift 1
-        ;;
-      -t | --time)
-        notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '系统启动用时' "$(systemd-analyze | head -1 | awk '{print $NF}')"
-        shift 1
-        ;;
-      -u | --user)
-        notify-send --urgency=normal --icon=system-users --app-name='Login info' '当前登录用户' "$(who -q | sed 's/# //')"
-        shift 1
-        ;;
       -h | --help)
         helpInfo
         shift 1

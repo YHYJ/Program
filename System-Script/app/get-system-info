@@ -4,9 +4,9 @@
 Name: get-system-info
 Author: YJ
 Email: yj1516268@outlook.com
-Created Time: 2023-03-06 10:12:48
+Created Time: 2021-11-17 08:49:08
 
-Description: 获取指定系统模块的信息
+Description: 查询系统信息
 
 Attentions:
 -
@@ -23,27 +23,16 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.2
-readonly minor_version=20230306
+readonly major_version=0.2.0
+readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_unknown=255    # 未知错误
+readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于获取指定系统模块的信息"
-
-# path variable
-readonly storage="$HOME/.cache/SpiderData"
-readonly pacman_list="$storage/PackageList/Pacman.list"
-readonly aur_list="$storage/PackageList/AUR.list"
-readonly system_list="$storage/ServiceList/System.list"
-readonly user_list="$storage/ServiceList/User.list"
-readonly id_list="$storage/UserList/ID.list"
-
-# printf variable
-readonly space='    '
+readonly desc="用于查询系统信息"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -58,16 +47,15 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -n, --name [MODULE]   指定要获取信息的模块"
+  echo -e "     -k, --kernel      显示内核版本"
+  echo -e "     -l, --login       显示最近开机时间"
+  echo -e "     -p, --package     显示可用更新"
+  echo -e "     -s, --service     显示更新检测状态"
+  echo -e "     -t, --time        显示系统启动用时"
+  echo -e "     -u, --user        显示当前登录用户"
   echo -e ""
-  echo -e "     -h, --help            显示帮助信息"
-  echo -e "     -v, --version         显示版本信息"
-  echo -e ""
-  echo -e "Modules:"
-  echo -e "     all                   获取全部模块信息"
-  echo -e "     package               获取已安装包信息"
-  echo -e "     service               获取服务信息"
-  echo -e "     user                  获取用户信息"
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
 }
 
 function versionInfo() {
@@ -75,29 +63,11 @@ function versionInfo() {
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
 #------------------------- Feature Function
-function getPackageInfo() {
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
-  pacman -Qenq > "$pacman_list" # 官方源中单独指定安装的软件包
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
-  pacman -Qemq > "$aur_list" # AUR中单独指定安装的软件包
-}
-
-function getServiceInfo() {
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "System-Service" "-->" "$system_list"
-  systemctl list-unit-files > "$system_list" # System service
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "User-Service" "-->" "$user_list"
-  systemctl --user list-unit-files > "$user_list" # User service
-}
-
-function getUserInfo() {
-  printf "%s %-9s \033[36m%s\033[0m %s\n" "$space" "User-List" "-->" "$id_list"
-  id root yj > "$id_list" # 当前$USER的ID信息
-}
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "n:hv" --longoptions "name:,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "klpstuhv" --longoptions "kernel,login,package,service,time,user,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -105,34 +75,28 @@ if [[ ${#@} -lt 2 ]]; then
 else
   while true; do
     case $1 in
-      -n | --name)
-        case $2 in
-          all)
-            getPackageInfo
-            getServiceInfo
-            getUserInfo
-            shift 1
-            ;;
-          package)
-            getPackageInfo
-            shift 1
-            ;;
-          service)
-            getServiceInfo
-            shift 1
-            ;;
-          user)
-            getUserInfo
-            shift 1
-            ;;
-          --)
-            shift 1
-            break
-            ;;
-          *)
-            echo -e "\n\033[31m[✘]\033[0m 未找到指定的模块"
-            ;;
-        esac
+      -k | --kernel)
+        notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '内核版本' "$(uname -sr)"
+        shift 1
+        ;;
+      -l | --login)
+        notify-send --urgency=normal --icon=system-users --app-name='Login info' '最近开机时间' "$(uptime -s)"
+        shift 1
+        ;;
+      -p | --package)
+        notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '可用更新' "$(cat /tmp/system-checkupdates.log)"
+        shift 1
+        ;;
+      -s | --service)
+        notify-send --urgency=normal --icon=system-software-update --app-name='Update info' '更新检测状态' "$(systemctl is-active system-checkupdates)"
+        shift 1
+        ;;
+      -t | --time)
+        notify-send --urgency=normal --icon=distributor-logo-archlinux --app-name='System info' '系统启动用时' "$(systemd-analyze | head -1 | awk '{print $NF}')"
+        shift 1
+        ;;
+      -u | --user)
+        notify-send --urgency=normal --icon=system-users --app-name='Login info' '当前登录用户' "$(who -q | sed 's/# //')"
         shift 1
         ;;
       -h | --help)

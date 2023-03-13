@@ -100,17 +100,17 @@ function VirtualenvInfo() {
 
 function PackageInfo() {
   echo -e "\033[1;34mPackage\033[0m"
-  /usr/local/bin/get-system-info --name package # Package List
+  /usr/local/bin/collect-system-info --name package # Package List
 }
 
 function ServiceInfo() {
   echo -e "\033[1;34mService\033[0m"
-  /usr/local/bin/get-system-info --name service # Service List
+  /usr/local/bin/collect-system-info --name service # Service List
 }
 
 function UserInfo() {
   echo -e "\033[1;34mUser\033[0m"
-  /usr/local/bin/get-system-info --name user # User List
+  /usr/local/bin/collect-system-info --name user # User List
 }
 
 ####################################################################

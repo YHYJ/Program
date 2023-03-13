@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 : << !
-Name: polybar-script_uptime-info
+Name: get-weather-info
 Author: YJ
 Email: yj1516268@outlook.com
-Created Time: 2020-02-13 10:07:54
+Created Time: 2019-09-16 17:09:49
 
-Description: 系统已启动时间
+Description: 获取天气信息
 
 Attentions:
 -
 
 Depends:
--
+- libnotify
 !
 
 ####################################################################
@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.0.4
-readonly minor_version=20230213
+readonly major_version=0.1.0
+readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -32,7 +32,7 @@ readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="是Polybar的脚本，用于获取系统已启动时间"
+readonly desc="用于获取天气信息"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -58,7 +58,8 @@ function versionInfo() {
 
 #------------------------- Feature Function
 function main() {
-  uptime --pretty | sed 's/up //' | sed 's/\ years\?,/y/' | sed 's/\ weeks\?,/w/' | sed 's/\ days\?,/d/' | sed 's/\ hours\?,\?/h/' | sed 's/\ minutes\?/m/'
+  notify-send --urgency=low --icon=weather --app-name="Weather info" '天气预报' '正在查询...'
+  notify-send --urgency=normal --icon=weather --app-name="Weather info" '今日天气' "$(curl 'wttr.in/?format=%l:+|++气温+%t++|++降水量+%p++|++湿度+%h')"
 }
 
 ####################################################################
@@ -68,7 +69,7 @@ ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  helpInfo
+  cacheCleaner
 else
   while true; do
     case $1 in

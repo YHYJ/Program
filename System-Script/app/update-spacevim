@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: update_space-vim
+Name: update-spacevim
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2022-06-11 16:43:34

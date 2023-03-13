@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: polybar-script_usb-manager
+Name: usb-manager
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-08-13 17:57:11
@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=1.1.2
-readonly minor_version=20230213
+readonly major_version=1.2.0
+readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -32,7 +32,7 @@ readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="是Polybar的脚本，用于控制外接USB存储设备"
+readonly desc="用于控制外接USB存储设备"
 
 # file variable
 readonly pid_file="/tmp/$name.pid"
