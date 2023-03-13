@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 : << !
-Name: plasma-script_readupdates
+Name: get-update-info
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2023-01-13 13:56:43
 
-Description: 从polybar-checkupdates.service读取系统更新信息
+Description: 从system-checkupdates.service读取系统更新信息
 
 Attentions:
 -
@@ -23,9 +23,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.0.3
-readonly minor_version=20230214
-readonly rel_version=2
+readonly major_version=0.1.0
+readonly minor_version=20230313
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly err_unknown=255 # 未知错误
@@ -58,8 +58,8 @@ function versionInfo() {
 
 #------------------------- Feature Function
 function main() {
-  if [ -f /tmp/polybar-script_checkupdates.log ]; then
-    cat /tmp/polybar-script_checkupdates.log
+  if [ -f /tmp/system-checkupdates.log ]; then
+    cat /tmp/system-checkupdates.log
   fi
 }
 
