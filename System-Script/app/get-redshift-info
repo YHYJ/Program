@@ -86,7 +86,7 @@ ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  helpInfo
+  main
 else
   while true; do
     case $1 in
