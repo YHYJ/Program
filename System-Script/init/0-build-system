@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+
+: << !
+Name: 0-build-system
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-03-14 09:58:36
+
+Description: Founding script, run in the Live environment to build the system
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.0.1
+readonly minor_version=20230314
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_param=2        # 参数错误
+readonly err_fetch=48       # checkupdate错误
+readonly err_permission=110 # 权限错误
+readonly err_range=122      # 取值范围错误
+readonly err_ctrl_c=130     # 接收到INT(Ctrl+C)指令
+readonly err_unknown=255    # 未知错误
+readonly err_no_program=127 # 未找到命令
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc=" is a System Building Tool running in the Live environment"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+}
+#------------------------- Feature Function
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi
