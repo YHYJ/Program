@@ -65,15 +65,16 @@ function versionInfo() {
 }
 #------------------------- Feature Function
 function main() {
-  ln -s /home/yj/.config/go/env /root/.config/go/env
-  ln -s /home/yj/.spacevim /root/.spacevim
-  ln -s /home/yj/.zshrc /root/.zshrc
-  ln -s /home/yj/.p10k.zsh /root/.p10k.zsh
-  ln -s /home/yj/.bashrc /root/.bashrc
-  ln -s /home/yj/.bash_profile /root/.bash_profile
-  ln -s /home/yj/.config/nvim/coc-settings.json /rooot/.config/nvim/coc-settings.json
-  ln -s /home/yj/.space-vim/private/config.vim /root/.space-vim/private/config.vim
-  ln -s /home/yj/.space-vim/private/packages.vim /root/.space-vim/private/packages.vim
+  ln -sf /home/yj/.config/go/env /root/.config/go/env
+  ln -sf /home/yj/.spacevim /root/.spacevim
+  ln -sf /home/yj/.zshrc /root/.zshrc
+  ln -sf /home/yj/.p10k.zsh /root/.p10k.zsh
+  ln -sf /home/yj/.bashrc /root/.bashrc
+  ln -sf /home/yj/.bash_profile /root/.bash_profile
+  ln -sf /home/yj/.config/nvim/coc-settings.json /rooot/.config/nvim/coc-settings.json
+  ln -sf /home/yj/.space-vim/private/config.vim /root/.space-vim/private/config.vim
+  ln -sf /home/yj/.space-vim/private/packages.vim /root/.space-vim/private/packages.vim
+  ln -sf /home/yj/.config/tealdeer/config.toml /root/.config/tealdeer/config.toml
 }
 
 ####################################################################
