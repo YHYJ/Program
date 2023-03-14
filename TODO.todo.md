@@ -1,3 +1,4 @@
+- [ ] 完成'System-Script/app/make-root-links’ (2023-03-14 13:06)
 - [ ] 完成'System-Script/init/0-build-system' (2023-03-14 10:06)
 - [ ] 脚本添加检测文件夹和可执行文件是否存在功能 (2023-03-13 16:04)
 - [ ] script (2020-05-13 14:32)
