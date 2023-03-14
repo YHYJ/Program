@@ -1,4 +1,4 @@
-/* File: polybar-script_mail.go */
+/* File: mail-manager.go */
 /* Author: YJ */
 /* Email: yj1516268@outlook.com */
 /* Created Time: 2020-06-03 18:48:27 */

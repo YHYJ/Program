@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-File: polybar-script_mail.py
+File: mail-manager.py
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2019-12-06 14:43:05
@@ -124,8 +124,9 @@ def set_mail(config, tags):
 
 
 if __name__ == "__main__":
-    name = os.path.basename(__file__).split('.')[0]  # 程序名
-    confile = '/home/yj/.config/polybar-script/{}.toml'.format(name)
+    login = os.getlogin() # 登录用户名(yj)
+    name = os.path.basename(__file__).split('.')[0]  # 程序名(mail-manager)
+    confile = '/home/yj/.config/{}/{}/config.toml'.format(login, name)
 
     config = get_config(confile)  # 获取配置信息
     tags = sys.argv  # 获取参数列表

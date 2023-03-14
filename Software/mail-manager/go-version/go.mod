@@ -1,4 +1,4 @@
-module github.com/YHYJ/polybar-script_mail
+module github.com/YHYJ/mail-manager
 
 go 1.14
 
