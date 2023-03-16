@@ -12,7 +12,7 @@ Attentions:
 -
 
 Depends:
--
+- git
 !
 
 ####################################################################
@@ -23,12 +23,15 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.3
-readonly minor_version=20230222
+readonly major_version=0.3.3
+readonly minor_version=20230316
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
 readonly err_param=2        # 参数错误
+readonly err_no_program=127 # 未找到命令
 readonly err_permission=110 # 权限错误
 
 #------------------------- Parameter Variable
@@ -80,25 +83,55 @@ function checkUser() {
 }
 
 function checkPath() {
-  if [[ -d "$path" ]]; then
-    echo -e "\n$path目录已存在\n"
+  if [[ -e "$1" ]]; then
+    if [[ -d "$1" ]]; then
+      echo -e "找到指定路径$1"
+    else
+      echo -e "指定路径$1不是文件夹，已退出"
+      exit $err_file
+    fi
   else
-    mkdir -p "$path"
-    echo -e "\n已创建MyRepos\n"
+    mkdir -p "$1"
+    echo -e "\n已创建$1\n"
+  fi
+}
+
+function checkCommand() {
+  if command -v "$1" &> /dev/null; then
+    return $normal
+  else
+    return $err_no_program
   fi
 }
 
 function cloneRepo() {
-  echo -e "正在Clone..."
-  echo ""
-  for repo in ${repos[*]}; do
-    if [[ ! -e "$path/$repo" ]]; then
-      git clone --recurse-submodules git@github.com:YHYJ/"$repo".git "$path/$repo"
-    else
-      # length=${#repo}
-      printf "同名文件夹\033[37m%-s\033[0m已存在，不克隆该仓库\n" "$repo"
-    fi
-  done
+  checkPath "$path"
+  if checkCommand "git"; then
+    # 检测path下是否存在repo同名文件
+    exist=()  # 不存在同名文件的
+    nexist=() # 存在同名文件的
+    for repo in ${repos[*]}; do
+      if [[ ! -e "$path/$repo" ]]; then
+        exist+=("$repo")
+      else
+        nexist+=("$repo")
+      fi
+    done
+
+    # 操作不存在同名文件的repo
+    for e_repo in ${exist[*]}; do
+      echo -e "\n正在克隆$repo"
+      git clone --recurse-submodules git@github.com:YHYJ/"$e_repo".git "$path/$e_repo"
+    done
+
+    # 操作存在同名文件的repo
+    echo -e ""
+    for ne_repo in ${nexist[*]}; do
+      printf "同名文件\033[37m%-s\033[0m已存在，不克隆该仓库\n" "$ne_repo"
+    done
+  else
+    echo -e "git 未安装，无法克隆"
+  fi
 }
 
 ####################################################################
@@ -109,7 +142,6 @@ eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
   checkUser "root"
-  checkPath
   cloneRepo
 else
   while true; do

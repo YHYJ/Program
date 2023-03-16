@@ -28,7 +28,8 @@ readonly minor_version=20230313
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_unknown=255 # 未知错误
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -66,8 +67,23 @@ function versionInfo() {
   echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
+
 #------------------------- Feature Function
+function checkPath() {
+  if [[ ! -d $1 ]]; then
+    mkdir "$1"
+  fi
+}
+
+function checkCommand() {
+  if ! command -v "$1" &> /dev/null; then
+    echo -e "$1 未安装"
+    exit $err_no_program
+  fi
+}
+
 function usb_update() {
+  checkPath "$pid_file"
   pid=$(cat "$pid_file")
 
   if [[ $pid != "" ]]; then
@@ -161,6 +177,7 @@ else
         shift 1
         ;;
       -m | --mount)
+        checkCommand "udisks2"
         usb_mount
         usb_update
         result=$?
@@ -172,6 +189,7 @@ else
         shift 1
         ;;
       -d | --unmount)
+        checkCommand "udisks2"
         usb_unmount
         usb_update
         result=$?

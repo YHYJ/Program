@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: collect-system-info
+Name: collect-system
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2023-03-06 10:12:48
@@ -23,25 +23,28 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.2
-readonly minor_version=20230306
-readonly rel_version=1
+readonly major_version=0.1.1
+readonly minor_version=20230316
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_no_program=127 # 未找到命令
 readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
 readonly desc="用于收集指定系统模块的信息"
-
 # path variable
 readonly storage="$HOME/.cache/SpiderData"
-readonly pacman_list="$storage/PackageList/Pacman.list"
-readonly aur_list="$storage/PackageList/AUR.list"
-readonly system_list="$storage/ServiceList/System.list"
-readonly user_list="$storage/ServiceList/User.list"
-readonly id_list="$storage/UserList/ID.list"
-
+readonly package_dir="$storage/PackageList"
+readonly service_dir="$storage/ServiceList"
+readonly app_vim_dir="$storage/App/vim"
+readonly app_guake_dir="$storage/App/guake"
+readonly user_dir="$storage/UserList"
+# app variable
+readonly vim_conf="$HOME/.space-vim/private/config.vim"
 # printf variable
 readonly space='    '
 
@@ -66,7 +69,8 @@ function helpInfo() {
   echo -e "Modules:"
   echo -e "     all                   收集全部模块信息"
   echo -e "     package               收集已安装包信息"
-  echo -e "     service               收集服务信息"
+  echo -e "     service               收集服务状态信息"
+  echo -e "     app                   收集程序配置信息"
   echo -e "     user                  收集用户信息"
 }
 
@@ -74,22 +78,82 @@ function versionInfo() {
   echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
+
 #------------------------- Feature Function
-function getPackageInfo() {
+function checkPath() {
+  if [[ -e "$1" ]]; then
+    if [[ ! -d "$1" ]]; then
+      echo -e "指定路径$1不是文件夹，已退出"
+      exit $err_file
+    fi
+  else
+    mkdir -p "$1"
+    echo -e "\n已创建$1\n"
+  fi
+}
+
+function checkCommand() {
+  if command -v "$1" &> /dev/null; then
+    return $normal
+  else
+    return $err_no_program
+  fi
+}
+
+function collectPackageInfo() {
+  checkPath "$package_dir"
+  pacman_list="$package_dir/Pacman.list"
+  aur_list="$package_dir/AUR.list"
   printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
   pacman -Qenq > "$pacman_list" # 官方源中单独指定安装的软件包
   printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
   pacman -Qemq > "$aur_list" # AUR中单独指定安装的软件包
 }
 
-function getServiceInfo() {
+function collectServiceInfo() {
+  checkPath "$service_dir"
+  system_list="$service_dir/System.list"
+  user_list="$service_dir/User.list"
   printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "System-Service" "-->" "$system_list"
   systemctl list-unit-files > "$system_list" # System service
   printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "User-Service" "-->" "$user_list"
   systemctl --user list-unit-files > "$user_list" # User service
 }
 
-function getUserInfo() {
+function collectAppInfo() {
+  # vim
+  if [[ -e "$vim_conf" ]]; then
+    checkPath "$app_vim_dir"
+    hotkey_doc="$app_vim_dir/Vim-Hotkey.md"
+    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Vim-Hotkey" "-->" "$hotkey_doc"
+    # 提取快捷键说明
+    grep -r 'Hotkey' "$vim_conf" > "$hotkey_doc"
+    # 格式化文档
+    sed -i 's/--/|/g' "$hotkey_doc" # 替换'--'为'|'
+    sed -i 's/^"//' "$hotkey_doc"   # 删除行首的'"'
+    sed -i 's/^/|/' "$hotkey_doc"   # 在行首添加'|'
+    sed -i 's/$/|/' "$hotkey_doc"   # 在行尾添加'|'
+    # 添加文件头
+    line1='|	关键字	|	归属	|	快捷键	|	说明	|'
+    line2='|---|---|---|---|'
+    sed -i "1i\\$line2" "$hotkey_doc"
+    sed -i "1i\\$line1" "$hotkey_doc"
+  else
+    echo -e "\n似乎未安装 vim/space-vim\n"
+  fi
+
+  # guake
+  if checkCommand "guake"; then
+    checkPath "$app_guake_dir"
+    guake_conf="$app_guake_dir/guake.conf"
+    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
+    guake --save-preferences="$guake_conf" # guake的配置文件
+  fi
+}
+
+function collectUserInfo() {
+  checkPath "$user_dir"
+  id_list="$user_dir/ID.list"
   printf "%s %-9s \033[36m%s\033[0m %s\n" "$space" "User-List" "-->" "$id_list"
   id root yj > "$id_list" # 当前$USER的ID信息
 }
@@ -108,21 +172,26 @@ else
       -n | --name)
         case $2 in
           all)
-            getPackageInfo
-            getServiceInfo
-            getUserInfo
+            collectPackageInfo
+            collectServiceInfo
+            collectAppInfo
+            collectUserInfo
             shift 1
             ;;
           package)
-            getPackageInfo
+            collectPackageInfo
             shift 1
             ;;
           service)
-            getServiceInfo
+            collectServiceInfo
+            shift 1
+            ;;
+          app)
+            collectAppInfo
             shift 1
             ;;
           user)
-            getUserInfo
+            collectUserInfo
             shift 1
             ;;
           --)

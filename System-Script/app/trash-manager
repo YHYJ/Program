@@ -24,12 +24,15 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=2.2.0
-readonly minor_version=20230313
+readonly major_version=2.2.1
+readonly minor_version=20230316
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_param=2 # 参数错误
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_param=2        # 参数错误
+readonly err_no_program=127 # 未找到命令
 
 #------------------------- Parameter Variable
 # description variable
@@ -37,10 +40,6 @@ readonly desc="用于控制回收站"
 
 # path variable
 readonly trash_path="$HOME/.local/share/Trash/files"
-# count variable
-number=$(find "$trash_path" -maxdepth 1 | wc -l)
-readonly number
-readonly real_number=$((number - 1))
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -69,17 +68,44 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
+function checkPath() {
+  if [[ -e "$1" ]]; then
+    if [[ ! -d "$1" ]]; then
+      echo -e "指定路径$1不是文件夹，已退出"
+      exit $err_file
+    fi
+  else
+    mkdir -p "$1"
+    echo -e "\n已创建$1\n"
+  fi
+}
+
+function checkCommand() {
+  if command -v "$1" &> /dev/null; then
+    return $normal
+  else
+    return $err_no_program
+  fi
+}
+
 function number() {
+  # count variable
+  count=$(find "$trash_path" -maxdepth 1 | wc -l)
+  count=$((count - 1))
   #function_body
-  if [[ $real_number != 0 ]]; then
-    echo "$real_number"
+  if [[ $count != 0 ]]; then
+    echo "$count"
   else
     echo ""
   fi
 }
 
 function listFile() {
-  notify-send --urgency=normal --icon=trashindicator --app-name='Trash info' "回收站文件" "$(ls -A "$trash_path")"
+  if checkCommand "notify-send"; then
+    notify-send --urgency=normal --icon=trashindicator --app-name='Trash info' "回收站文件" "$(ls -A "$trash_path")"
+  else
+    echo -e "xdg-open 未安装"
+  fi
 }
 
 ####################################################################
@@ -98,10 +124,12 @@ else
         shift 1
         ;;
       -l | --list)
+        checkPath "$trash_path"
         listFile
         shift 1
         ;;
       -n | --number)
+        checkPath "$trash_path"
         number
         shift 1
         ;;

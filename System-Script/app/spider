@@ -29,19 +29,20 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.0
-readonly minor_version=20230306
-readonly rel_version=2
+readonly major_version=0.2.2
+readonly minor_version=20230316
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_unknown=255 # 未知错误
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
 readonly desc="用于搜集Linux系统信息"
 
 # 搜集结果存储路径
-readonly datadir="$HOME/.cache/SpiderData"
+readonly storage="$HOME/.cache/SpiderData"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -51,7 +52,7 @@ function helpInfo() {
   echo -e ""
   echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
   echo -e "--------------------------------------------------"
-  echo -e "\033[1;33m搜集结果存储于\033[0m: \033[34m$datadir\033[0m"
+  echo -e "\033[1;33m搜集结果存储于\033[0m: \033[34m$storage\033[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -82,35 +83,42 @@ function finish() {
 }
 
 #------------------------- Feature Function
-function Check() {
-  if [[ ! -d $datadir ]]; then
-    mkdir "$datadir"
+function checkPath() {
+  if [[ ! -d $1 ]]; then
+    mkdir "$1"
   fi
 }
 
-function AppInfo() {
+function checkCommand() {
+  if ! command -v "$1" &> /dev/null; then
+    echo -e "$1 未安装"
+    exit $err_no_program
+  fi
+}
+
+function spiderAppInfo() {
   echo -e "\033[1;34mApp\033[0m"
-  /usr/local/bin/get-program-info --name all
+  collect-system --name app # App config file
 }
 
-function VirtualenvInfo() {
-  echo -e "\033[1;34mVirtualenv\033[0m"
-  /usr/local/bin/py-virtualenv-tool --save # Python Virtualenv
-}
-
-function PackageInfo() {
+function spiderPackageInfo() {
   echo -e "\033[1;34mPackage\033[0m"
-  /usr/local/bin/collect-system-info --name package # Package List
+  collect-system --name package # Package List
 }
 
-function ServiceInfo() {
+function spiderServiceInfo() {
   echo -e "\033[1;34mService\033[0m"
-  /usr/local/bin/collect-system-info --name service # Service List
+  collect-system --name service # Service List
 }
 
-function UserInfo() {
+function spiderUserInfo() {
   echo -e "\033[1;34mUser\033[0m"
-  /usr/local/bin/collect-system-info --name user # User List
+  collect-system --name user # User List
+}
+
+function spiderVirtualenvInfo() {
+  echo -e "\033[1;34mVirtualenv\033[0m"
+  py-virtualenv-tool --save # Python Virtualenv
 }
 
 ####################################################################
@@ -127,42 +135,49 @@ else
       -g | --get)
         case $2 in
           all)
-            Check
-            AppInfo
-            PackageInfo
-            ServiceInfo
-            UserInfo
-            VirtualenvInfo
+            checkCommand "collect-system"
+            checkCommand "py-virtualenv-tool"
+            checkPath "$1"
+            spiderAppInfo
+            spiderPackageInfo
+            spiderServiceInfo
+            spiderUserInfo
+            spiderVirtualenvInfo
             finish
             shift 1
             ;;
           app)
-            Check
-            AppInfo
+            checkCommand "collect-system"
+            checkPath "$1"
+            spiderAppInfo
             finish
             shift 1
             ;;
           env)
-            Check
-            VirtualenvInfo
+            checkCommand "py-virtualenv-tool"
+            checkPath "$1"
+            spiderVirtualenvInfo
             finish
             shift 1
             ;;
           package)
-            Check
-            PackageInfo
+            checkCommand "collect-system"
+            checkPath "$1"
+            spiderPackageInfo
             finish
             shift 1
             ;;
           service)
-            Check
-            ServiceInfo
+            checkCommand "collect-system"
+            checkPath "$1"
+            spiderServiceInfo
             finish
             shift 1
             ;;
           user)
-            Check
-            UserInfo
+            checkCommand "collect-system"
+            checkPath "$1"
+            spiderUserInfo
             finish
             shift 1
             ;;

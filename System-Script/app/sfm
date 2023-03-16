@@ -12,7 +12,7 @@ Attentions:
 -
 
 Depends:
-- util-linux
+- xdg-utils
 !
 
 ####################################################################
@@ -23,12 +23,13 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.5
-readonly minor_version=20230216
+readonly major_version=0.2.6
+readonly minor_version=20230316
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0 # 一切正常
+readonly normal=0           # 一切正常
+readonly err_no_program=127 # 未找到命令
 
 #------------------------- Parameter Variable
 # description variable
@@ -57,13 +58,25 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
-function getArgType() {
-  if [[ -d $1 ]]; then
-    xdg-open "$1" &> /dev/null &
-    exit $normal
+function checkCommand() {
+  if command -v "$1" &> /dev/null; then
+    return $normal
   else
-    xdg-open . &> /dev/null &
-    exit $normal
+    return $err_no_program
+  fi
+}
+
+function getArgType() {
+  if checkCommand "xdg-open"; then
+    if [[ -d $1 ]]; then
+      xdg-open "$1" &> /dev/null &
+      exit $normal
+    else
+      xdg-open . &> /dev/null &
+      exit $normal
+    fi
+  else
+    echo -e "xdg-open 未安装"
   fi
 }
 

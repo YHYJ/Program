@@ -23,12 +23,13 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.2.2
-readonly minor_version=20230213
+readonly major_version=0.2.3
+readonly minor_version=20230316
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_unknown=255 # 未知错误
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -58,7 +59,14 @@ function versionInfo() {
   echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
+
 #------------------------- Feature Function
+function checkCommand() {
+  if ! command -v "$1" &> /dev/null; then
+    echo -e "$1 未安装"
+    exit $err_no_program
+  fi
+}
 function startPolybar() { # 启动Polybar
   # 创建日志文件
   echo "---" | tee -a /tmp/polybar.log
@@ -94,10 +102,12 @@ else
   while true; do
     case $1 in
       -s | --start)
+        checkCommand "polybar"
         startPolybar
         shift 1
         ;;
       -r | --restart)
+        checkCommand "polybar"
         restartPolybar
         shift 1
         ;;

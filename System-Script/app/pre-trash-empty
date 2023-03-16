@@ -23,12 +23,14 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.0
-readonly minor_version=20230313
+readonly major_version=0.1.1
+readonly minor_version=20230316
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_unknown=255 # 未知错误
+readonly normal=0           # 一切正常
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -72,10 +74,23 @@ function askQuestion() {
     fi
   done
 }
+
 #------------------------- Feature Function
-function zenityStatus() {
+function checkCommand() {
+  if command -v "$1" &> /dev/null; then
+    return $normal
+  else
+    return $err_no_program
+  fi
+}
+
+function removeFile() {
   if [[ -n $DISPLAY ]]; then
-    zenity --question --default-cancel --text="是否确认移除回收站中的所有项目\n（这些项目将永远消失）"
+    if checkCommand "zenity"; then
+      zenity --question --default-cancel --text="是否确认移除回收站中的所有项目\n（这些项目将永远消失）"
+    else
+      askQuestion "是否确认移除回收站中的所有项目（这些项目将永远消失）[y/N]: "
+    fi
   else
     askQuestion "是否确认移除回收站中的所有项目（这些项目将永远消失）[y/N]: "
   fi
@@ -101,7 +116,7 @@ else
   while true; do
     case $1 in
       -f | --force)
-        zenityStatus "$1"
+        removeFile "$1"
         shift 1
         ;;
       -h | --help)

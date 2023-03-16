@@ -29,16 +29,17 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.4.0
-readonly minor_version=20230313
+readonly major_version=3.4.1
+readonly minor_version=20230316
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0        # 一切正常
-readonly err_file=1      # 文件/路径类错误
-readonly err_param=2     # 参数错误
-readonly err_range=122   # 取值范围错误
-readonly err_unknown=255 # 未知错误
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_param=2        # 参数错误
+readonly err_range=122      # 取值范围错误
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -110,7 +111,7 @@ function setConfile() {
   echo -e "$meta_ip\n$local_ip" > "$confile"
 }
 
-function fileDetection() {
+function checkPath() {
   if [[ ! -f $confile ]]; then
     mkdir -p "$conf_dir"
   fi
@@ -119,6 +120,13 @@ function fileDetection() {
   ls -l /sys/class/net/ | rg -v 'virtual|total' | awk '{print $NF}' | awk -F/ '{print $NF}' | awk 'NR==1 {next} {print $1}' >> "$confile"
   all_nic=$(cat "$confile")
   readonly all_nic
+}
+
+function checkCommand() {
+  if ! command -v "$1" &> /dev/null; then
+    echo -e "$1 未安装，无法启动服务"
+    exit $err_no_program
+  fi
 }
 
 function getIP() {
@@ -197,7 +205,7 @@ function startServer() {
 ARGS=$(getopt --options "d:p:chv" --longoptions "dir:,port:,card,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
-fileDetection
+checkPath
 
 if [[ ${#@} -lt 2 ]]; then
   startServer
@@ -205,14 +213,17 @@ else
   while true; do
     case $1 in
       -d | --dir)
+        checkCommand "python"
         getDir "$2"
         shift 2
         ;;
       -p | --port)
+        checkCommand "python"
         getPort "$2"
         shift 2
         ;;
       -c | --card)
+        checkCommand "python"
         echo -e "本机可用网卡/IP有："
         echo -e "\033[1;37m$all_nic\033[0m"
         askQuestion "请指定网卡/IP，默认为$default_ip(等待$time_out秒): "

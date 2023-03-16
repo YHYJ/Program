@@ -23,21 +23,25 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.5
-readonly minor_version=20230306
-readonly rel_version=2
+readonly major_version=0.1.0
+readonly minor_version=20230316
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly err_unknown=255 # 未知错误
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
 readonly desc="用于操作Python Virtualenv"
 # environment variable
-readonly storage="$HOME/.cache/SpiderData/App/virtualenv"
+readonly storage="$HOME/.cache/SpiderData"
+readonly app_virtualenv_dir="$storage/App/virtualenv"
+# app variable
 readonly virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
 readonly virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
-
 # printf variable
 readonly space='    '
 
@@ -66,53 +70,86 @@ function versionInfo() {
   echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
+
 #------------------------- Feature Function
 if [ -s "$virtualenvwrapper_lazy" ]; then
   # shellcheck source=/dev/null
   source "$virtualenvwrapper_lazy"
-else
+elif [ -s "$virtualenvwrapper" ]; then
   # shellcheck source=/dev/null
   source "$virtualenvwrapper"
+else
+  echo -e "virtualenv(wrapper) 未安装"
+  exit $err_no_program
 fi
 venvs=$(workon)
 
+function checkPath() {
+  if [[ -e "$1" ]]; then
+    if [[ ! -d "$1" ]]; then
+      echo -e "指定路径$1不是文件夹，已退出"
+      exit $err_file
+    fi
+  else
+    mkdir -p "$1"
+    echo -e "\n已创建$1\n"
+  fi
+}
+
+function checkCommand() {
+  if command -v "$1" &> /dev/null; then
+    return $normal
+  else
+    return $err_no_program
+  fi
+}
+
 function deleteVirtualenvFile() {
-  rm -rf "${storage:?}/"*
+  # 删除虚拟环境备份文件
+  rm -rf "${app_virtualenv_dir:?}/"*
 }
 
 function saveVirtualenv() {
-  printf "%s %-11s \033[36m%s\033[0m %s\n" "$space" "Python-Venv" "-->" "$storage/*"
-  for venv in ${venvs[*]}; do
-    workon "$venv"
-    pyversion=$(python -V | tr ' ' '-')
-    filepath="$storage"/requirements_"$pyversion"_"$venv".txt
-    pip freeze > "$filepath"
-    printf "%s%s Venv: \033[37m%s\033[0m \033[35m%2s\033[0m\n" "$space" "$space" "$venv" "✔"
-  done
+  if checkCommand "pip"; then
+    printf "%s %-11s \033[36m%s\033[0m %s\n" "$space" "Python-Venv" "-->" "$app_virtualenv_dir/*"
+    for venv in ${venvs[*]}; do
+      workon "$venv"
+      pyversion=$(python -V | tr ' ' '-')
+      filepath="$app_virtualenv_dir"/requirements_"$pyversion"_"$venv".txt
+      pip freeze > "$filepath"
+      printf "%s%s Venv: \033[37m%s\033[0m \033[35m%2s\033[0m\n" "$space" "$space" "$venv" "✔"
+    done
+  else
+    echo -e "pip 未安装，无法备份开发环境"
+  fi
 }
 
 function makeVirtualenv() {
-  # 遍历存储的requirements*.txt，得到绝对路径表示的文件名
-  if [ "$(ls -A "$storage")" ]; then
-    for filepath in "$storage"/*.txt; do
-      # 获取文件名并切分得到虚拟环境名
-      filename=$(basename "$filepath")
-      envname=$(echo "$filename" | cut -d "_" -f 3 | cut -d "." -f 1)
-      # 将切分得到的虚拟环境名和现有虚拟环境名做对比
-      if [[ ! "${venvs[*]}" =~ $envname ]]; then
-        # 名字不同则创建并搭建环境
-        mkvirtualenv -p python3 "$envname"
-        workon "$envname"
-        pip install -r "$filepath"
-      fi
-    done
+  if checkCommand "pip"; then
+    # 遍历存储的requirements*.txt，得到绝对路径表示的文件名
+    if [ "$(ls -A "$app_virtualenv_dir")" ]; then
+      for filepath in "$app_virtualenv_dir"/*.txt; do
+        # 获取文件名并切分得到虚拟环境名
+        filename=$(basename "$filepath")
+        envname=$(echo "$filename" | cut -d "_" -f 3 | cut -d "." -f 1)
+        # 将切分得到的虚拟环境名和现有虚拟环境名做对比
+        if [[ ! "${venvs[*]}" =~ $envname ]]; then
+          # 名字不同则创建并搭建环境
+          mkvirtualenv -p python3 "$envname"
+          workon "$envname"
+          pip install -r "$filepath"
+        fi
+      done
+    fi
+  else
+    echo -e "pip 未安装，无法搭建开发环境"
   fi
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-mkdir -p "$storage"
+mkdir -p "$app_virtualenv_dir"
 
 ARGS=$(getopt --options "dsmhv" --longoptions "delete,save,make,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
@@ -121,6 +158,7 @@ if [[ ${#@} -lt 2 ]]; then
   helpInfo
 else
   while true; do
+    checkPath "$app_virtualenv_dir"
     case $1 in
       -d | --delete)
         deleteVirtualenvFile
