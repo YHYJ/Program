@@ -137,7 +137,7 @@ else
           all)
             checkCommand "collect-system"
             checkCommand "py-virtualenv-tool"
-            checkPath "$1"
+            checkPath "$storage"
             spiderAppInfo
             spiderPackageInfo
             spiderServiceInfo
@@ -148,35 +148,35 @@ else
             ;;
           app)
             checkCommand "collect-system"
-            checkPath "$1"
+            checkPath "$storage"
             spiderAppInfo
             finish
             shift 1
             ;;
           env)
             checkCommand "py-virtualenv-tool"
-            checkPath "$1"
+            checkPath "$storage"
             spiderVirtualenvInfo
             finish
             shift 1
             ;;
           package)
             checkCommand "collect-system"
-            checkPath "$1"
+            checkPath "$storage"
             spiderPackageInfo
             finish
             shift 1
             ;;
           service)
             checkCommand "collect-system"
-            checkPath "$1"
+            checkPath "$storage"
             spiderServiceInfo
             finish
             shift 1
             ;;
           user)
             checkCommand "collect-system"
-            checkPath "$1"
+            checkPath "$storage"
             spiderUserInfo
             finish
             shift 1
