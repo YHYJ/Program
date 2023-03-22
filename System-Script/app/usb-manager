@@ -13,6 +13,7 @@ Attentions:
 
 Depends:
 - udisks2
+- jq
 !
 
 ####################################################################
@@ -25,7 +26,7 @@ readonly name
 # program version
 readonly major_version=1.2.1
 readonly minor_version=20230322
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly err_no_program=127 # 未找到命令
@@ -69,9 +70,9 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
-function checkPath() {
-  if [[ ! -d $1 ]]; then
-    mkdir "$1"
+function checkFile() {
+  if [[ ! -f $1 ]]; then
+    touch "$1"
   fi
 }
 
@@ -83,7 +84,7 @@ function checkCommand() {
 }
 
 function usb_update() {
-  checkPath "$pid_file"
+  checkFile "$pid_file"
   pid=$(cat "$pid_file")
 
   if [[ $pid != "" ]]; then
