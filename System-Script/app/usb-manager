@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=1.2.0
-readonly minor_version=20230313
+readonly major_version=1.2.1
+readonly minor_version=20230322
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -177,7 +177,7 @@ else
         shift 1
         ;;
       -m | --mount)
-        checkCommand "udisks2"
+        checkCommand "udisksctl"
         usb_mount
         usb_update
         result=$?
@@ -189,7 +189,7 @@ else
         shift 1
         ;;
       -d | --unmount)
-        checkCommand "udisks2"
+        checkCommand "udisksctl"
         usb_unmount
         usb_update
         result=$?
