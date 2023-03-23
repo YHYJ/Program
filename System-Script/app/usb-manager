@@ -35,7 +35,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于控制可移动USB存储设备"
+readonly desc=" is a tool for controlling USB storage devices"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -50,18 +50,18 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -l, --list                                列出USB存储设备"
-  echo -e "     -m, --mount   [all, PartName, DiskName]   挂载USB存储设备"
-  echo -e "     -u, --unmount [all, PartName, DiskName]   卸载USB存储设备（仅卸载）"
-  echo -e "     -r, --remove  [all, DiskName]             弹出USB存储设备（卸载并弹出）"
+  echo -e "     -l, --list                                List USB storage devices"
+  echo -e "     -m, --mount   [all, PartName, DiskName]   Mount USB storage device"
+  echo -e "     -u, --unmount [all, PartName, DiskName]   Unmount USB storage device (unmount)"
+  echo -e "     -r, --remove  [all, PartName, DiskName]   Remove USB storage device (unmount/remove)"
   echo -e ""
-  echo -e "     -h, --help                                显示帮助信息"
-  echo -e "     -v, --version                             显示版本信息"
+  echo -e "     -h, --help                                Display help information"
+  echo -e "     -v, --version                             Display version information"
   echo -e ""
   echo -e "Args:"
-  echo -e "     all     : 所有可移动USB存储设备"
-  echo -e "     PartName: 指定的可移动USB存储设备分区"
-  echo -e "     DiskName: 指定的可移动USB存储设备"
+  echo -e "     all     : All USB storage devices"
+  echo -e "     PartName: Partition name of USB storage device"
+  echo -e "     DiskName: USB storage device name"
 }
 
 function versionInfo() {
@@ -72,7 +72,7 @@ function versionInfo() {
 #------------------------- Feature Function
 function checkCommand() {
   if ! command -v "$1" &> /dev/null; then
-    echo -e "$1 未安装"
+    echo -e "$1 is not installed"
     exit $err_no_program
   fi
 }
@@ -117,7 +117,7 @@ function mountAction() { # 挂载设备
       udisksctl mount --no-user-interaction -b "$1"
     fi
   else
-    echo "$1 不是可移动USB存储设备"
+    echo "$1 is not a USB storage device"
     exit $err_file
   fi
 }
@@ -146,7 +146,7 @@ function unmountAction() { # 卸载设备
       udisksctl unmount --no-user-interaction -b "$1"
     fi
   else
-    echo "$1 不是可移动USB存储设备"
+    echo "$1 is not a USB storage device"
     exit $err_file
   fi
 }
@@ -173,7 +173,7 @@ function removeAction() { # 移除设备
       echo -e "$1 is safely removed"
     fi
   else
-    echo "$1 不是可移动USB存储设备"
+    echo "$1 is not a USB storage device"
     exit $err_file
   fi
 }
