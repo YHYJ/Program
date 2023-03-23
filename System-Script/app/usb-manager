@@ -24,27 +24,18 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.1
-readonly minor_version=20230322
-readonly rel_version=1
+readonly major_version=0.3.1
+readonly minor_version=20230323
+readonly rel_version=3
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
 readonly err_file=1         # 文件/路径类错误
-readonly err_param=2        # 参数错误
-readonly err_fetch=48       # checkupdate错误
-readonly err_permission=110 # 权限错误
-readonly err_range=122      # 取值范围错误
 readonly err_no_program=127 # 未找到命令
-readonly err_ctrl_c=130     # 接收到INT(Ctrl+C)指令
 readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
 readonly desc="用于控制可移动USB存储设备"
-
-# time variable
-readonly time_out=1
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -101,20 +92,19 @@ function mountAction() { # 挂载设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
-  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .name' | tr '\n' ' ')"
   IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.rm == true) | .name' | tr '\n' ' ')"
+  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .name' | tr '\n' ' ')"
 
   if [[ "$1" == 'all' ]]; then
     # --mount 的参数是'all'，挂载所有part
     for ((index = 0; index < ${#partnames[*]}; index++)); do
       udisksctl mount --no-user-interaction -b "${partnames[index]}"
     done
-  elif [ -b "$1" ]; then
+  elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
       # --mount 的参数是disk，挂载该disk的所有part
       IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
       for ((index = 0; index < ${#disk_parts[*]}; index++)); do
-        echo "挂载 ${disk_parts[index]}"
         udisksctl mount --no-user-interaction -b "${disk_parts[index]}"
       done
     else
@@ -127,28 +117,27 @@ function mountAction() { # 挂载设备
   fi
 }
 
-function umountAction() { # 卸载设备
+function unmountAction() { # 卸载设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
-  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
   IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.rm == true) | .name' | tr '\n' ' ')"
+  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
 
   if [[ "$1" == 'all' ]]; then
-    # --mount 的参数是'all'，卸载所有part
+    # --unmount 的参数是'all'，卸载所有part
     for ((index = 0; index < ${#partnames[*]}; index++)); do
       udisksctl unmount --no-user-interaction -b "${partnames[index]}"
     done
-  elif [ -b "$1" ]; then
+  elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
-      # --mount 的参数是disk，卸载该disk的所有part
+      # --unmount 的参数是disk，卸载该disk的所有part
       IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
       for ((index = 0; index < ${#disk_parts[*]}; index++)); do
-        echo "卸载 ${disk_parts[index]}"
         udisksctl unmount --no-user-interaction -b "${disk_parts[index]}"
       done
     else
-      # --mount 的参数是part，卸载该part
+      # --unmount 的参数是part，卸载该part
       udisksctl unmount --no-user-interaction -b "$1"
     fi
   else
@@ -161,29 +150,38 @@ function removeAction() { # 移除设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
-  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
   IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.rm == true) | .name' | tr '\n' ' ')"
+  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
 
-  # 卸载分区
-  for ((index = 0; index < ${#partnames[*]}; index++)); do
-    udisksctl unmount --no-user-interaction -b "${partnames[index]}"
-  done
+  # 卸载设备
+  unmountAction "$1"
 
-  # 弹出磁盘
-  for ((index = 0; index < ${#disknames[*]}; index++)); do
-    udisksctl power-off --no-user-interaction -b "${disknames[index]}"
-    echo -e "${disknames[index]} is safely removed"
-  done
+  if [[ "$1" == 'all' ]]; then
+    # 移除设备
+    for ((index = 0; index < ${#disknames[*]}; index++)); do
+      udisksctl power-off --no-user-interaction -b "${disknames[index]}"
+      echo -e "${disknames[index]} is safely removed"
+    done
+  elif [ -b "$1" ]; then # 检测是否是块设备
+    if [[ "${disknames[*]}" =~ $1 ]]; then
+      udisksctl power-off --no-user-interaction -b "$1"
+      echo -e "$1 is safely removed"
+    fi
+  else
+    echo "$1 不是可移动USB存储设备"
+    exit $err_file
+  fi
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "lm:u:rhv" --longoptions "list,mount:,unmount:,remove,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "lm:u:r:hv" --longoptions "list,mount:,unmount:,remove:,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  helpInfo
+  checkCommand "udisksctl"
+  listAction
 else
   while true; do
     case $1 in
@@ -199,13 +197,13 @@ else
         ;;
       -u | --unmount)
         checkCommand "udisksctl"
-        umountAction "$2"
+        unmountAction "$2"
         shift 2
         ;;
       -r | --remove)
         checkCommand "udisksctl"
-        removeAction
-        shift 1
+        removeAction "$2"
+        shift 2
         ;;
       -h | --help)
         helpInfo
