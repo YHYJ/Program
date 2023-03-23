@@ -59,9 +59,10 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
+  echo -e "     -l, --list        列出USB存储设备"
   echo -e "     -m, --mount       挂载USB存储设备"
-  echo -e "     -u, --umount      卸载USB存储设备（仅解除挂载）"
-  echo -e "     -r, --remove      弹出USB存储设备（解除挂载并弹出）"
+  echo -e "     -u, --umount      卸载USB存储设备（仅卸载）"
+  echo -e "     -r, --remove      弹出USB存储设备（卸载并弹出）"
   echo -e ""
   echo -e "     -h, --help        显示帮助信息"
   echo -e "     -v, --version     显示版本信息"
@@ -78,6 +79,16 @@ function checkCommand() {
     echo -e "$1 未安装"
     exit $err_no_program
   fi
+}
+
+function listAction() {
+  # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
+  devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
+  # 使用jq查找符合要求的设备
+  partnames=$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .name, .mountpoint')
+
+  # 挂载分区
+  echo -e "$partnames"
 }
 
 function mountAction() {
@@ -126,7 +137,7 @@ function removeAction() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "murhv" --longoptions "mount,umount,remove,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "lmurhv" --longoptions "list,mount,umount,remove,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -134,6 +145,11 @@ if [[ ${#@} -lt 2 ]]; then
 else
   while true; do
     case $1 in
+      -l | --list)
+        checkCommand "udisksctl"
+        listAction
+        shift 1
+        ;;
       -m | --mount)
         checkCommand "udisksctl"
         mountAction
