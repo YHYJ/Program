@@ -24,9 +24,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.3.1
+readonly major_version=0.3.2
 readonly minor_version=20230323
-readonly rel_version=3
+readonly rel_version=4
 
 #------------------------- Exit Code Variable
 readonly err_file=1         # 文件/路径类错误
@@ -185,8 +185,7 @@ ARGS=$(getopt --options "lm:u:r:hv" --longoptions "list,mount:,unmount:,remove:,
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  checkCommand "udisksctl"
-  listAction
+  helpInfo
 else
   while true; do
     case $1 in
