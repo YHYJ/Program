@@ -59,13 +59,13 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -l, --list        列出USB存储设备"
-  echo -e "     -m, --mount       挂载USB存储设备"
-  echo -e "     -u, --umount      卸载USB存储设备（仅卸载）"
-  echo -e "     -r, --remove      弹出USB存储设备（卸载并弹出）"
+  echo -e "     -l, --list                      列出USB存储设备"
+  echo -e "     -m, --mount   [all, PartName]   挂载USB存储设备"
+  echo -e "     -u, --unmount [all, PartName]   卸载USB存储设备（仅卸载）"
+  echo -e "     -r, --remove  [all, DiskName]   弹出USB存储设备（卸载并弹出）"
   echo -e ""
-  echo -e "     -h, --help        显示帮助信息"
-  echo -e "     -v, --version     显示版本信息"
+  echo -e "     -h, --help                      显示帮助信息"
+  echo -e "     -v, --version                   显示版本信息"
 }
 
 function versionInfo() {
@@ -81,7 +81,7 @@ function checkCommand() {
   fi
 }
 
-function listAction() {
+function listAction() { # 列出设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备并转为数组存储（IFS=" "指定使用空格作为分隔符）
@@ -97,32 +97,67 @@ function listAction() {
   done
 }
 
-function mountAction() {
+function mountAction() { # 挂载设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .name' | tr '\n' ' ')"
+  IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.rm == true) | .name' | tr '\n' ' ')"
 
-  # 挂载分区
-  for ((index = 0; index < ${#partnames[*]}; index++)); do
-    echo -e "${partnames[index]}"
-    # udisksctl mount --no-user-interaction -b "${partnames[index]}"
-  done
+  if [[ "$1" == 'all' ]]; then
+    # --mount 的参数是'all'，挂载所有part
+    for ((index = 0; index < ${#partnames[*]}; index++)); do
+      udisksctl mount --no-user-interaction -b "${partnames[index]}"
+    done
+  elif [ -b "$1" ]; then
+    if [[ "${disknames[*]}" =~ $1 ]]; then
+      # --mount 的参数是disk，挂载该disk的所有part
+      IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
+      for ((index = 0; index < ${#disk_parts[*]}; index++)); do
+        echo "挂载 ${disk_parts[index]}"
+        udisksctl mount --no-user-interaction -b "${disk_parts[index]}"
+      done
+    else
+      # --mount 的参数是part，挂载该part
+      udisksctl mount --no-user-interaction -b "$1"
+    fi
+  else
+    echo "$1 不是可移动USB存储设备"
+    exit $err_file
+  fi
 }
 
-function umountAction() {
+function umountAction() { # 卸载设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
+  IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.rm == true) | .name' | tr '\n' ' ')"
 
-  # 卸载分区
-  for ((index = 0; index < ${#partnames[*]}; index++)); do
-    udisksctl unmount --no-user-interaction -b "${partnames[index]}"
-  done
+  if [[ "$1" == 'all' ]]; then
+    # --mount 的参数是'all'，卸载所有part
+    for ((index = 0; index < ${#partnames[*]}; index++)); do
+      udisksctl unmount --no-user-interaction -b "${partnames[index]}"
+    done
+  elif [ -b "$1" ]; then
+    if [[ "${disknames[*]}" =~ $1 ]]; then
+      # --mount 的参数是disk，卸载该disk的所有part
+      IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
+      for ((index = 0; index < ${#disk_parts[*]}; index++)); do
+        echo "卸载 ${disk_parts[index]}"
+        udisksctl unmount --no-user-interaction -b "${disk_parts[index]}"
+      done
+    else
+      # --mount 的参数是part，卸载该part
+      udisksctl unmount --no-user-interaction -b "$1"
+    fi
+  else
+    echo "$1 不是可移动USB存储设备"
+    exit $err_file
+  fi
 }
 
-function removeAction() {
+function removeAction() { # 移除设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
@@ -144,7 +179,7 @@ function removeAction() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "lmurhv" --longoptions "list,mount,umount,remove,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "lm:u:rhv" --longoptions "list,mount:,unmount:,remove,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -159,13 +194,13 @@ else
         ;;
       -m | --mount)
         checkCommand "udisksctl"
-        mountAction
-        shift 1
+        mountAction "$2"
+        shift 2
         ;;
-      -u | --umount)
+      -u | --unmount)
         checkCommand "udisksctl"
-        umountAction
-        shift 1
+        umountAction "$2"
+        shift 2
         ;;
       -r | --remove)
         checkCommand "udisksctl"
