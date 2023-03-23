@@ -84,22 +84,29 @@ function checkCommand() {
 function listAction() {
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
-  # 使用jq查找符合要求的设备
-  partnames=$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .name, .mountpoint')
+  # 使用jq查找符合要求的设备并转为数组存储（IFS=" "指定使用空格作为分隔符）
+  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | .name' | tr '\n' ' ')"
+  IFS=" " read -r -a mountpoints <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | .mountpoint' | tr '\n' ' ')"
 
-  # 挂载分区
-  echo -e "$partnames"
+  for ((index = 0; index < ${#partnames[*]}; index++)); do
+    if [ "${mountpoints[index]}" == 'null' ]; then
+      echo -e "${partnames[index]} is not mounted"
+    else
+      echo -e "${partnames[index]} is mounted to ${mountpoints[index]}"
+    fi
+  done
 }
 
 function mountAction() {
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
-  partnames=$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .name')
+  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .name' | tr '\n' ' ')"
 
   # 挂载分区
-  for partname in $partnames; do
-    udisksctl mount --no-user-interaction -b "$partname"
+  for ((index = 0; index < ${#partnames[*]}; index++)); do
+    echo -e "${partnames[index]}"
+    # udisksctl mount --no-user-interaction -b "${partnames[index]}"
   done
 }
 
@@ -107,11 +114,11 @@ function umountAction() {
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
-  partnames=$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name')
+  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
 
   # 卸载分区
-  for partname in $partnames; do
-    udisksctl unmount --no-user-interaction -b "$partname"
+  for ((index = 0; index < ${#partnames[*]}; index++)); do
+    udisksctl unmount --no-user-interaction -b "${partnames[index]}"
   done
 }
 
@@ -119,18 +126,18 @@ function removeAction() {
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否可卸载(RM)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,RM,MOUNTPOINT)
   # 使用jq查找符合要求的设备
-  partnames=$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name')
-  disknames=$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.rm == true) | .name')
+  IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
+  IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.rm == true) | .name' | tr '\n' ' ')"
 
   # 卸载分区
-  for partname in $partnames; do
-    udisksctl unmount --no-user-interaction -b "$partname"
+  for ((index = 0; index < ${#partnames[*]}; index++)); do
+    udisksctl unmount --no-user-interaction -b "${partnames[index]}"
   done
 
   # 弹出磁盘
-  for diskname in $disknames; do
-    udisksctl power-off --no-user-interaction -b "$diskname"
-    echo -e "$diskname is safely removed"
+  for ((index = 0; index < ${#disknames[*]}; index++)); do
+    udisksctl power-off --no-user-interaction -b "${disknames[index]}"
+    echo -e "${disknames[index]} is safely removed"
   done
 }
 
