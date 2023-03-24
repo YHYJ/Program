@@ -24,9 +24,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.3.2
-readonly minor_version=20230323
-readonly rel_version=4
+readonly major_version=0.3.3
+readonly minor_version=20230324
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly err_file=1         # 文件/路径类错误
@@ -103,18 +103,18 @@ function mountAction() { # 挂载设备
   if [[ "$1" == 'all' ]]; then
     # --mount 的参数是'all'，挂载所有part
     for ((index = 0; index < ${#partnames[*]}; index++)); do
-      udisksctl mount --no-user-interaction -b "${partnames[index]}"
+      udisksctl mount --no-user-interaction --block-device "${partnames[index]}"
     done
   elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
       # --mount 的参数是disk，挂载该disk的所有part
       IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint == null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
       for ((index = 0; index < ${#disk_parts[*]}; index++)); do
-        udisksctl mount --no-user-interaction -b "${disk_parts[index]}"
+        udisksctl mount --no-user-interaction --block-device "${disk_parts[index]}"
       done
     else
       # --mount 的参数是part，挂载该part
-      udisksctl mount --no-user-interaction -b "$1"
+      udisksctl mount --no-user-interaction --block-device "$1"
     fi
   else
     echo "$1 is not a USB storage device"
@@ -132,18 +132,18 @@ function unmountAction() { # 卸载设备
   if [[ "$1" == 'all' ]]; then
     # --unmount 的参数是'all'，卸载所有part
     for ((index = 0; index < ${#partnames[*]}; index++)); do
-      udisksctl unmount --no-user-interaction -b "${partnames[index]}"
+      udisksctl unmount --no-user-interaction --block-device "${partnames[index]}"
     done
   elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
       # --unmount 的参数是disk，卸载该disk的所有part
       IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.rm == true) | select(.mountpoint != null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
       for ((index = 0; index < ${#disk_parts[*]}; index++)); do
-        udisksctl unmount --no-user-interaction -b "${disk_parts[index]}"
+        udisksctl unmount --no-user-interaction --block-device "${disk_parts[index]}"
       done
     else
       # --unmount 的参数是part，卸载该part
-      udisksctl unmount --no-user-interaction -b "$1"
+      udisksctl unmount --no-user-interaction --block-device "$1"
     fi
   else
     echo "$1 is not a USB storage device"
@@ -164,12 +164,12 @@ function removeAction() { # 移除设备
   if [[ "$1" == 'all' ]]; then
     # 移除设备
     for ((index = 0; index < ${#disknames[*]}; index++)); do
-      udisksctl power-off --no-user-interaction -b "${disknames[index]}"
+      udisksctl power-off --no-user-interaction --block-device "${disknames[index]}"
       echo -e "${disknames[index]} is safely removed"
     done
   elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
-      udisksctl power-off --no-user-interaction -b "$1"
+      udisksctl power-off --no-user-interaction --block-device "$1"
       echo -e "$1 is safely removed"
     fi
   else
