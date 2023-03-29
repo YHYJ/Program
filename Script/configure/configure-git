@@ -26,8 +26,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.0.4
-readonly minor_version=20230214
+readonly major_version=0.1.0
+readonly minor_version=20230329
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -104,8 +104,14 @@ function main() {
   echo -e "git配置完成\n\n"
 
   ssh-keygen -t rsa -C "yj1516268@outlook.com"
-  xsel < "$HOME/.ssh/id_rsa.pub" --clipboard --input
-  echo -e "公钥已复制到粘贴板，请到https://github.com/settings/keys进行设置\n\n"
+
+  if command -v xsel &> /dev/null; then
+    xsel < "$HOME/.ssh/id_rsa.pub" --clipboard --input
+    echo -e "公钥已复制到粘贴板，请到https://github.com/settings/keys进行设置\n\n"
+  else
+    echo -e "生成的公钥如下，请手动复制后到https://github.com/settings/keys进行设置\n\n"
+    cat "$HOME/.ssh/id_rsa.pub"
+  fi
 }
 
 ####################################################################
