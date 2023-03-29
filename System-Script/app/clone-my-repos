@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.3.3
-readonly minor_version=20230316
+readonly major_version=0.3.4
+readonly minor_version=20230329
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -120,7 +120,7 @@ function cloneRepo() {
 
     # 操作不存在同名文件的repo
     for e_repo in ${exist[*]}; do
-      echo -e "\n正在克隆$repo"
+      echo -e "\n正在克隆$e_repo"
       git clone --recurse-submodules git@github.com:YHYJ/"$e_repo".git "$path/$e_repo"
     done
 
