@@ -42,6 +42,7 @@ readonly package_dir="$storage/PackageList"
 readonly service_dir="$storage/ServiceList"
 readonly app_vim_dir="$storage/App/vim"
 readonly app_guake_dir="$storage/App/guake"
+readonly app_konsave_dir="$HOME/.config/konsave"
 readonly user_dir="$storage/UserList"
 # app variable
 readonly vim_conf="$HOME/.space-vim/private/config.vim"
@@ -139,7 +140,7 @@ function collectAppInfo() {
     sed -i "1i\\$line2" "$hotkey_doc"
     sed -i "1i\\$line1" "$hotkey_doc"
   else
-    echo -e "\n似乎未安装 vim/space-vim\n"
+    echo -e "\n似乎未安装 space-vim\n"
   fi
 
   # guake
@@ -148,6 +149,13 @@ function collectAppInfo() {
     guake_conf="$app_guake_dir/guake.conf"
     printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
     guake --save-preferences="$guake_conf" # guake的配置文件
+  fi
+
+  # konsave
+  if checkCommand "konsave"; then
+    checkPath "$app_konsave_dir"
+    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Guake-Confile" "-->" "$app_konsave_dir/*"
+    konsave --force --save "$(hostname)"
   fi
 }
 
