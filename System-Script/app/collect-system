@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.1
-readonly minor_version=20230316
+readonly major_version=0.1.2
+readonly minor_version=20230330
 readonly rel_version=2
 
 #------------------------- Exit Code Variable
@@ -154,8 +154,8 @@ function collectAppInfo() {
   # konsave
   if checkCommand "konsave"; then
     checkPath "$app_konsave_dir"
-    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Guake-Confile" "-->" "$app_konsave_dir/*"
-    konsave --force --save "$(hostname)"
+    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Plasma-Confile" "-->" "$app_konsave_dir/*"
+    konsave --force --save "$(hostname)" &> /dev/null
   fi
 }
 
