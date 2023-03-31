@@ -24,8 +24,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=2.2.1
-readonly minor_version=20230316
+readonly major_version=2.3.1
+readonly minor_version=20230331
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -68,6 +68,21 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
+function askQuestion() {
+  while true; do
+    read -e -r -p "$1"
+    REPLY=${REPLY:-N}
+    echo
+    if [[ "$REPLY" =~ ^[Yy] ]]; then
+      return 0
+    elif [[ "$REPLY" =~ ^[Nn] ]]; then
+      return 1
+    else
+      echo -e "应输入 Y/y 或 N/n\n"
+    fi
+  done
+}
+
 function checkPath() {
   if [[ -e "$1" ]]; then
     if [[ ! -d "$1" ]]; then
@@ -88,7 +103,7 @@ function checkCommand() {
   fi
 }
 
-function number() {
+function trashFileNmber() {
   # count variable
   count=$(find "$trash_path" -maxdepth 1 | wc -l)
   count=$((count - 1))
@@ -100,11 +115,32 @@ function number() {
   fi
 }
 
-function listFile() {
+function listTrashFile() {
   if checkCommand "notify-send"; then
-    notify-send --urgency=normal --icon=trashindicator --app-name='Trash info' "回收站文件" "$(ls -A "$trash_path")"
+    notify-send --urgency=normal --icon=trashindicator --app-name='Trash info' "回收站文件 ($(du -s -h "$trash_path" | awk '{print $1}'))" "$(ls -A "$trash_path")"
   else
-    echo -e "xdg-open 未安装"
+    echo -e "$(ls -A "$trash_path")"
+    echo -e "$(du -s -h "$trash_path")"
+  fi
+}
+
+function emptyTrash() {
+  if [[ -n $DISPLAY ]]; then
+    if checkCommand "zenity"; then
+      zenity --question --default-cancel --text="是否确认移除回收站中的所有项目\n（这些项目将永远消失）"
+    else
+      askQuestion "是否确认移除回收站中的所有项目（这些项目将永远消失）[y/N]: "
+    fi
+  else
+    askQuestion "是否确认移除回收站中的所有项目（这些项目将永远消失）[y/N]: "
+  fi
+  status=$?
+  if [[ $status == 0 ]]; then
+    if [[ -n $1 ]]; then
+      /usr/bin/trash-empty -f
+    else
+      /usr/bin/trash-empty
+    fi
   fi
 }
 
@@ -120,17 +156,18 @@ else
   while true; do
     case $1 in
       -e | --empty)
-        /usr/local/bin/trash-empty_substitute --force
+        checkPath "$trash_path"
+        emptyTrash "$1"
         shift 1
         ;;
       -l | --list)
         checkPath "$trash_path"
-        listFile
+        listTrashFile
         shift 1
         ;;
       -n | --number)
         checkPath "$trash_path"
-        number
+        trashFileNmber
         shift 1
         ;;
       -h | --help)
