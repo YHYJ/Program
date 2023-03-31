@@ -26,7 +26,7 @@ readonly name
 # program version
 readonly major_version=2.3.1
 readonly minor_version=20230331
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -120,6 +120,7 @@ function listTrashFile() {
     notify-send --urgency=normal --icon=trashindicator --app-name='Trash info' "回收站文件 ($(du -s -h "$trash_path" | awk '{print $1}'))" "$(ls -A "$trash_path")"
   else
     echo -e "$(ls -A "$trash_path")"
+    echo -e ""
     echo -e "$(du -s -h "$trash_path")"
   fi
 }
