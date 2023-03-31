@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.2.1
-readonly minor_version=20230316
+readonly major_version=0.2.2
+readonly minor_version=20230331
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -47,13 +47,14 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -b, --boot-time           显示最近开机时间"
-  echo -e "     -k, --kernel-version      显示内核版本"
-  echo -e "     -p, --package-updateable  显示可用更新"
-  echo -e "     -r, --run-time            显示系统运行时长"
-  echo -e "     -s, --service-status      显示更新检测状态"
-  echo -e "     -t, --time-spent          显示系统启动用时"
-  echo -e "     -u, --user-online         显示当前登录用户"
+  echo -e "     -b, --boot-time           查询最近开机时间"
+  echo -e "     -k, --kernel-version      查询内核版本"
+  echo -e "     -l, --system-load         查询系统负载"
+  echo -e "     -p, --package-updateable  查询可用更新"
+  echo -e "     -r, --run-time            查询系统运行时长"
+  echo -e "     -s, --service-status      查询更新检测状态"
+  echo -e "     -t, --time-spent          查询系统启动用时"
+  echo -e "     -u, --user-online         查询当前登录用户"
   echo -e ""
   echo -e "     -h, --help                显示帮助信息"
   echo -e "     -v, --version             显示版本信息"
@@ -69,7 +70,7 @@ function versionInfo() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "bkprstuhv" --longoptions "boot-time,kernel-version,package-updateable,run-time,service-status,time-spent,user-online,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "bklprstuhv" --longoptions "boot-time,kernel-version,system-load,package-updateable,run-time,service-status,time-spent,user-online,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -83,6 +84,10 @@ else
         ;;
       -k | --kernel-version)
         uname -sr
+        shift 1
+        ;;
+      -l | --system-load)
+        uptime | awk -F ': ' '{print $NF}'
         shift 1
         ;;
       -p | --package-updateable)
@@ -104,7 +109,7 @@ else
         shift 1
         ;;
       -u | --user-online)
-        who -q | sed 's/# //'
+        who -q | tr '\n' ' ' | awk -F '%' '{print $NF}'
         shift 1
         ;;
       -h | --help)
