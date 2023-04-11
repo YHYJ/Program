@@ -26,9 +26,9 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.4.0
-readonly minor_version=20230316
-readonly rel_version=2
+readonly major_version=3.4.1
+readonly minor_version=20230411
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly err_file=1         # 文件/路径类错误
@@ -45,7 +45,7 @@ readonly username
 attribution='root'
 readonly attribution
 # path variable
-readonly source_path="/home/$username/Documents/MyRepos/System/Program/System-Script/app"
+readonly source_path="/home/$username/Documents/Repos/System/Program/System-Script/app"
 readonly target_path="/usr/local/bin"
 readonly conf_dir="/home/$username/.config/yj"
 readonly confile="$conf_dir/$name.conf"

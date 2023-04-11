@@ -23,7 +23,7 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.1
+readonly major_version=0.1.2
 readonly minor_version=20230411
 readonly rel_version=1
 
@@ -91,7 +91,10 @@ function addTags() {
   if [[ -d "$target_folder" ]]; then
     for folder in "$target_folder"/*; do
       if [[ -d "$folder" ]]; then
-        if [[ -d "$folder/.git" ]]; then
+        if [ "$tagname" ]; then
+          echo "$tagname"
+          tag -y "$folder" -t "$tagname"
+        elif [[ -d "$folder/.git" ]]; then
           tag -y "$folder" -t "repo"
         else
           tag=$(basename "$folder" | tr '[:upper:]' '[:lower:]')
@@ -99,9 +102,9 @@ function addTags() {
         fi
         ((num++))
       elif [[ -f "$folder" ]]; then
-        echo -e "$folder是文本文件，忽略."
+        echo -e "$folder是文本文件，忽略"
       else
-        echo -e "$folder文件类型未知，忽略."
+        echo -e "$folder文件类型未知，忽略"
       fi
       echo -e ""
     done
@@ -118,8 +121,7 @@ function main() {
   checkUser "root"
 
   if [[ -x "$dtags_path" ]]; then
-    echo "$tag"
-    addTags "$tag"
+    addTags
   else
     echo -e "请先安装dtags"
   fi
@@ -138,15 +140,25 @@ else
     case $1 in
       -f | --folder)
         target_folder=$2
-        shift 1
+        shift 2
+        if [[ ${#@} -le 1 ]]; then
+          main
+        fi
+        ;;
+      -t | --tag)
+        tagname=$2
+        shift 2
+        if [[ ${#@} -le 1 ]]; then
+          main
+        fi
         ;;
       -h | --help)
         helpInfo
-        exit $normal
+        shift 1
         ;;
       -v | --version)
         versionInfo
-        exit $normal
+        shift 1
         ;;
       --)
         shift 1
@@ -157,6 +169,6 @@ else
         exit $err_unknown
         ;;
     esac
-    main
+    # main
   done
 fi

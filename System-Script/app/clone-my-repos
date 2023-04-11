@@ -40,7 +40,7 @@ readonly desc="用于克隆我的GitHub仓库"
 
 #------------------------- Parameter Variable
 # path variable
-readonly path="$HOME/Documents/MyRepos"
+readonly path="$HOME/Documents/Repos"
 readonly repos=(
   YHYJ
   System TimeNote

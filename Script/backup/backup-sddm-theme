@@ -37,7 +37,7 @@ readonly err_unknown=255    # 未知错误
 readonly desc="用于备份SDDM的主题文件"
 # path variable
 readonly themepath="/usr/share/sddm/themes"
-readonly backupdir="$HOME/Documents/MyRepos/System-Conf/confile/usr/share/sddm"
+readonly backupdir="$HOME/Documents/Repos/System-Conf/confile/usr/share/sddm"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#

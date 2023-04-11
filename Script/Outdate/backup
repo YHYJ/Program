@@ -42,7 +42,7 @@ readonly err_permission=110 # 权限错误
 readonly desc="用于备份Linux系统信息和配置"
 
 # 总备份文件存储路径
-readonly backup_path="$HOME/Documents/MyRepos/System-Conf"
+readonly backup_path="$HOME/Documents/Repos/System-Conf"
 
 ## 需要备份的文件的前缀路径
 # $HOME/.cache
