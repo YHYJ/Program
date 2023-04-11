@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+
+: << !
+Name: 3-init-root
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2023-04-10 10:00:17
+
+Description: 初始化root账户
+
+Attentions:
+-登录到root账户而非使用sudo提权使用
+
+Depends:
+-
+!
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.0.1
+readonly minor_version=20230411
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_param=2        # 参数错误
+readonly err_fetch=48       # checkupdate错误
+readonly err_permission=110 # 权限错误
+readonly err_range=122      # 取值范围错误
+readonly err_no_program=127 # 未找到命令
+readonly err_ctrl_c=130     # 接收到INT(Ctrl+C)指令
+readonly err_unknown=255    # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="初始化root账户"
+# 主目录设置
+readonly yj_home="/home/yj"
+readonly root_home="/root"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+  echo -e ""
+  echo -e "Notice:"
+  echo -e "    \033[5m登录到root账户而非使用sudo提权使用\033[0m"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+}
+
+#------------------------- Feature Function
+function checkUser() {
+  if [[ $USER != "$1" ]]; then
+    echo -e "\n\033[31m[✘]\033[0m 当前用户不是$1，拒绝执行"
+    exit $err_permission
+  fi
+}
+
+function main() {
+  # 更改登录shell
+  chsh -s /bin/zsh root
+  # 配置shell
+  ln -sf "$yj_home"/.zshrc "$root_home"/.zshrc
+  ln -sf "$yj_home"/.bashrc "$root_home"/.bashrc
+  ln -sf "$yj_home"/.p10k.zsh "$root_home"/.p10k.zsh
+  # 更新XDG用户目录
+  mkdir "$root_home"/.Public "$root_home"/.Templates
+  ln -sf "$yj_home"/.config/user-dirs.locale "$root_home"/.config/user-dirs.locale
+  ln -sf "$yj_home"/.config/user-dirs.dirs "$root_home"/.config/user-dirs.dirs
+  xdg-user-dirs-update
+  # 配置git
+  ln -sf "$yj_home"/.gitconfig "$root_home"/.gitconfig
+  # 配置npm
+  ln -sf "$yj_home"/.npmrc "$root_home"/.npmrc
+  # 安装并配置space-vim
+  cp "$yj_home"/Documents/Repos/System/Program/Script/install/install-spacevim ~ && bash install-spacevim
+  ln -sf "$yj_home"/.spacevim "$root_home"/.spacevim
+  ln -sf "$yj_home"/.config/nvim/coc-settings.json "$root_home"/.config/nvim/coc-settings.json
+  ln -sf "$yj_home"/.space-vim/private/config.vim "$root_home"/.space-vim/private/config.vim
+  ln -sf "$yj_home"/.space-vim/private/packages.vim "$root_home"/.space-vim/private/packages.vim
+  ln -sf "$yj_home"/.space-vim/private/README.md "$root_home"/.space-vim/private/README.md
+  ln -sf "$yj_home"/.space-vim/private/Layers.md "$root_home"/.space-vim/private/Layers.md
+  # 配置dtags
+  mkdir "$root_home"/.dtags
+  ln -sf "$yj_home"/.dtags/completion "$root_home"/.dtags/completion
+  ln -sf "$yj_home"/.dtags/config.json "$root_home"/.dtags/config.json
+  # 配置ssh客户端
+  mkdir "$root_home"/.ssh && ln -sf "$yj_home"/.ssh/config "$root_home"/.ssh/config
+  # 配置yay
+  mkdir "$root_home"/.config/yay && ln -sf "$yj_home"/.config/yay/config.json "$root_home"/.config/yay/config.json
+  # 配置tldr
+  mkdir "$root_home"/.config/tealdeer && ln -sf "$yj_home"/.config/tealdeer/config.toml "$root_home"/.config/tealdeer/config.toml
+  # 配置neofetch
+  mkdir "$root_home"/.config/neofetch && ln -sf "$yj_home"/.config/neofetch/config.conf "$root_home"/.config/neofetch/config.conf
+  # 配置go
+  mkdir "$root_home"/.config/go && ln -sf "$yj_home"/.config/go/env "$root_home"/.config/go/env
+  # 安装go写的程序
+  go install github.com/yhyj/scleaner@latest
+  go install github.com/yhyj/rolling@latest
+  go install github.com/yhyj/checker@latest
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  checkUser "root"
+  main
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi
