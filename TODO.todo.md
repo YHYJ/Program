@@ -1,5 +1,3 @@
-- [ ] 由于dtags版本更新，需要更新configure-dtags脚本 (2023-04-10 11:22)
-- [ ] 完成'System-Script/app/make-root-links’ (2023-03-14 13:06)
 - [ ] 完成'System-Script/init/0-build-system' (2023-03-14 10:06)
 - [ ] script (2020-05-13 14:32)
   - [ ] 尝试使用go重建所有script (2020-07-31 14:15)
@@ -39,3 +37,4 @@
 - [X] 把脚本中使用到'~/.config/myprogram'中的'myprogram'改成用户名 (2023-03-13 16:03)
 - [X] polybar-script/mail摆脱polybar限制并修改配置文件位置 (2023-03-13 22:40)
 - [X] 脚本添加检测文件夹和可执行文件是否存在功能 (2023-03-13 16:04)
+- [X] 由于dtags版本更新，需要更新configure-dtags脚本 (2023-04-10 11:22)
