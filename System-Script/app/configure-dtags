@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.0.4
-readonly minor_version=20230214
+readonly major_version=0.1.1
+readonly minor_version=20230411
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -38,7 +38,6 @@ readonly err_unknown=255    # 未知错误
 readonly desc="用于配置dtags"
 # path variable
 readonly dtags_path="/usr/bin/dtags-activate"
-readonly myrepos="$HOME/Documents/MyRepos"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -53,6 +52,8 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
+  echo -e "     -f, --folder          配置该文件夹的内容"
+  echo -e ""
   echo -e "     -h, --help            显示帮助信息"
   echo -e "     -v, --version         显示版本信息"
 }
@@ -87,27 +88,29 @@ function checkUser() {
 
 function addTags() {
   num=0
-  if [[ -d "$myrepos" ]]; then
-    for file in "$myrepos"/*; do
-      if [[ -d "$file" ]]; then
-        if [[ -d "$file"/.git ]]; then
-          dtags-t "$file" "repo" && eval "$(dtags-refresh zsh)"
-          ((num++))
+  if [[ -d "$target_folder" ]]; then
+    for folder in "$target_folder"/*; do
+      if [[ -d "$folder" ]]; then
+        if [[ -d "$folder/.git" ]]; then
+          tag -y "$folder" -t "repo"
         else
-          echo -e "$file不是一个repo，忽略.\n"
+          tag=$(basename "$folder" | tr '[:upper:]' '[:lower:]')
+          tag -y "$folder" -t "$tag"
         fi
-      elif [[ -f "$file" ]]; then
-        echo -e "$file是文本文件，忽略.\n"
+        ((num++))
+      elif [[ -f "$folder" ]]; then
+        echo -e "$folder是文本文件，忽略."
       else
-        echo -e "$file文件类型未知，忽略.\n"
+        echo -e "$folder文件类型未知，忽略."
       fi
+      echo -e ""
     done
   else
-    echo -e "\033[31m$myrepos目录不存在\033[0m\n"
+    echo -e "\n\033[31m$target_folder目录不存在\033[0m"
     exit $err_file
   fi
 
-  echo -e "\033[34m已创建/存在共\033[0m\033[32m$num\033[0m\033[34m个dtags.\033[0m\n"
+  echo -e "\033[34m已创建/存在共\033[0m\033[32m$num\033[0m\033[34m个dtags\033[0m"
   exit $normal
 }
 
@@ -115,35 +118,35 @@ function main() {
   checkUser "root"
 
   if [[ -x "$dtags_path" ]]; then
-    addTags "repo"
+    echo "$tag"
+    addTags "$tag"
   else
-    if askQuestion "是否确认安装dtags [y/N]: "; then
-      echo
-      installPkg
-    else
-      echo -e "退出\n"
-    fi
+    echo -e "请先安装dtags"
   fi
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "f:t:hv" --longoptions "folder:,tag:,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  main
+  helpInfo
 else
   while true; do
     case $1 in
+      -f | --folder)
+        target_folder=$2
+        shift 1
+        ;;
       -h | --help)
         helpInfo
-        shift 1
+        exit $normal
         ;;
       -v | --version)
         versionInfo
-        shift 1
+        exit $normal
         ;;
       --)
         shift 1
@@ -154,5 +157,6 @@ else
         exit $err_unknown
         ;;
     esac
+    main
   done
 fi
