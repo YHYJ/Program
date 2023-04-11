@@ -23,7 +23,7 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.1.2
+readonly major_version=0.1.3
 readonly minor_version=20230411
 readonly rel_version=1
 
@@ -53,9 +53,18 @@ function helpInfo() {
   echo -e ""
   echo -e "Options:"
   echo -e "     -f, --folder          配置该文件夹的内容"
+  echo -e "     -t, --tag             指定Tag"
   echo -e ""
   echo -e "     -h, --help            显示帮助信息"
   echo -e "     -v, --version         显示版本信息"
+  echo -e ""
+  echo -e "Notice:"
+  echo -e "    - 只使用-f/--folder参数："
+  echo -e "      1. -f/--folder参数值下的文件夹里包含.git文件夹，则Tag = repo"
+  echo -e "      2. -f/--folder参数值下的文件夹里不含.git文件夹，则Tag = '全小写文件夹名'"
+  echo -e "    - 使用-t/--tag参数："
+  echo -e "      1. -t/--tag参数值为0，则Tag = '全小写文件夹名'"
+  echo -e "      2. -t/--tag参数值为其他，则Tag = '-t/--tag参数值'"
 }
 
 function versionInfo() {
@@ -91,8 +100,10 @@ function addTags() {
   if [[ -d "$target_folder" ]]; then
     for folder in "$target_folder"/*; do
       if [[ -d "$folder" ]]; then
-        if [ "$tagname" ]; then
-          echo "$tagname"
+        if [[ "$tagname" == 0 ]]; then
+          tag=$(basename "$folder" | tr '[:upper:]' '[:lower:]')
+          tag -y "$folder" -t "$tag"
+        elif [ "$tagname" ]; then
           tag -y "$folder" -t "$tagname"
         elif [[ -d "$folder/.git" ]]; then
           tag -y "$folder" -t "repo"
