@@ -23,7 +23,7 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.4
+readonly major_version=0.1.5
 readonly minor_version=20230414
 readonly rel_version=1
 
@@ -46,6 +46,7 @@ readonly app_konsave_dir="$storage/App/plasma"
 readonly user_dir="$storage/UserList"
 # app variable
 readonly vim_conf="$HOME/.space-vim/private/config.vim"
+readonly konsave_dir="$HOME/.config/konsave"
 # printf variable
 readonly space='    '
 
@@ -156,6 +157,7 @@ function collectAppInfo() {
     checkPath "$app_konsave_dir"
     plasma_knsv="$app_konsave_dir/$(hostname).knsv"
     printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Plasma-Confile" "-->" "$plasma_knsv"
+    rm -rf "$konsave_dir/conf.yaml"
     cd "$app_konsave_dir" || exit "$err_file"
     konsave --force --save "$(hostname)" &> /dev/null
     konsave --force --export-profile "$(hostname)" &> /dev/null
