@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.5
-readonly minor_version=20230414
+readonly major_version=0.1.6
+readonly minor_version=20230417
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -117,9 +117,9 @@ function collectServiceInfo() {
   system_list="$service_dir/System.list"
   user_list="$service_dir/User.list"
   printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "System-Service" "-->" "$system_list"
-  systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' > "$system_list" # System service
+  systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$system_list" # System service
   printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "User-Service" "-->" "$user_list"
-  systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' > "$user_list" # User service
+  systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$user_list" # User service
 }
 
 function collectAppInfo() {
