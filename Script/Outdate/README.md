@@ -30,3 +30,4 @@
 - 'ccleaner'：已被scleaner (go)取代
 - 'check-aur'：已被checker (go)取代
 - 'check-pacnew'：已被checker (go)取代
+- 'clone-my-repos'：已被clone-repos (go)取代
