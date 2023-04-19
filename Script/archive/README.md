@@ -11,18 +11,19 @@
 
 <!-- vim-markdown-toc GFM -->
 
-* [退役](#退役)
+* [outdate](#outdate)
+* [i3wm](#i3wm)
+* [polybar](#polybar)
 
 <!-- vim-markdown-toc -->
 
 ---
 
-<!-- Object info -->
 存放因各种原因过时或归档的程序
 
 ---
 
-## 退役
+## outdate
 
 - 'backup'：已被spider + chezmoi的组合取代
 - 'rolling-count'：已被rolling (go)取代
@@ -31,3 +32,13 @@
 - 'check-aur'：已被checker (go)取代
 - 'check-pacnew'：已被checker (go)取代
 - 'clone-my-repos'：已被clone-repos (go)取代
+
+## i3wm
+
+- 'lock-screen'：基于i3wm的锁屏脚本
+
+## polybar
+
+- 'mail-manager'：用于polybar的邮箱操作程序
+- 'polybar-launcher'：polybar启动器
+- 'polybar-script_usb-manager'：用于polybar的USB设备管理器
