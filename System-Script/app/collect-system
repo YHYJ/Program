@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.6
-readonly minor_version=20230417
+readonly major_version=0.1.7
+readonly minor_version=20230421
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -42,7 +42,6 @@ readonly package_dir="$storage/PackageList"
 readonly service_dir="$storage/ServiceList"
 readonly app_vim_dir="$storage/App/vim"
 readonly app_guake_dir="$storage/App/guake"
-readonly app_konsave_dir="$storage/App/plasma"
 readonly user_dir="$storage/UserList"
 # app variable
 readonly vim_conf="$HOME/.space-vim/private/config.vim"
@@ -154,13 +153,10 @@ function collectAppInfo() {
 
   # konsave
   if checkCommand "konsave"; then
-    checkPath "$app_konsave_dir"
-    plasma_knsv="$app_konsave_dir/$(hostname).knsv"
-    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Plasma-Confile" "-->" "$plasma_knsv"
+    checkPath "$konsave_dir"
+    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
     rm -rf "$konsave_dir/conf.yaml"
-    cd "$app_konsave_dir" || exit "$err_file"
     konsave --force --save "$(hostname)" &> /dev/null
-    konsave --force --export-profile "$(hostname)" &> /dev/null
   fi
 }
 
