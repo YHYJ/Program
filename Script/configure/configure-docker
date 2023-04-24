@@ -39,7 +39,7 @@ readonly desc="用于配置Docker"
 # path variable
 readonly dockerd_exec_file="/usr/bin/dockerd"
 readonly dockerd_confile="/etc/systemd/system/docker.service.d/override.conf"
-readonly docker_root="$HOME/Documents/MyDockeroot"
+readonly docker_root="$HOME/Documents/Docker/Root"
 # content variable
 readonly override_content="[Service]\nExecStart= \nExecStart=$dockerd_exec_file --data-root=$docker_root -H fd://"
 
