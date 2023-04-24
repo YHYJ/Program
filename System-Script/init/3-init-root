@@ -81,7 +81,7 @@ function main() {
   ln -sf "$yj_home"/.p10k.zsh "$root_home"/.p10k.zsh
   # 更新XDG用户目录
   echo -e "\033[32;3m正在配置user-dirs\033[0m"
-  mkdir "$root_home"/.Public "$root_home"/.Templates
+  mkdir "$root_home/Desktop" "$root_home/Downloads" "$root_home/Documents" "$root_home/Music" "$root_home/Pictures" "$root_home/Videos" "$root_home/.Public" "$root_home/.Templates"
   ln -sf "$yj_home"/.config/user-dirs.locale "$root_home"/.config/user-dirs.locale
   ln -sf "$yj_home"/.config/user-dirs.dirs "$root_home"/.config/user-dirs.dirs
   xdg-user-dirs-update
@@ -93,7 +93,8 @@ function main() {
   ln -sf "$yj_home"/.npmrc "$root_home"/.npmrc
   # 安装并配置space-vim
   echo -e "\033[32;3m正在配置space-vim\033[0m"
-  cp "$yj_home"/Documents/Repos/System/Program/Script/install/install-spacevim ~ && bash install-spacevim
+  cp "$yj_home"/Documents/Repos/System/Program/Script/install/install-spacevim ~/Desktop
+  cd ~/Desktop || exit 1 && bash install-spacevim && rm -f ~/Desktop/install-spacevim
   ln -sf "$yj_home"/.spacevim "$root_home"/.spacevim
   ln -sf "$yj_home"/.config/nvim/coc-settings.json "$root_home"/.config/nvim/coc-settings.json
   ln -sf "$yj_home"/.space-vim/private/config.vim "$root_home"/.space-vim/private/config.vim
@@ -124,6 +125,7 @@ function main() {
   echo -e "\033[32;3m正在安装我的程序\033[0m"
   go install github.com/yhyj/checker@latest
   go install github.com/yhyj/clone-repos@latest
+  go install github.com/yhyj/eniac@latest
   go install github.com/yhyj/rolling@latest
   go install github.com/yhyj/scleaner@latest
   echo -e "完成"
