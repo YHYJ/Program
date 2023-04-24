@@ -27,8 +27,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=3.3.5
-readonly minor_version=20230214
+readonly major_version=3.3.6
+readonly minor_version=20230424
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -42,7 +42,7 @@ readonly err_permission=110 # 权限错误
 readonly desc="用于备份Linux系统信息和配置"
 
 # 总备份文件存储路径
-readonly backup_path="$HOME/Documents/Repos/System-Conf"
+readonly backup_path="$HOME/Documents/Repos/System/Profile"
 
 ## 需要备份的文件的前缀路径
 # $HOME/.cache

@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.0.4
-readonly minor_version=20230214
+readonly major_version=0.0.5
+readonly minor_version=20230424
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -36,7 +36,7 @@ readonly err_unknown=255 # 未知错误
 # description variable
 readonly desc="用于批量安装Packages"
 # path variable
-list_filename="$HOME/Documents/Repos/System-Conf/system-info/pacman-pkglist"
+list_filename="$HOME/Documents/Repos/System/Profile/home/yj/dot_cache/SpiderData/PackageList/Pacman.list"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
