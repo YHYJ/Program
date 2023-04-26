@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.7
-readonly minor_version=20230421
+readonly major_version=0.1.8
+readonly minor_version=20230426
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -164,7 +164,7 @@ function collectUserInfo() {
   checkPath "$user_dir"
   id_list="$user_dir/ID.list"
   printf "%s %-9s \033[36m%s\033[0m %s\n" "$space" "User-List" "-->" "$id_list"
-  id root yj > "$id_list" # 当前$USER的ID信息
+  id root yj -Gn > "$id_list" # 当前$USER的ID信息
 }
 
 ####################################################################
