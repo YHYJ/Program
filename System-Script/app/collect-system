@@ -23,7 +23,7 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.8
+readonly major_version=0.1.9
 readonly minor_version=20230426
 readonly rel_version=1
 
@@ -155,7 +155,6 @@ function collectAppInfo() {
   if checkCommand "konsave"; then
     checkPath "$konsave_dir"
     printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
-    rm -rf "$konsave_dir/conf.yaml"
     konsave --force --save "$(hostname)" &> /dev/null
   fi
 }
