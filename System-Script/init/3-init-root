@@ -121,13 +121,6 @@ function main() {
   # 配置go
   echo -e "\033[32;3m正在配置go\033[0m"
   mkdir "$root_home"/.config/go && ln -sf "$yj_home"/.config/go/env "$root_home"/.config/go/env
-  # 安装go写的程序
-  echo -e "\033[32;3m正在安装我的程序\033[0m"
-  go install github.com/yhyj/checker@latest
-  go install github.com/yhyj/clone-repos@latest
-  go install github.com/yhyj/eniac@latest
-  go install github.com/yhyj/rolling@latest
-  go install github.com/yhyj/scleaner@latest
   echo -e "完成"
 }
 
