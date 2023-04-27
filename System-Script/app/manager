@@ -26,8 +26,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.4.1
-readonly minor_version=20230411
+readonly major_version=3.4.2
+readonly minor_version=20230427
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -83,15 +83,15 @@ function versionInfo() {
 
 function notifyInfo() {
   if [[ $update_num -gt 0 ]] && [[ $install_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $update_num个程序更新完成, $install_num个程序安装完成"
+    echo -e "\n\033[35m[✔]\033[0m $update_num 个程序更新完成, $install_num 个程序安装完成"
   elif [[ $update_num -eq 0 ]] && [[ $install_num -eq 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m 没有程序需要安装/更新"
+    echo -e "\n\033[35m[✔]\033[0m 没有程序更新"
   elif [[ $update_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $update_num个程序更新完成"
+    echo -e "\n\033[35m[✔]\033[0m $update_num 个程序更新完成"
   elif [[ $install_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $install_num个程序安装完成"
+    echo -e "\n\033[35m[✔]\033[0m $install_num 个程序安装完成"
   elif [[ $uninstall_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $install_num个程序卸载完成"
+    echo -e "\n\033[35m[✔]\033[0m $install_num 个程序卸载完成"
   fi
 }
 
