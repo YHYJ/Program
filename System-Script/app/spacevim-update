@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: update_space-vim
+Name: spacevim-update
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2022-06-11 16:43:34
@@ -12,7 +12,7 @@ Attentions:
 -
 
 Depends:
--
+- make
 !
 
 ####################################################################
@@ -23,14 +23,15 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.2
-readonly minor_version=20221113
+readonly major_version=0.1.0
+readonly minor_version=20230316
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0        # 一切正常
-readonly err_file=1      # 文件/路径类错误
-readonly err_unknown=255 # 未知错误
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -56,37 +57,70 @@ function helpInfo() {
 }
 
 function versionInfo() {
+  echo -e ""
   echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
 }
+
 #------------------------- Feature Function
+function checkPath() {
+  if [[ -e "$1" ]]; then
+    if [[ ! -d "$1" ]]; then
+      echo -e "指定路径$1不是文件夹，已退出"
+      exit $err_file
+    fi
+  else
+    mkdir -p "$1"
+    echo -e "\n已创建$1\n"
+  fi
+}
+
+function checkCommand() {
+  if command -v "$1" &> /dev/null; then
+    return $normal
+  else
+    return $err_no_program
+  fi
+}
+
 function makeUpdate() {
-  if [[ -d $install_path ]]; then
+  if checkCommand "make"; then
     current_path=$(pwd)
     cd "$install_path" || exit $err_file
     make update
     cd "$current_path" || exit $err_file
+  else
+    echo -e "make 未安装，无法更新"
   fi
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-if [[ ${#@} -lt 1 ]]; then
-  # 未给定参数
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  checkPath "$install_path"
   makeUpdate
 else
-  case $1 in
-    -h | --help)
-      helpInfo
-      exit $normal
-      ;;
-    -v | --version)
-      versionInfo
-      exit $normal
-      ;;
-    *)
-      helpInfo
-      exit $err_unknown
-      ;;
-  esac
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
 fi

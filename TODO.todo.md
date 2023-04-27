@@ -1,3 +1,7 @@
+  - [ ] 脚本更新导致的修改 (2023-04-27 15:25)
+    - [ ] ~/.cache/Spider更名为~/.cache/SpiderData (2023-04-27 15:25)
+    - [ ] ~/Documents/MyRepos更名为~/Documents/Repos (2023-04-27 15:26)
+    - [ ] ~/.config/myprogram更名为~/.config/yj (2023-04-27 15:36)
   - [ ] 备份`brew tap`的输出 (2022-12-02 16:12)
   - [ ] 新增init.chezmoi.sh (2022-11-22 11:47)
   - [ ] 更新脚本以适应macOS： (2022-11-13 03:41)
