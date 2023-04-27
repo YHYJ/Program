@@ -28,12 +28,11 @@ name=$(basename "$0")
 readonly name
 # program nversion
 readonly major_version=0.1.3
-readonly minor_version=20221113
+readonly minor_version=20230427
 readonly rel_version=3
 
 #------------------------- Exit Code Variable
 readonly normal=0        # 一切正常
-readonly err_param=2     # 参数错误
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
@@ -94,9 +93,9 @@ function getPackageInfo() {
 
 function getUserInfo() {
   echo -e "正在搜集\033[1;34;47mUser\033[0m信息"
-  id root > "$datadir/User/ID.list"
+  id root -Gn > "$datadir/User/ID.list"
   echo -e "\n" >> "$datadir/User/ID.list"
-  id yj >> "$datadir/User/ID.list"
+  id yj -Gn >> "$datadir/User/ID.list"
 }
 
 ####################################################################
