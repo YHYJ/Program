@@ -26,8 +26,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.4.2
-readonly minor_version=20230427
+readonly major_version=3.4.3
+readonly minor_version=20230509
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -40,7 +40,7 @@ readonly err_unknown=255    # 未知错误
 readonly desc="用于安装自定义程序和脚本"
 
 # name variable
-username=$(id -nu "$PKEXEC_UID" 2> /dev/null || id -nu)
+username=$(id -nu "$PKEXEC_UID" 2> /dev/null || id 1000 -nu)
 readonly username
 attribution='root'
 readonly attribution
