@@ -26,9 +26,9 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.4.3
+readonly major_version=3.6.0
 readonly minor_version=20230509
-readonly rel_version=2
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly err_file=1         # 文件/路径类错误
@@ -68,12 +68,12 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -c, --check            检查是否有更新"
-  echo -e "     -d, --dir <string>     指定需要安装的程序文件的路径（尚未启用）"
-  echo -e "     -i, --install          执行程序安装操作"
+  echo -e "     -d, --dir <string>      指定需要安装的程序文件的路径（尚未启用）"
+  echo -e "     -p, --program           检查并安装二进制程序更新"
+  echo -e "     -s, --script            检查并安装脚本程序更新"
   echo -e ""
-  echo -e "     -h, --help             显示帮助信息"
-  echo -e "     -v, --version          显示版本信息"
+  echo -e "     -h, --help              显示帮助信息"
+  echo -e "     -v, --version           显示版本信息"
 }
 
 function versionInfo() {
@@ -127,7 +127,7 @@ function checkUpdate() {
   echo "${diff_programs[@]}" > "$confile"
 }
 
-function installOperation() {
+function installScript {
   # install/update
   programs=$(cat "$confile")
   readonly programs
@@ -142,14 +142,23 @@ function installOperation() {
       install_num=$((install_num + 1))
     fi
   done
+}
 
-  notifyInfo
+function installProgram() {
+  # 安装go写的程序
+  echo -e "\033[36;3mInstalling go-based programs...\033[0m"
+  go install github.com/yhyj/checker@latest
+  go install github.com/yhyj/clone-repos@latest
+  go install github.com/yhyj/eniac@latest
+  go install github.com/yhyj/rolling@latest
+  go install github.com/yhyj/scleaner@latest
+  echo -e "\033[36;3mCompleted\033[0m"
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "cihv" --longoptions "check,install,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "i:sphv" --longoptions "install:,script,program,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -159,13 +168,35 @@ else
     checkPath "$source_path"
     checkPath "$conf_dir"
     case $1 in
-      -c | --check)
+      -i | --install)
+        case $2 in
+          program)
+            installProgram
+            shift 1
+            ;;
+          script)
+            installScript
+            notifyInfo
+            shift 1
+            ;;
+          --)
+            shift 1
+            break
+            ;;
+          *)
+            helpInfo
+            exit $err_unknown
+            ;;
+        esac
+        shift 1
+        ;;
+      -s | --script)
         checkUpdate
         if [[ ${#diff_programs[@]} -gt 0 ]]; then
           if ! diff "$source_path/$name" "$target_path/$name" &> /dev/null; then
-            pkexec "$source_path/$name" --install
+            pkexec "$source_path/$name" --install script
           else
-            pkexec "$target_path/$name" --install
+            pkexec "$target_path/$name" --install script
           fi
         else
           update_num=0
@@ -174,8 +205,12 @@ else
         fi
         shift 1
         ;;
-      -i | --install)
-        installOperation
+      -p | --program)
+        if ! diff "$source_path/$name" "$target_path/$name" &> /dev/null; then
+          pkexec "$source_path/$name" --install program
+        else
+          pkexec "$target_path/$name" --install program
+        fi
         shift 1
         ;;
       -h | --help)
