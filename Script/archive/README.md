@@ -32,6 +32,7 @@
 - 'check-aur'：已被checker (go)取代
 - 'check-pacnew'：已被checker (go)取代
 - 'clone-my-repos'：已被clone-repos (go)取代
+- 'get-system-info'：已被eniac (go) 取代
 
 ## i3wm
 
@@ -39,6 +40,5 @@
 
 ## polybar
 
-- 'mail-manager'：用于polybar的邮箱操作程序
 - 'polybar-launcher'：polybar启动器
 - 'polybar-script_usb-manager'：用于polybar的USB设备管理器
