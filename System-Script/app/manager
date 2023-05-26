@@ -26,8 +26,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.6.0
-readonly minor_version=20230509
+readonly major_version=3.6.1
+readonly minor_version=20230526
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -49,6 +49,7 @@ readonly source_path="/home/$username/Documents/Repos/System/Program/System-Scri
 readonly target_path="/usr/local/bin"
 readonly conf_dir="/home/$username/.config/yj"
 readonly confile="$conf_dir/$name.conf"
+readonly autocompletion_dir="/home/$username/.cache/oh-my-zsh/completions"
 diff_programs=()
 # count variable
 update_num=0
@@ -144,15 +145,44 @@ function installScript {
   done
 }
 
+function installAutocompletionScript {
+  # 安装/更新自动补全脚本
+  "$target_path/$1" completion zsh > "$autocompletion_dir"/_"$1"
+}
+
 function installProgram() {
   # 安装go写的程序
   echo -e "\033[36;3mInstalling go-based programs...\033[0m"
-  go install github.com/yhyj/checker@latest
-  go install github.com/yhyj/clone-repos@latest
-  go install github.com/yhyj/eniac@latest
-  go install github.com/yhyj/rolling@latest
-  go install github.com/yhyj/scleaner@latest
-  go install github.com/yhyj/skynet@latest
+  if go install github.com/yhyj/checker@latest ; then
+    echo -e "\033[1;34m==>\033[0m \033[32mchecker\033[0m 安装完成"
+    installAutocompletionScript checker
+    echo -e "\033[1;34m==>\033[0m \033[32mchecker\033[0m 自动补全脚本安装完成"
+  fi
+  if go install github.com/yhyj/clone-repos@latest ; then
+    echo -e "\033[1;34m==>\033[0m \033[32mclone-repos\033[0m 安装完成"
+    installAutocompletionScript clone-repos
+    echo -e "\033[1;34m==>\033[0m \033[32mclone-repos\033[0m 自动补全脚本安装完成"
+  fi
+  if go install github.com/yhyj/eniac@latest ; then
+    echo -e "\033[1;34m==>\033[0m \033[32meniac\033[0m 安装完成"
+    installAutocompletionScript eniac
+    echo -e "\033[1;34m==>\033[0m \033[32meniac\033[0m 自动补全脚本安装完成"
+  fi
+  if go install github.com/yhyj/rolling@latest ; then
+    echo -e "\033[1;34m==>\033[0m \033[32mrolling\033[0m 安装完成"
+    installAutocompletionScript rolling
+    echo -e "\033[1;34m==>\033[0m \033[32mrolling\033[0m 自动补全脚本安装完成"
+  fi
+  if go install github.com/yhyj/scleaner@latest ; then
+    echo -e "\033[1;34m==>\033[0m \033[32mscleaner\033[0m 安装完成"
+    installAutocompletionScript scleaner
+    echo -e "\033[1;34m==>\033[0m \033[32mscleaner\033[0m 自动补全脚本安装完成"
+  fi
+  if go install github.com/yhyj/skynet@latest ; then
+    echo -e "\033[1;34m==>\033[0m \033[32mskynet\033[0m 安装完成"
+    installAutocompletionScript skynet
+    echo -e "\033[1;34m==>\033[0m \033[32mskynet\033[0m 自动补全脚本安装完成"
+  fi
   echo -e "\033[36;3mCompleted\033[0m"
 }
 
