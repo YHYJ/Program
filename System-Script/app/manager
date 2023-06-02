@@ -26,8 +26,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.6.1
-readonly minor_version=20230526
+readonly major_version=3.6.2
+readonly minor_version=20230602
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -47,7 +47,7 @@ readonly attribution
 # path variable
 readonly source_path="/home/$username/Documents/Repos/System/Program/System-Script/app"
 readonly target_path="/usr/local/bin"
-readonly conf_dir="/home/$username/.config/yj"
+readonly conf_dir="/home/$username/.config/$name"
 readonly confile="$conf_dir/$name.conf"
 readonly autocompletion_dir="/home/$username/.cache/oh-my-zsh/completions"
 diff_programs=()
