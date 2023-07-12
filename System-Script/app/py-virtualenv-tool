@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.0
-readonly minor_version=20230316
+readonly major_version=0.1.1
+readonly minor_version=20230712
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -116,7 +116,7 @@ function saveVirtualenv() {
       workon "$venv"
       pyversion=$(python -V | tr ' ' '-')
       filepath="$app_virtualenv_dir"/requirements_"$pyversion"_"$venv".txt
-      pip freeze > "$filepath"
+      pip freeze --no-python-version-warning > "$filepath"
       printf "%s%s Venv: \033[37m%s\033[0m \033[35m%2s\033[0m\n" "$space" "$space" "$venv" "✔"
     done
   else
