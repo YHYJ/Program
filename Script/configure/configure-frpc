@@ -40,7 +40,7 @@ readonly desc="用于配置Frpc"
 readonly frpc_exec_file="/usr/bin/frpc"
 readonly frpcd_confile="/etc/systemd/system/frpc.service.d/override.conf"
 # content variable
-readonly override_content="[Service]\nRestart= \nRestart=always"
+readonly override_content="[Service]\nRestart=always\nRestartSec=1s\n"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
