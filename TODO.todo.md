@@ -1,9 +1,6 @@
 - [ ] 完成'System-Script/init/0-build-system' (2023-03-14 10:06)
 - [ ] script (2020-05-13 14:32)
-  - [ ] 尝试使用go重建所有script (2020-07-31 14:15)
   - [ ] 把polybar-script_mail.py用golang重构 (2020-05-20 09:24)
-  - [ ] 尝试把http-server的网卡选择替换为dialog -- 困难，dialog无法正常接收网卡信息 (2020-05-13 14:33)
-  - [ ] 为复杂脚本写completion (2020-08-07 22:41)
   - [ ] bash脚本做卸载操作太麻烦，用go重构 (2020-08-09 23:11)
   - [X] 解决输入信息无法删除的问题（例如http-server） (2020-06-30 10:09)
   - [X] 配置文件挪到home去
@@ -15,6 +12,8 @@
   - [X] ! 将system-usb-udev重写为polybar-script_usb-udev (2020-06-19 09:30)
   - [X] 完善各script的参数系统 (2020-07-31 11:29)
   - [X] 更新脚本：根据UID来checkUser (2020-08-09 22:08)
+  - [X] 为复杂脚本写completion (2020-08-07 22:41)
+  - [X] 尝试使用go重建所有script (2020-07-31 14:15)
 - [X] 因为仓库更换，需要更新脚本：
   - [X] ! 重点是backup、program-manager (2022-10-24 13:32)
 - [X] ! 完善脚本：增加版本号、help和version（三位）信息 (2021-11-09 10:10)
