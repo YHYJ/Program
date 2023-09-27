@@ -64,10 +64,10 @@ function versionInfo() {
 function getEditor() {
   if [[ -z $EDITOR ]]; then
     # $EDITOR变量为空
-    if command -v nvim &> /dev/null; then
+    if command -v nvim > /dev/null 2>&1; then
       editor="nvim"
       merge_tool="vimdiff"
-    elif command -v vim &> /dev/null; then
+    elif command -v vim > /dev/null 2>&1; then
       editor="vim"
       merge_tool="vimdiff"
     else
@@ -105,7 +105,7 @@ function main() {
 
   ssh-keygen -t rsa -C "yj1516268@outlook.com"
 
-  if command -v xsel &> /dev/null; then
+  if command -v xsel > /dev/null 2>&1; then
     xsel < "$HOME/.ssh/id_rsa.pub" --clipboard --input
     echo -e "公钥已复制到粘贴板，请到https://github.com/settings/keys进行设置\n\n"
   else

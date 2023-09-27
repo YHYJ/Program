@@ -59,17 +59,17 @@ function versionInfo() {
 #------------------------- Feature Function
 function cacheCleaner() {
   # 清除pip缓存
-  if command -v pip &> /dev/null; then
+  if command -v pip > /dev/null 2>&1; then
     pip cache purge
     echo -e "    --> Cleared pip cache\n"
   fi
   # 清除npm缓存
-  if command -v npm &> /dev/null; then
+  if command -v npm > /dev/null 2>&1; then
     npm cache clean --force
     echo -e "    --> Cleared npm cache\n"
   fi
   # 清除yarn缓存
-  if command -v yarn &> /dev/null; then
+  if command -v yarn > /dev/null 2>&1; then
     yarn cache clean
     echo -e "    --> Cleared yarn cache"
   fi

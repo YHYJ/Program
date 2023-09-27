@@ -90,7 +90,7 @@ function checkPath() {
 }
 
 function checkCommand() {
-  if ! command -v "$1" &> /dev/null; then
+  if ! command -v "$1" > /dev/null 2>&1; then
     echo -e "$1 未安装"
     exit $err_no_program
   fi

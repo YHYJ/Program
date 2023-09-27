@@ -68,7 +68,7 @@ function versionInfo() {
 #------------------------- Feature Function
 function main() {
   if [[ ! -e $dockerd_confile ]]; then
-    if command -v $dockerd_exec_file &> /dev/null; then
+    if command -v $dockerd_exec_file > /dev/null 2>&1; then
       echo -e "$override_content" > $dockerd_confile
       echo -e "Docker Root Dir已配置为$docker_root"
       echo -e "请重启docker服务"

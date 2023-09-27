@@ -67,7 +67,7 @@ function versionInfo() {
 #------------------------- Feature Function
 function main() {
   if [[ ! -e $frpcd_confile ]]; then
-    if command -v $frpc_exec_file &> /dev/null; then
+    if command -v $frpc_exec_file > /dev/null 2>&1; then
       echo -e "$override_content" > $frpcd_confile
       echo -e "请重启frpc服务"
       exit $normal

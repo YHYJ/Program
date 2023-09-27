@@ -75,7 +75,7 @@ function checkPath() {
 }
 
 function checkCommand() {
-  if command -v "$1" &> /dev/null; then
+  if command -v "$1" > /dev/null 2>&1; then
     return $normal
   else
     return $err_no_program

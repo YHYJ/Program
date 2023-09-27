@@ -70,7 +70,7 @@ function versionInfo() {
 #------------------------- Feature Function
 function main() {
   if [[ ! -e "$pip_confile" ]]; then
-    if command -v pip &> /dev/null; then
+    if command -v pip > /dev/null 2>&1; then
       echo -e "$conf_content" > $pip_confile
       echo -e "现在pip使用$source_name镜像源"
       exit $normal
