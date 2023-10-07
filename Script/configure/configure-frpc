@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.0.1
-readonly minor_version=20230808
+readonly major_version=0.0.2
+readonly minor_version=20231007
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -40,7 +40,7 @@ readonly desc="用于配置Frpc"
 readonly frpc_exec_file="/usr/bin/frpc"
 readonly frpcd_confile="/etc/systemd/system/frpc.service.d/override.conf"
 # content variable
-readonly override_content="[Service]\nRestart=always\nRestartSec=1s\n"
+readonly override_content="[Service]\nRestart=always\n"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
