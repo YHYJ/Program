@@ -24,8 +24,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.4.0
-readonly minor_version=20230328
+readonly major_version=0.4.1
+readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -43,7 +43,7 @@ readonly desc=" is a tool for controlling USB storage devices"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -66,7 +66,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
 }
 
 #------------------------- Feature Function

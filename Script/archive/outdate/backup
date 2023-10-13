@@ -27,8 +27,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=3.3.6
-readonly minor_version=20230424
+readonly major_version=3.3.7
+readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -244,9 +244,9 @@ readonly coc_config_back="$backup_path/confile/home/dot_config/nvim/coc-settings
 #------------------------- Info Function
 function helpInfo() { # 打印帮助信息
   echo -e ""
-  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
-  echo -e "\033[1;33m备份路径\033[0m: \033[34m$backup_path\033[0m"
+  echo -e "\x1b[1;33m备份路径\x1b[0m: \x1b[34m$backup_path\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -272,7 +272,7 @@ function helpInfo() { # 打印帮助信息
 
 function versionInfo() { # 打印版本信息
   echo -e ""
-  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
 }
 
 function logInfo() { # 打印进度信息
@@ -281,20 +281,20 @@ function logInfo() { # 打印进度信息
       echo -e "$2的备份文件已是最新"
       ;;
     1)
-      echo -e "\033[1;34m==>\033[0m 正在备份\033[4;36;40m$2\033[0m"
+      echo -e "\x1b[1;34m==>\x1b[0m 正在备份\x1b[4;36;40m$2\x1b[0m"
       ;;
   esac
 }
 
 function finishInfo() { # 打印结果信息
-  echo -e "\n\033[35m[✔]\033[0m 备份完成，未列出部分皆是最新备份"
+  echo -e "\n\x1b[35m[✔]\x1b[0m 备份完成，未列出部分皆是最新备份"
   exit $normal
 }
 
 #------------------------- Feature Function
 function checkPermission() { # 权限检测
   if [[ $USER == "$1" ]]; then
-    echo -e "\n\033[31m[✘]\033[0m 当前权限是$1，拒绝执行！！！"
+    echo -e "\n\x1b[31m[✘]\x1b[0m 当前权限是$1，拒绝执行！！！"
     exit $err_permission
   fi
 }
@@ -879,79 +879,79 @@ else
 
             updateCache
 
-            echo -e "检查 \033[1;34;47mboot\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mboot\x1b[0m 系列"
             backupBootConfig
-            echo -e "检查 \033[1;34;47metc\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47metc\x1b[0m 系列"
             backupEtcConfig
-            echo -e "检查 \033[1;34;47musr\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47musr\x1b[0m 系列"
             backupUsrConfig
-            echo -e "检查 \033[1;34;47muser\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47muser\x1b[0m 系列"
             backupUserConfig
-            echo -e "检查 \033[1;34;47mPackage\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mPackage\x1b[0m 系列"
             backupPackage
-            echo -e "检查 \033[1;34;47mService\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mService\x1b[0m 系列"
             backupService
-            echo -e "检查 \033[1;34;47m$USER-Group\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47m$USER-Group\x1b[0m 系列"
             backupID
-            echo -e "检查 \033[1;34;47mManual\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mManual\x1b[0m 系列"
             backupManual
 
             finishInfo
             ;;
           boot)
-            echo -e "检查 \033[1;34;47mboot\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mboot\x1b[0m 系列"
             backupBootConfig
 
             finishInfo
             ;;
           etc)
-            echo -e "检查 \033[1;34;47metc\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47metc\x1b[0m 系列"
             backupEtcConfig
 
             finishInfo
             ;;
           usr)
-            echo -e "检查 \033[1;34;47musr\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47musr\x1b[0m 系列"
             backupUsrConfig
 
             finishInfo
             ;;
           user)
-            echo -e "检查 \033[1;34;47muser\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47muser\x1b[0m 系列"
             backupUserConfig
 
             finishInfo
             ;;
           package)
-            echo -e "检查 \033[1;34;47mPackage\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mPackage\x1b[0m 系列"
             updateCache
             backupPackage
 
             finishInfo
             ;;
           service)
-            echo -e "检查 \033[1;34;47mService\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mService\x1b[0m 系列"
             updateCache
             backupService
 
             finishInfo
             ;;
           id)
-            echo -e "检查 \033[34;47m$USER-Group\033[0m 系列"
+            echo -e "检查 \x1b[34;47m$USER-Group\x1b[0m 系列"
             updateCache
             backupID
 
             finishInfo
             ;;
           manual)
-            echo -e "检查 \033[1;34;47mManual\033[0m 系列"
+            echo -e "检查 \x1b[1;34;47mManual\x1b[0m 系列"
             updateCache
             backupManual
 
             finishInfo
             ;;
           *)
-            echo -e "\n\033[31m[✘]\033[0m 未知的备份内容"
+            echo -e "\n\x1b[31m[✘]\x1b[0m 未知的备份内容"
             ;;
         esac
         shift 1

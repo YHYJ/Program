@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.1
-readonly minor_version=20230712
+readonly major_version=0.1.2
+readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -51,7 +51,7 @@ readonly space='    '
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -68,7 +68,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
 }
 
 #------------------------- Feature Function
@@ -111,13 +111,13 @@ function deleteVirtualenvFile() {
 
 function saveVirtualenv() {
   if checkCommand "pip"; then
-    printf "%s %-11s \033[36m%s\033[0m %s\n" "$space" "Python-Venv" "-->" "$app_virtualenv_dir/*"
+    printf "%s %-11s \x1b[36m%s\x1b[0m %s\n" "$space" "Python-Venv" "-->" "$app_virtualenv_dir/*"
     for venv in ${venvs[*]}; do
       workon "$venv"
       pyversion=$(python -V | tr ' ' '-')
       filepath="$app_virtualenv_dir"/requirements_"$pyversion"_"$venv".txt
       pip freeze --no-python-version-warning > "$filepath"
-      printf "%s%s Venv: \033[37m%s\033[0m \033[35m%2s\033[0m\n" "$space" "$space" "$venv" "✔"
+      printf "%s%s Venv: \x1b[37m%s\x1b[0m \x1b[35m%2s\x1b[0m\n" "$space" "$space" "$venv" "✔"
     done
   else
     echo -e "pip 未安装，无法备份开发环境"

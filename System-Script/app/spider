@@ -29,8 +29,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.2
-readonly minor_version=20230316
+readonly major_version=0.2.3
+readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -50,9 +50,9 @@ readonly storage="$HOME/.cache/SpiderData"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
-  echo -e "\033[1;33m搜集结果存储于\033[0m: \033[34m$storage\033[0m"
+  echo -e "\x1b[1;33m搜集结果存储于\x1b[0m: \x1b[34m$storage\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -75,11 +75,11 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
 }
 
 function finish() {
-  echo -e "\n\033[35m[✔]\033[0m 信息搜集完成"
+  echo -e "\n\x1b[35m[✔]\x1b[0m 信息搜集完成"
 }
 
 #------------------------- Feature Function
@@ -97,27 +97,27 @@ function checkCommand() {
 }
 
 function spiderAppInfo() {
-  echo -e "\033[1;34mApp\033[0m"
+  echo -e "\x1b[1;34mApp\x1b[0m"
   collect-system --name app # App config file
 }
 
 function spiderPackageInfo() {
-  echo -e "\033[1;34mPackage\033[0m"
+  echo -e "\x1b[1;34mPackage\x1b[0m"
   collect-system --name package # Package List
 }
 
 function spiderServiceInfo() {
-  echo -e "\033[1;34mService\033[0m"
+  echo -e "\x1b[1;34mService\x1b[0m"
   collect-system --name service # Service List
 }
 
 function spiderUserInfo() {
-  echo -e "\033[1;34mUser\033[0m"
+  echo -e "\x1b[1;34mUser\x1b[0m"
   collect-system --name user # User List
 }
 
 function spiderVirtualenvInfo() {
-  echo -e "\033[1;34mVirtualenv\033[0m"
+  echo -e "\x1b[1;34mVirtualenv\x1b[0m"
   py-virtualenv-tool --save # Python Virtualenv
 }
 
@@ -186,7 +186,7 @@ else
             break
             ;;
           *)
-            echo -e "\n\033[31m[✘]\033[0m 无法搜集该内容"
+            echo -e "\n\x1b[31m[✘]\x1b[0m 无法搜集该内容"
             ;;
         esac
         shift 1

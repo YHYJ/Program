@@ -26,8 +26,8 @@ TODO:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=3.6.2
-readonly minor_version=20230602
+readonly major_version=3.6.3
+readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -62,7 +62,7 @@ uninstall_num=0
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -79,27 +79,27 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
 }
 
 function notifyInfo() {
   if [[ $update_num -gt 0 ]] && [[ $install_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $update_num 个程序更新完成, $install_num 个程序安装完成"
+    echo -e "\n\x1b[35m[✔]\x1b[0m $update_num 个程序更新完成, $install_num 个程序安装完成"
   elif [[ $update_num -eq 0 ]] && [[ $install_num -eq 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m 没有程序更新"
+    echo -e "\n\x1b[35m[✔]\x1b[0m 没有程序更新"
   elif [[ $update_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $update_num 个程序更新完成"
+    echo -e "\n\x1b[35m[✔]\x1b[0m $update_num 个程序更新完成"
   elif [[ $install_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $install_num 个程序安装完成"
+    echo -e "\n\x1b[35m[✔]\x1b[0m $install_num 个程序安装完成"
   elif [[ $uninstall_num -gt 0 ]]; then
-    echo -e "\n\033[35m[✔]\033[0m $install_num 个程序卸载完成"
+    echo -e "\n\x1b[35m[✔]\x1b[0m $install_num 个程序卸载完成"
   fi
 }
 
 #------------------------- Feature Function
 function checkUser() {
   if [[ $USER == "$1" ]]; then
-    echo -e "\n\033[31m[✘]\033[0m 当前用户是$1，拒绝执行"
+    echo -e "\n\x1b[31m[✘]\x1b[0m 当前用户是$1，拒绝执行"
     exit $err_permission
   fi
 }
@@ -135,11 +135,11 @@ function installScript {
   for program in ${programs[*]}; do # 不要理会这个报错，否则就真错了
     if [[ -x $target_path/$program ]]; then
       install --mode=755 --owner="$attribution" --group="$attribution" "$source_path/$program" "$target_path/$program"
-      echo -e "\033[1;34m==>\033[0m 正在更新 \033[32m$program\033[0m"
+      echo -e "\x1b[1;34m==>\x1b[0m 正在更新 \x1b[32m$program\x1b[0m"
       update_num=$((update_num + 1))
     else
       install --mode=755 --owner="$attribution" --group="$attribution" "$source_path/$program" "$target_path/$program"
-      echo -e "\033[1;34m==>\033[0m 正在安装 \033[32m$program\033[0m"
+      echo -e "\x1b[1;34m==>\x1b[0m 正在安装 \x1b[32m$program\x1b[0m"
       install_num=$((install_num + 1))
     fi
   done
@@ -152,38 +152,38 @@ function installAutocompletionScript {
 
 function installProgram() {
   # 安装go写的程序
-  echo -e "\033[36;3mInstalling go-based programs...\033[0m"
+  echo -e "\x1b[36;3mInstalling go-based programs...\x1b[0m"
   if go install github.com/yhyj/checker@latest ; then
-    echo -e "\033[1;34m==>\033[0m \033[32mchecker\033[0m 安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mchecker\x1b[0m 安装完成"
     installAutocompletionScript checker
-    echo -e "\033[1;34m==>\033[0m \033[32mchecker\033[0m 自动补全脚本安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mchecker\x1b[0m 自动补全脚本安装完成"
   fi
   if go install github.com/yhyj/clone-repos@latest ; then
-    echo -e "\033[1;34m==>\033[0m \033[32mclone-repos\033[0m 安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mclone-repos\x1b[0m 安装完成"
     installAutocompletionScript clone-repos
-    echo -e "\033[1;34m==>\033[0m \033[32mclone-repos\033[0m 自动补全脚本安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mclone-repos\x1b[0m 自动补全脚本安装完成"
   fi
   if go install github.com/yhyj/eniac@latest ; then
-    echo -e "\033[1;34m==>\033[0m \033[32meniac\033[0m 安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32meniac\x1b[0m 安装完成"
     installAutocompletionScript eniac
-    echo -e "\033[1;34m==>\033[0m \033[32meniac\033[0m 自动补全脚本安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32meniac\x1b[0m 自动补全脚本安装完成"
   fi
   if go install github.com/yhyj/rolling@latest ; then
-    echo -e "\033[1;34m==>\033[0m \033[32mrolling\033[0m 安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mrolling\x1b[0m 安装完成"
     installAutocompletionScript rolling
-    echo -e "\033[1;34m==>\033[0m \033[32mrolling\033[0m 自动补全脚本安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mrolling\x1b[0m 自动补全脚本安装完成"
   fi
   if go install github.com/yhyj/scleaner@latest ; then
-    echo -e "\033[1;34m==>\033[0m \033[32mscleaner\033[0m 安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mscleaner\x1b[0m 安装完成"
     installAutocompletionScript scleaner
-    echo -e "\033[1;34m==>\033[0m \033[32mscleaner\033[0m 自动补全脚本安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mscleaner\x1b[0m 自动补全脚本安装完成"
   fi
   if go install github.com/yhyj/skynet@latest ; then
-    echo -e "\033[1;34m==>\033[0m \033[32mskynet\033[0m 安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mskynet\x1b[0m 安装完成"
     installAutocompletionScript skynet
-    echo -e "\033[1;34m==>\033[0m \033[32mskynet\033[0m 自动补全脚本安装完成"
+    echo -e "\x1b[1;34m==>\x1b[0m \x1b[32mskynet\x1b[0m 自动补全脚本安装完成"
   fi
-  echo -e "\033[36;3mCompleted\033[0m"
+  echo -e "\x1b[36;3mCompleted\x1b[0m"
 }
 
 ####################################################################

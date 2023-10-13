@@ -27,8 +27,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=1.1.2
-readonly minor_version=20230214
+readonly major_version=1.1.3
+readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -55,9 +55,9 @@ readonly time_out=60 # 输入超时
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
-  echo -e "\033[1;33m默认备份路径\033[0m: \033[34m$images_savefile\033[0m"
+  echo -e "\x1b[1;33m默认备份路径\x1b[0m: \x1b[34m$images_savefile\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -72,7 +72,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
 }
 
 #------------------------- Feature Function
@@ -89,12 +89,12 @@ function userAuthentication() {
       return 0
     else
       # 当前用户不在'docker'组
-      echo -e "\033[31m[✘]\033[0m 用户$USER不是docker组成员，请将其添加到docker组后重试"
+      echo -e "\x1b[31m[✘]\x1b[0m 用户$USER不是docker组成员，请将其添加到docker组后重试"
       return 2
     fi
   else
     # 没有'docker'组
-    echo -e "\033[31m[✘]\033[0m docker组不存在，请创建并将$USER添加到该组后重试"
+    echo -e "\x1b[31m[✘]\x1b[0m docker组不存在，请创建并将$USER添加到该组后重试"
     return 1
   fi
 }
@@ -104,7 +104,7 @@ function saveImage() {
   if systemctl is-active docker &> /dev/null; then
     docker save $(docker images --format '{{.Repository}}') -o "$1" # 不要使用引号
   else
-    echo -e "\033[31m[✘]\033[0m docker服务未启动，请在启动后重试"
+    echo -e "\x1b[31m[✘]\x1b[0m docker服务未启动，请在启动后重试"
   fi
 }
 

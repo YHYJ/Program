@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.9
-readonly minor_version=20230426
+readonly major_version=0.2.0
+readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -55,7 +55,7 @@ readonly space='    '
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -77,7 +77,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
 }
 
 #------------------------- Feature Function
@@ -105,9 +105,9 @@ function collectPackageInfo() {
   checkPath "$package_dir"
   pacman_list="$package_dir/Pacman.list"
   aur_list="$package_dir/AUR.list"
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
   pacman -Qenq > "$pacman_list" # 官方源中单独指定安装的软件包
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
   pacman -Qemq > "$aur_list" # AUR中单独指定安装的软件包
 }
 
@@ -115,9 +115,9 @@ function collectServiceInfo() {
   checkPath "$service_dir"
   system_list="$service_dir/System.list"
   user_list="$service_dir/User.list"
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "System-Service" "-->" "$system_list"
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "System-Service" "-->" "$system_list"
   systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$system_list" # System service
-  printf "%s %-14s \033[36m%s\033[0m %s\n" "$space" "User-Service" "-->" "$user_list"
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-Service" "-->" "$user_list"
   systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$user_list" # User service
 }
 
@@ -126,7 +126,7 @@ function collectAppInfo() {
   if [[ -e "$vim_conf" ]]; then
     checkPath "$app_vim_dir"
     hotkey_doc="$app_vim_dir/Vim-Hotkey.md"
-    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Vim-Hotkey" "-->" "$hotkey_doc"
+    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Vim-Hotkey" "-->" "$hotkey_doc"
     # 提取快捷键说明
     grep -r 'Hotkey' "$vim_conf" > "$hotkey_doc"
     # 格式化文档
@@ -147,14 +147,14 @@ function collectAppInfo() {
   if checkCommand "guake"; then
     checkPath "$app_guake_dir"
     guake_conf="$app_guake_dir/guake.conf"
-    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
+    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
     guake --save-preferences="$guake_conf" # guake的配置文件
   fi
 
   # konsave
   if checkCommand "konsave"; then
     checkPath "$konsave_dir"
-    printf "%s %-13s \033[36m%s\033[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
+    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
     konsave --force --save "$(hostname)" &> /dev/null
   fi
 }
@@ -162,7 +162,7 @@ function collectAppInfo() {
 function collectUserInfo() {
   checkPath "$user_dir"
   id_list="$user_dir/ID.list"
-  printf "%s %-9s \033[36m%s\033[0m %s\n" "$space" "User-List" "-->" "$id_list"
+  printf "%s %-9s \x1b[36m%s\x1b[0m %s\n" "$space" "User-List" "-->" "$id_list"
   id root yj -Gn > "$id_list" # 当前$USER的ID信息
 }
 
@@ -207,7 +207,7 @@ else
             break
             ;;
           *)
-            echo -e "\n\033[31m[✘]\033[0m 未找到指定的模块"
+            echo -e "\n\x1b[31m[✘]\x1b[0m 未找到指定的模块"
             ;;
         esac
         shift 1
