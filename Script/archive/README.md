@@ -29,12 +29,12 @@
 - 'rolling-count'：已被rolling(go)取代
 - 'scleaner'：已被scleaner(go)取代
 - 'ccleaner'：已被scleaner(go)取代
-- 'check-aur'：已被checker(go)取代
-- 'check-pacnew'：已被checker(go)取代
 - 'clone-my-repos'：已被clone-repos(go)取代
 - 'get-system-info'：已被eniac(go)取代
 - 'http-server'：已被skynet(go)取代
 - 'manager'：已被manager(go)取代
+- 'check/*'：已被checker(go)取代
+- 'configure/*'：已被manager(go)取代
 
 ## i3wm
 
