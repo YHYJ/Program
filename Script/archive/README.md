@@ -34,6 +34,7 @@
 - 'http-server'：已被skynet(go)取代
 - 'manager'：已被manager(go)取代
 - 'check/*'：已被checker(go)取代
+- 'git/*'：已被git hook取代
 - 'configure/*'：已被manager(go)取代
 
 ## i3wm
