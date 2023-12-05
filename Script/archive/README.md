@@ -36,6 +36,7 @@
 - 'check/*'：已被checker(go)取代
 - 'git/*'：已被git hook取代
 - 'configure/*'：已被manager(go)取代
+- 'trash-manager'：已被trash(go)取代
 
 ## i3wm
 
