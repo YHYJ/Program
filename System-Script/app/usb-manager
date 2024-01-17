@@ -52,8 +52,8 @@ function helpInfo() {
   echo -e "Options:"
   echo -e "     -l, --list                                List USB storage devices"
   echo -e "     -m, --mount   [all, PartName, DiskName]   Mount USB storage device"
-  echo -e "     -u, --unmount [all, PartName, DiskName]   Unmount USB storage device (unmount)"
-  echo -e "     -r, --remove  [all, PartName, DiskName]   Remove USB storage device (unmount/remove)"
+  echo -e "     -u, --umount  [all, PartName, DiskName]   Unmount USB storage device"
+  echo -e "     -r, --remove  [all, PartName, DiskName]   Remove USB storage device"
   echo -e ""
   echo -e "     -h, --help                                Display help information"
   echo -e "     -v, --version                             Display version information"
@@ -122,7 +122,7 @@ function mountAction() { # 挂载设备
   fi
 }
 
-function unmountAction() { # 卸载设备
+function umountAction() { # 卸载设备
   # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,HOTPLUG,MOUNTPOINT)
   # 使用jq查找符合要求的设备
@@ -130,19 +130,19 @@ function unmountAction() { # 卸载设备
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
 
   if [[ "$1" == 'all' ]]; then
-    # --unmount 的参数是'all'，卸载所有part
+    # --umount 的参数是'all'，卸载所有part
     for ((index = 0; index < ${#partnames[*]}; index++)); do
       udisksctl unmount --no-user-interaction --block-device "${partnames[index]}"
     done
   elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
-      # --unmount 的参数是disk，卸载该disk的所有part
+      # --umount 的参数是disk，卸载该disk的所有part
       IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint != null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
       for ((index = 0; index < ${#disk_parts[*]}; index++)); do
         udisksctl unmount --no-user-interaction --block-device "${disk_parts[index]}"
       done
     else
-      # --unmount 的参数是part，卸载该part
+      # --umount 的参数是part，卸载该part
       udisksctl unmount --no-user-interaction --block-device "$1"
     fi
   else
@@ -159,7 +159,7 @@ function removeAction() { # 移除设备
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
 
   # 卸载设备
-  unmountAction "$1"
+  umountAction "$1"
 
   if [[ "$1" == 'all' ]]; then
     # 移除设备
@@ -181,7 +181,7 @@ function removeAction() { # 移除设备
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "lm:u:r:hv" --longoptions "list,mount:,unmount:,remove:,help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "lm:u:r:hv" --longoptions "list,mount:,umount:,remove:,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -199,9 +199,9 @@ else
         mountAction "$2"
         shift 2
         ;;
-      -u | --unmount)
+      -u | --umount)
         checkCommand "udisksctl"
-        unmountAction "$2"
+        umountAction "$2"
         shift 2
         ;;
       -r | --remove)
