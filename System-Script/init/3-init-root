@@ -88,9 +88,6 @@ function main() {
   # 配置git
   echo -e "\x1b[32;3m正在配置git\x1b[0m"
   ln -sf "$yj_home"/.gitconfig "$root_home"/.gitconfig
-  # 配置npm
-  echo -e "\x1b[32;3m正在配置npm\x1b[0m"
-  ln -sf "$yj_home"/.npmrc "$root_home"/.npmrc
   # 安装并配置space-vim
   echo -e "\x1b[32;3m正在配置space-vim\x1b[0m"
   cp "$yj_home"/Documents/Repos/System/Program/Script/install/install-spacevim ~/Desktop
