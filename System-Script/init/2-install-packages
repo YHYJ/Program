@@ -28,6 +28,7 @@ readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
 readonly err_file=1      # 文件/路径类错误
 readonly err_ctrl_c=130  # 接收到INT(Ctrl+C)指令
 readonly err_unknown=255 # 未知错误
@@ -76,6 +77,7 @@ function main() {
         pacman -S "$package"
         echo -e "\n"
       done
+      exit $normal
     else
       exit $err_file
     fi
