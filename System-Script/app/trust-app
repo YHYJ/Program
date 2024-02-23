@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+: << !
+Name: trust-app
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2024-02-23 13:18:59
+
+Description: 使 macOS 信任指定程序
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.0.1
+readonly minor_version=20240223
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly err_file=1      # 文件/路径类错误
+readonly err_unknown=255 # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="使 macOS 系统信任指定程序"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\033[32m$name\033[0m\033[1m$desc\033[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -, --app          指定应用程序路径"
+  echo -e ""
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\033[1m$name\033[0m version (\033[1m$major_version-$minor_version.$rel_version\033[0m)"
+}
+
+#------------------------- Feature Function
+function trustApp() {
+  # 如果$1存在，输出1，否则输出错误
+  if [[ -e $1 ]]; then
+    xattr -rd com.apple.quarantine "$1"
+    echo -e "\n\x1b[35m[✔]\x1b[0m \x1b[4;34m$1\x1b[0m is trusted"
+  else
+    echo -e "\n\x1b[31m[✘]\x1b[0m \x1b[34m$1\x1b[0m does not exist"
+    exit $err_file
+  fi
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+ARGS=$(getopt --options "ahv" --longoptions "app:,help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    case $1 in
+      -a | --app)
+        trustApp "$2"
+        shift 2
+        ;;
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi
