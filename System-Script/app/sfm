@@ -24,7 +24,7 @@ name=$(basename "$0")
 readonly name
 # program nversion
 readonly major_version=0.2.7
-readonly minor_version=20231013
+readonly minor_version=20240408
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
