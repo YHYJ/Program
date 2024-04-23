@@ -24,7 +24,7 @@ name=$(basename "$0")
 readonly name
 # program nversion
 readonly major_version=0.2.7
-readonly minor_version=20240408
+readonly minor_version=20240423
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -41,7 +41,7 @@ readonly desc="在指定路径启动文件管理器"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
@@ -69,10 +69,10 @@ function checkCommand() {
 function getArgType() {
   if checkCommand "xdg-open"; then
     if [[ -d $1 ]]; then
-      xdg-open "$1" &> /dev/null &
+      xdg-open "$1" > /dev/null 2>&1
       exit $normal
     else
-      xdg-open . &> /dev/null &
+      xdg-open . > /dev/null 2>&1
       exit $normal
     fi
   else
