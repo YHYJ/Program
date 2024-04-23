@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+: << !
+Name: open-remote-repository
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2024-04-23 12:34:11
+
+Description: 打开本地存储库对应的远端存储库
+
+Attentions:
+-
+
+Depends:
+-
+!
+
+####################################################################
+#+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Program Variable
+# program name
+name=$(basename "$0")
+readonly name
+# program version
+readonly major_version=0.0.1
+readonly minor_version=20240423
+readonly rel_version=1
+
+#------------------------- Exit Code Variable
+readonly err_file=1         # 文件/路径类错误
+readonly err_no_program=127 # 未找到命令
+readonly err_unknown=255    # 未知错误
+
+#------------------------- Parameter Variable
+# description variable
+readonly desc="通过默认浏览器打开本地存储库对应的远端存储库"
+
+####################################################################
+#+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
+####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     $name [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
+}
+
+#------------------------- Feature Function
+function isRepo() {
+  # 检测当前目录是否为 git 存储库
+  if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    echo -e "Not a Git repository"
+    exit $err_file
+  fi
+}
+
+function checkOS() {
+  # 检测系统类型，确定打开默认浏览器的命令
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    open="open"
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    open="xdg-open"
+  else
+    echo "Unsupported OS: $OSTYPE"
+    exit $err_no_program
+  fi
+}
+
+function main() {
+  isRepo
+  checkOS
+
+  REMOTE_URL=$(git remote -v | grep '^origin.*push' | awk '{print $2}' | head -n 1 | sed 's/git@\(.*\):\(.*\).git/https:\/\/\1\/\2/')
+  $open "$REMOTE_URL" > /dev/null 2>&1
+}
+
+####################################################################
+#++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
+####################################################################
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  main
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        helpInfo
+        exit $err_unknown
+        ;;
+    esac
+  done
+fi
