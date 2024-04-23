@@ -12,8 +12,6 @@
 <!-- vim-markdown-toc GFM -->
 
 * [父模块列表](#父模块列表)
-* [各文件夹简介](#各文件夹简介)
-    * [System-Script](#system-script)
 
 <!-- vim-markdown-toc -->
 
@@ -35,11 +33,3 @@
 | 父模块                                   | 简介     |
 |------------------------------------------|----------|
 | [System](https://github.com/YHYJ/System) | 我的系统 |
-
-## 各文件夹简介
-
-### System-Script
-
-存放系统级工具
-
-- app：工具类程序
