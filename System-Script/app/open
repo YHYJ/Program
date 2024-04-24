@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 : << !
-Name: sfm
+Name: open
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:51:05
 
-Description: Start file manager -- 在指定目录启动文件管理器
+Description: Open URI -- 以默认程序打开指定的 URI
 
 Attentions:
 -
@@ -23,17 +23,20 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.7
-readonly minor_version=20240423
+readonly major_version=0.3.0
+readonly minor_version=20240424
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_no_program=127 # 未找到命令
+readonly err_file=1 # 文件/路径类错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="在指定路径启动文件管理器"
+readonly desc="使用默认程序打开指定的 URI"
+
+# command
+open="xdg-open"
+editor="nano"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -59,24 +62,37 @@ function versionInfo() {
 
 #------------------------- Feature Function
 function checkCommand() {
-  if command -v "$1" > /dev/null 2>&1; then
-    return $normal
-  else
-    return $err_no_program
+  # 确定编辑器
+  if command -v nvim &> /dev/null; then
+    editor="nvim"
+  elif command -v vim &> /dev/null; then
+    editor="vim"
+  elif command -v vi &> /dev/null; then
+    editor="vi"
   fi
 }
 
-function getArgType() {
-  if checkCommand "xdg-open"; then
-    if [[ -d $1 ]]; then
-      xdg-open "$1" > /dev/null 2>&1
-      exit $normal
+function main() {
+  checkCommand
+
+  uri=$1
+  if [[ -d $uri ]]; then # 文件夹
+    $open "$uri"
+  elif [[ -f $uri ]]; then # 文件
+    $editor "$uri"
+  elif [[ "$uri" == file://* ]]; then # URL
+    if [[ -d "${uri#file://}" ]]; then
+      $open "$uri"
+    elif [[ -f "${uri#file://}" ]]; then
+      $editor "$uri"
     else
-      xdg-open . > /dev/null 2>&1
-      exit $normal
+      echo -e "\x1b[31m'$uri' is not a file or directory\x1b[0m"
     fi
+  elif [[ "$uri" == http://* || "$uri" == https://* || "$uri" == mailto:* || "$uri" == tel:* ]]; then # URL
+    $open "$uri" > /dev/null 2>&1
   else
-    echo -e "xdg-open 未安装"
+    echo -e "\x1b[31mWhat is '$uri'\x1b[0m"
+    exit $err_file
   fi
 }
 
@@ -91,6 +107,6 @@ case $1 in
     versionInfo
     ;;
   *)
-    getArgType "$1"
+    main "$1"
     ;;
 esac
