@@ -23,11 +23,12 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.3.0
-readonly minor_version=20240424
+readonly major_version=0.3.1
+readonly minor_version=20240425
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
+readonly normal=0   # 一切正常
 readonly err_file=1 # 文件/路径类错误
 
 #------------------------- Parameter Variable
@@ -77,19 +78,25 @@ function main() {
 
   uri=$1
   if [[ -d $uri ]]; then # 文件夹
-    $open "$uri"
+    $open "$uri" > /dev/null 2>&1
+    exit $normal
   elif [[ -f $uri ]]; then # 文件
     $editor "$uri"
+    exit $normal
   elif [[ "$uri" == file://* ]]; then # URL
     if [[ -d "${uri#file://}" ]]; then
-      $open "$uri"
+      $open "$uri" > /dev/null 2>&1
+      exit $normal
     elif [[ -f "${uri#file://}" ]]; then
       $editor "$uri"
+      exit $normal
     else
       echo -e "\x1b[31m'$uri' is not a file or directory\x1b[0m"
+      exit $err_file
     fi
   elif [[ "$uri" == http://* || "$uri" == https://* || "$uri" == mailto:* || "$uri" == tel:* ]]; then # URL
     $open "$uri" > /dev/null 2>&1
+    exit $normal
   else
     echo -e "\x1b[31mWhat is '$uri'\x1b[0m"
     exit $err_file
@@ -99,14 +106,28 @@ function main() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-case $1 in
-  -h | --help)
-    helpInfo
-    ;;
-  -v | --version)
-    versionInfo
-    ;;
-  *)
-    main "$1"
-    ;;
-esac
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+eval set -- "$ARGS"
+
+if [[ ${#@} -lt 2 ]]; then
+  main "$PWD"
+else
+  while true; do
+    case $1 in
+      -h | --help)
+        helpInfo
+        shift 1
+        ;;
+      -v | --version)
+        versionInfo
+        shift 1
+        ;;
+      --)
+        shift 1
+        ;;
+      *)
+        main "$1"
+        ;;
+    esac
+  done
+fi
