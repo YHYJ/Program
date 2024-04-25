@@ -274,10 +274,10 @@ function spiderVirtualenvInfo() { # 搜集虚拟环境信息
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
+checkOS
+
 ARGS=$(getopt --options "g:hv" --longoptions "get:,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
-
-checkOS
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
