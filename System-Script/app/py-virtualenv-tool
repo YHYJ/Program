@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2023-02-09 11:00:29
 
-Description: Python Virtualenv工具
+Description: Python Virtualenv 工具
 
 Attentions:
 -
@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.3
-readonly minor_version=20240423
+readonly major_version=0.1.4
+readonly minor_version=20240425
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -35,13 +35,14 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于操作Python Virtualenv"
+readonly desc="用于操作 Python Virtualenv"
 # environment variable
 readonly storage="$HOME/.cache/SpiderData"
 readonly app_virtualenv_dir="$storage/App/virtualenv"
 # app variable
-readonly virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
-readonly virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
+pip="pip"
+virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
+virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
 # printf variable
 readonly space='    '
 
@@ -72,17 +73,32 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
-if [ -s "$virtualenvwrapper_lazy" ]; then
-  # shellcheck source=/dev/null
-  source "$virtualenvwrapper_lazy"
-elif [ -s "$virtualenvwrapper" ]; then
-  # shellcheck source=/dev/null
-  source "$virtualenvwrapper"
-else
-  echo -e "virtualenv(wrapper) 未安装"
-  exit $err_no_program
-fi
-venvs=$(workon)
+function checkOS() {
+  # 检测系统类型，确定因系统差异导致的变量或命令不同
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    pip="pip3.11"
+    virtualenvwrapper="/opt/homebrew/bin/virtualenvwrapper.sh"
+    virtualenvwrapper_lazy="/opt/homebrew/bin/virtualenvwrapper_lazy.sh"
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    pip="pip"
+    virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
+    virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
+  fi
+}
+
+function initVirtualenv() {
+  if [ -s "$virtualenvwrapper_lazy" ]; then
+    # shellcheck source=/dev/null
+    source "$virtualenvwrapper_lazy"
+  elif [ -s "$virtualenvwrapper" ]; then
+    # shellcheck source=/dev/null
+    source "$virtualenvwrapper"
+  else
+    echo -e "virtualenv(wrapper) 未安装"
+    exit $err_no_program
+  fi
+  venvs=$(workon)
+}
 
 function checkPath() {
   if [[ -e "$1" ]]; then
@@ -110,7 +126,7 @@ function deleteVirtualenvFile() {
 }
 
 function saveVirtualenv() {
-  if checkCommand "pip"; then
+  if checkCommand "$pip"; then
     printf "%s %-11s \x1b[36m%s\x1b[0m %s\n" "$space" "Python-Venv" "-->" "$app_virtualenv_dir/*"
     for venv in ${venvs[*]}; do
       workon "$venv"
@@ -124,7 +140,7 @@ function saveVirtualenv() {
 }
 
 function makeVirtualenv() {
-  if checkCommand "pip"; then
+  if checkCommand "$pip"; then
     # 遍历存储的requirements*.txt，得到绝对路径表示的文件名
     if [ "$(ls -A "$app_virtualenv_dir")" ]; then
       for filepath in "$app_virtualenv_dir"/*.txt; do
@@ -148,6 +164,8 @@ function makeVirtualenv() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
+checkOS
+initVirtualenv
 mkdir -p "$app_virtualenv_dir"
 
 ARGS=$(getopt --options "dsmhv" --longoptions "delete,save,make,help,version" -n "$name" -- "$@")
