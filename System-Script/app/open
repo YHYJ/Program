@@ -116,11 +116,11 @@ else
     case $1 in
       -h | --help)
         helpInfo
-        shift 1
+        exit $normal
         ;;
       -v | --version)
         versionInfo
-        shift 1
+        exit $normal
         ;;
       --)
         shift 1
