@@ -29,11 +29,13 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.2.3
-readonly minor_version=20240423
+readonly major_version=0.3.0
+readonly minor_version=20240425
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
 readonly err_unknown=255    # 未知错误
 
@@ -41,8 +43,18 @@ readonly err_unknown=255    # 未知错误
 # description variable
 readonly desc="用于搜集Linux系统信息"
 
-# 搜集结果存储路径
+# path variable
 readonly storage="$HOME/.cache/SpiderData"
+readonly package_dir="$storage/PackageList"
+readonly service_dir="$storage/ServiceList"
+readonly app_vim_dir="$storage/App/vim"
+readonly app_guake_dir="$storage/App/guake"
+readonly user_dir="$storage/UserList"
+# app variable
+readonly vim_conf="$HOME/.space-vim/private/config.vim"
+readonly konsave_dir="$HOME/.config/konsave"
+# printf variable
+readonly space='    '
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -83,42 +95,106 @@ function finish() {
 }
 
 #------------------------- Feature Function
-function checkPath() {
-  if [[ ! -d $1 ]]; then
-    mkdir "$1"
+function checkPath() { # 检查指定路径是否存在，否则创建
+  if [[ -e "$1" ]]; then
+    if [[ ! -d "$1" ]]; then
+      echo -e "指定路径$1不是文件夹，已退出"
+      exit $err_file
+    fi
+  else
+    mkdir -p "$1"
+    echo -e "\n已创建$1\n"
   fi
 }
 
 function checkCommand() {
-  if ! command -v "$1" > /dev/null 2>&1; then
-    echo -e "$1 未安装"
-    exit $err_no_program
+  if command -v "$1" > /dev/null 2>&1; then
+    return $normal
+  else
+    return $err_no_program
   fi
 }
 
-function spiderAppInfo() {
+function spiderAppInfo() { # 搜集特定 APP 配置文件等
   echo -e "\x1b[1;34mApp\x1b[0m"
-  collect-system --name app # App config file
+
+  # vim
+  if [[ -e "$vim_conf" ]]; then
+    checkPath "$app_vim_dir"
+    hotkey_doc="$app_vim_dir/Vim-Hotkey.md"
+    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Vim-Hotkey" "-->" "$hotkey_doc"
+    # 提取快捷键说明
+    grep -r 'Hotkey' "$vim_conf" > "$hotkey_doc"
+    # 格式化文档
+    sed -i 's/--/|/g' "$hotkey_doc" # 替换'--'为'|'
+    sed -i 's/^"//' "$hotkey_doc"   # 删除行首的'"'
+    sed -i 's/^/|/' "$hotkey_doc"   # 在行首添加'|'
+    sed -i 's/$/|/' "$hotkey_doc"   # 在行尾添加'|'
+    # 添加文件头
+    line1='|	关键字	|	归属	|	快捷键	|	说明	|'
+    line2='|---|---|---|---|'
+    sed -i "1i\\$line2" "$hotkey_doc"
+    sed -i "1i\\$line1" "$hotkey_doc"
+  else
+    echo -e "\n似乎未安装 space-vim\n"
+  fi
+
+  # guake
+  if checkCommand "guake"; then
+    checkPath "$app_guake_dir"
+    guake_conf="$app_guake_dir/guake.conf"
+    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
+    guake --save-preferences="$guake_conf" # guake的配置文件
+  else
+    echo -e "\n似乎未安装 guake\n"
+  fi
+
+  # konsave
+  if checkCommand "konsave"; then
+    checkPath "$konsave_dir"
+    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
+    konsave --force --save "$(hostname)" &> /dev/null
+  else
+    echo -e "\n似乎未安装 konsave\n"
+  fi
 }
 
-function spiderPackageInfo() {
+function spiderPackageInfo() { # 搜集已安装软件包列表
   echo -e "\x1b[1;34mPackage\x1b[0m"
-  collect-system --name package # Package List
+
+  checkPath "$package_dir"
+  pacman_list="$package_dir/Pacman.list"
+  aur_list="$package_dir/AUR.list"
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
+  pacman -Qenq > "$pacman_list" # 官方源中单独指定安装的软件包
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
+  pacman -Qemq > "$aur_list" # AUR中单独指定安装的软件包
 }
 
-function spiderServiceInfo() {
+function spiderServiceInfo() { # 搜集系统服务列表
   echo -e "\x1b[1;34mService\x1b[0m"
-  collect-system --name service # Service List
+
+  checkPath "$service_dir"
+  system_list="$service_dir/System.list"
+  user_list="$service_dir/User.list"
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "System-Service" "-->" "$system_list"
+  systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$system_list" # System service
+  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-Service" "-->" "$user_list"
+  systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$user_list" # User service
 }
 
-function spiderUserInfo() {
+function spiderUserInfo() { # 搜集用户信息
   echo -e "\x1b[1;34mUser\x1b[0m"
-  collect-system --name user # User List
+
+  checkPath "$user_dir"
+  id_list="$user_dir/ID.list"
+  printf "%s %-9s \x1b[36m%s\x1b[0m %s\n" "$space" "User-List" "-->" "$id_list"
+  id root yj -Gn > "$id_list" # 当前$USER的ID信息
 }
 
-function spiderVirtualenvInfo() {
+function spiderVirtualenvInfo() { # 搜集虚拟环境信息
   echo -e "\x1b[1;34mVirtualenv\x1b[0m"
-  py-virtualenv-tool --save # Python Virtualenv
+  py-virtualenv-tool --save
 }
 
 ####################################################################
@@ -135,47 +211,48 @@ else
       -g | --get)
         case $2 in
           all)
-            checkCommand "collect-system"
-            checkCommand "py-virtualenv-tool"
             checkPath "$storage"
             spiderAppInfo
             spiderPackageInfo
             spiderServiceInfo
             spiderUserInfo
-            spiderVirtualenvInfo
+            if checkCommand "py-virtualenv-tool"; then
+              spiderVirtualenvInfo
+            else
+              echo "TODO"
+            fi
             finish
             shift 1
             ;;
           app)
-            checkCommand "collect-system"
             checkPath "$storage"
             spiderAppInfo
             finish
             shift 1
             ;;
           env)
-            checkCommand "py-virtualenv-tool"
-            checkPath "$storage"
-            spiderVirtualenvInfo
-            finish
+            if checkCommand "py-virtualenv-tool"; then
+              checkPath "$storage"
+              spiderVirtualenvInfo
+              finish
+            else
+              echo "TODO"
+            fi
             shift 1
             ;;
           package)
-            checkCommand "collect-system"
             checkPath "$storage"
             spiderPackageInfo
             finish
             shift 1
             ;;
           service)
-            checkCommand "collect-system"
             checkPath "$storage"
             spiderServiceInfo
             finish
             shift 1
             ;;
           user)
-            checkCommand "collect-system"
             checkPath "$storage"
             spiderUserInfo
             finish
