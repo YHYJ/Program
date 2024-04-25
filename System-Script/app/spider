@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2022-10-24 14:48:12
 
-Description: Linux系统信息搜集工具
+Description: 系统信息搜集工具
 
 Attentions: 搜集如下信息
 - Package
@@ -14,11 +14,11 @@ Attentions: 搜集如下信息
 - User
 - Vim
 - Guake
+- Konsave
 - Virtualenv
 
 Depends:
 - coreutils
-- diffutils/colordiff
 !
 
 ####################################################################
@@ -29,7 +29,7 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.3.0
+readonly major_version=0.4.0
 readonly minor_version=20240425
 readonly rel_version=1
 
@@ -41,8 +41,9 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于搜集Linux系统信息"
-
+readonly desc="用于搜集系统信息，支持 Arch Linux 和 macOS"
+# system variable
+system_type="unknown"
 # path variable
 readonly storage="$HOME/.cache/SpiderData"
 readonly package_dir="$storage/PackageList"
@@ -95,6 +96,17 @@ function finish() {
 }
 
 #------------------------- Feature Function
+function checkOS() {
+  # 检测系统类型，确定打开默认浏览器的命令
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    system_type="macOS"
+  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    system_type="Linux"
+  else
+    system_type="unknown"
+  fi
+}
+
 function checkPath() { # 检查指定路径是否存在，否则创建
   if [[ -e "$1" ]]; then
     if [[ ! -d "$1" ]]; then
@@ -103,7 +115,6 @@ function checkPath() { # 检查指定路径是否存在，否则创建
     fi
   else
     mkdir -p "$1"
-    echo -e "\n已创建$1\n"
   fi
 }
 
@@ -115,10 +126,7 @@ function checkCommand() {
   fi
 }
 
-function spiderAppInfo() { # 搜集特定 APP 配置文件等
-  echo -e "\x1b[1;34mApp\x1b[0m"
-
-  # vim
+function __getVimInfo() { # 获取 vim 信息
   if [[ -e "$vim_conf" ]]; then
     checkPath "$app_vim_dir"
     hotkey_doc="$app_vim_dir/Vim-Hotkey.md"
@@ -135,66 +143,114 @@ function spiderAppInfo() { # 搜集特定 APP 配置文件等
     line2='|---|---|---|---|'
     sed -i "1i\\$line2" "$hotkey_doc"
     sed -i "1i\\$line1" "$hotkey_doc"
-  else
-    echo -e "\n似乎未安装 space-vim\n"
   fi
+}
 
-  # guake
+function __getGuakeInfo() { # 获取 guake 信息
   if checkCommand "guake"; then
     checkPath "$app_guake_dir"
     guake_conf="$app_guake_dir/guake.conf"
     printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
     guake --save-preferences="$guake_conf" # guake的配置文件
-  else
-    echo -e "\n似乎未安装 guake\n"
   fi
+}
 
-  # konsave
+function __getKonsaveInfo() { # 获取 konsave 信息
   if checkCommand "konsave"; then
     checkPath "$konsave_dir"
     printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
     konsave --force --save "$(hostname)" &> /dev/null
+  fi
+}
+
+function spiderAppInfo() { # 搜集特定 APP 配置文件等
+  echo -e "\x1b[1;34mApp\x1b[0m"
+
+  if [ $system_type == "Linux" ]; then
+    __getVimInfo
+    __getGuakeInfo
+    __getKonsaveInfo
+  elif [ $system_type == "macOS" ]; then
+    __getVimInfo
   else
-    echo -e "\n似乎未安装 konsave\n"
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
   fi
 }
 
 function spiderPackageInfo() { # 搜集已安装软件包列表
   echo -e "\x1b[1;34mPackage\x1b[0m"
 
-  checkPath "$package_dir"
-  pacman_list="$package_dir/Pacman.list"
-  aur_list="$package_dir/AUR.list"
-  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
-  pacman -Qenq > "$pacman_list" # 官方源中单独指定安装的软件包
-  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
-  pacman -Qemq > "$aur_list" # AUR中单独指定安装的软件包
+  if [ $system_type == "Linux" ]; then
+    checkPath "$package_dir"
+    pacman_list="$package_dir/Pacman.list"
+    aur_list="$package_dir/AUR.list"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
+    pacman -Qenq > "$pacman_list" # 官方源中单独指定安装的软件包
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
+    pacman -Qemq > "$aur_list" # AUR中单独指定安装的软件包
+  elif [ $system_type == "macOS" ]; then
+    checkPath "$package_dir"
+    formulae_list="$package_dir/Formulae.list"
+    casks_list="$package_dir/Casks.list"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Formulae-Package" "-->" "$formulae_list"
+    brew list --formulae > "$formulae_list" # Homebrew 安装的命令行工具和应用程序
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Casks-Package" "-->" "$casks_list"
+    brew list --casks > "$casks_list" # Homebrew 安装的 GUI 应用程序
+  else
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+  fi
 }
 
 function spiderServiceInfo() { # 搜集系统服务列表
   echo -e "\x1b[1;34mService\x1b[0m"
 
-  checkPath "$service_dir"
-  system_list="$service_dir/System.list"
-  user_list="$service_dir/User.list"
-  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "System-Service" "-->" "$system_list"
-  systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$system_list" # System service
-  printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-Service" "-->" "$user_list"
-  systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$user_list" # User service
+  if [ $system_type == "Linux" ]; then
+    checkPath "$service_dir"
+    system_list="$service_dir/System.list"
+    user_list="$service_dir/User.list"
+    if checkCommand "systemctl"; then
+      printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "System-Service" "-->" "$system_list"
+      systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$system_list" # System service
+      printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-Service" "-->" "$user_list"
+      systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$user_list" # User service
+    else
+      printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported non-systemd based OS"
+    fi
+  elif [ $system_type == "macOS" ]; then
+    checkPath "$service_dir"
+    user_list="$service_dir/User.list"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-Launch" "-->" "$user_list"
+    launchctl list | grep -v 'com.apple' | grep -v 'org.openbsd' > "$user_list" # User service
+  else
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+  fi
 }
 
 function spiderUserInfo() { # 搜集用户信息
   echo -e "\x1b[1;34mUser\x1b[0m"
 
-  checkPath "$user_dir"
-  id_list="$user_dir/ID.list"
-  printf "%s %-9s \x1b[36m%s\x1b[0m %s\n" "$space" "User-List" "-->" "$id_list"
-  id root yj -Gn > "$id_list" # 当前$USER的ID信息
+  if [ $system_type == "Linux" ] || [ $system_type == "macOS" ]; then
+    checkPath "$user_dir"
+    id_list="$user_dir/ID.list"
+    printf "%s %-9s \x1b[36m%s\x1b[0m %s\n" "$space" "User-List" "-->" "$id_list"
+    id root yj -Gn > "$id_list" # $USER 和 root 的 ID 信息
+  else
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+  fi
 }
 
 function spiderVirtualenvInfo() { # 搜集虚拟环境信息
   echo -e "\x1b[1;34mVirtualenv\x1b[0m"
-  py-virtualenv-tool --save
+
+  if [ $system_type == "Linux" ] || [ $system_type == "macOS" ]; then
+    if checkCommand "py-virtualenv-tool"; then
+      py-virtualenv-tool --save
+    else
+      echo -e "$space \x1b[31m!\x1b[0m Please install py-virtualenv-tool"
+    fi
+  else
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+  fi
 }
 
 ####################################################################
@@ -202,6 +258,8 @@ function spiderVirtualenvInfo() { # 搜集虚拟环境信息
 ####################################################################
 ARGS=$(getopt --options "g:hv" --longoptions "get:,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
+
+checkOS
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
@@ -216,11 +274,7 @@ else
             spiderPackageInfo
             spiderServiceInfo
             spiderUserInfo
-            if checkCommand "py-virtualenv-tool"; then
-              spiderVirtualenvInfo
-            else
-              echo "TODO"
-            fi
+            spiderVirtualenvInfo
             finish
             shift 1
             ;;
@@ -231,13 +285,9 @@ else
             shift 1
             ;;
           env)
-            if checkCommand "py-virtualenv-tool"; then
-              checkPath "$storage"
-              spiderVirtualenvInfo
-              finish
-            else
-              echo "TODO"
-            fi
+            checkPath "$storage"
+            spiderVirtualenvInfo
+            finish
             shift 1
             ;;
           package)
