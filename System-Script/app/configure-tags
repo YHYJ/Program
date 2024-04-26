@@ -31,7 +31,7 @@ readonly name
 # program nversion
 readonly major_version=0.1.5
 readonly minor_version=20240426
-readonly rel_version=2
+readonly rel_version=3
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -89,7 +89,7 @@ function askQuestion() {
     elif [[ "$REPLY" =~ ^[Nn] ]]; then
       return 1
     else
-      echo -e "Please input Y/y or N/n\n"
+      echo -e "Please input [Y/y] or [N/n]\n"
     fi
   done
 }
