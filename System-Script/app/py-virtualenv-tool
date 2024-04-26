@@ -25,7 +25,7 @@ readonly name
 # program version
 readonly major_version=0.1.5
 readonly minor_version=20240426
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -126,7 +126,7 @@ function deleteVirtualenvFile() {
 
 function saveVirtualenv() {
   if checkCommand "$pip"; then
-    printf "%s %-11s \x1b[36m%s\x1b[0m %s\n" "$space" "Python-Venv" "-->" "$app_virtualenv_dir/*"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Python-Venv" "-->" "$app_virtualenv_dir/*"
     for venv in ${venvs[*]}; do
       workon "$venv"
       filepath="$app_virtualenv_dir"/requirements_"$venv".txt

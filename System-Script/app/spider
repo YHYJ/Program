@@ -31,7 +31,7 @@ readonly name
 # program nversion
 readonly major_version=0.4.1
 readonly minor_version=20240426
-readonly rel_version=2
+readonly rel_version=3
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -130,7 +130,7 @@ function __getVimInfo() { # 获取 vim 信息
   if [[ -e "$vim_conf" ]]; then
     checkPath "$app_vim_dir"
     hotkey_doc="$app_vim_dir/Vim-Hotkey.md"
-    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Vim-Hotkey" "-->" "$hotkey_doc"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Vim-Hotkey" "-->" "$hotkey_doc"
     # 提取快捷键说明
     grep -r 'Hotkey' "$vim_conf" > "$hotkey_doc"
 
@@ -168,7 +168,7 @@ function __getGuakeInfo() { # 获取 guake 信息
   if checkCommand "guake"; then
     checkPath "$app_guake_dir"
     guake_conf="$app_guake_dir/guake.conf"
-    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
     guake --save-preferences="$guake_conf"
   fi
 }
@@ -176,7 +176,7 @@ function __getGuakeInfo() { # 获取 guake 信息
 function __getKonsaveInfo() { # 获取 konsave 信息
   if checkCommand "konsave"; then
     checkPath "$konsave_dir"
-    printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
     konsave --force --save "$(hostname)" &> /dev/null
   fi
 }
@@ -250,7 +250,7 @@ function spiderUserInfo() { # 搜集用户信息
   if [ $system_type == "Linux" ] || [ $system_type == "macOS" ]; then
     checkPath "$user_dir"
     id_list="$user_dir/ID.list"
-    printf "%s %-9s \x1b[36m%s\x1b[0m %s\n" "$space" "User-List" "-->" "$id_list"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-List" "-->" "$id_list"
     id root yj -Gn > "$id_list" # $USER 和 root 的 ID 信息
   else
     printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
