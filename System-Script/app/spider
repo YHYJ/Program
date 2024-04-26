@@ -30,8 +30,8 @@ name=$(basename "$0")
 readonly name
 # program nversion
 readonly major_version=0.4.1
-readonly minor_version=20240425
-readonly rel_version=2
+readonly minor_version=20240426
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -153,13 +153,13 @@ $line1
 " "$hotkey_doc"
     else
       # 格式化文档
-      sed -i '' 's/--/|/g' "$hotkey_doc" # 替换'--'为'|'
-      sed -i '' 's/^"//' "$hotkey_doc"   # 删除行首的'"'
-      sed -i '' 's/^/|/' "$hotkey_doc"   # 在行首添加'|'
-      sed -i '' 's/$/|/' "$hotkey_doc"   # 在行尾添加'|'
+      sed -i 's/--/|/g' "$hotkey_doc" # 替换'--'为'|'
+      sed -i 's/^"//' "$hotkey_doc"   # 删除行首的'"'
+      sed -i 's/^/|/' "$hotkey_doc"   # 在行首添加'|'
+      sed -i 's/$/|/' "$hotkey_doc"   # 在行尾添加'|'
       # 添加文件头
-      sed -i '' "1i\\$line2" "$hotkey_doc"
-      sed -i '' "1i\\$line1" "$hotkey_doc"
+      sed -i "1i\\$line2" "$hotkey_doc"
+      sed -i "1i\\$line1" "$hotkey_doc"
     fi
   fi
 }
