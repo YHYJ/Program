@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.3.1
-readonly minor_version=20240425
+readonly major_version=0.3.2
+readonly minor_version=20240426
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -33,7 +33,7 @@ readonly err_file=1 # 文件/路径类错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="使用默认程序打开指定的 URI"
+readonly desc="自动识别 URI 类型并以默认程序打开"
 
 # command
 open="xdg-open"
@@ -52,8 +52,8 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -h, --help            显示帮助信息"
-  echo -e "     -v, --version         显示版本信息"
+  echo -e "     -h, --help        显示帮助信息"
+  echo -e "     -v, --version     显示版本信息"
 }
 
 function versionInfo() {

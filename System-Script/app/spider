@@ -31,7 +31,7 @@ readonly name
 # program nversion
 readonly major_version=0.4.1
 readonly minor_version=20240426
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -110,7 +110,7 @@ function checkOS() {
 function checkPath() { # 检查指定路径是否存在，否则创建
   if [[ -e "$1" ]]; then
     if [[ ! -d "$1" ]]; then
-      echo -e "指定路径$1不是文件夹，已退出"
+      echo -e "指定路径 $1 不是文件夹，已退出"
       exit $err_file
     fi
   else

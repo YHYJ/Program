@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2023-03-22 15:58:15
 
-Description: 使用udisk2控制可移动USB存储设备
+Description: 一个控制可移动 USB 存储设备的工具
 
 Attentions:
 -
@@ -25,7 +25,7 @@ name=$(basename "$0")
 readonly name
 # program version
 readonly major_version=0.4.1
-readonly minor_version=20240423
+readonly minor_version=20240426
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -35,7 +35,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc=" is a tool for controlling USB storage devices"
+readonly desc="is a tool for controlling USB storage devices"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -78,9 +78,9 @@ function checkCommand() {
 }
 
 function listAction() { # 列出设备
-  # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
+  # 罗列可移动 USB 存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,HOTPLUG,MOUNTPOINT)
-  # 使用jq查找符合要求的设备并转为数组存储（IFS=" "指定使用空格作为分隔符）
+  # 使用 jq 命令查找符合要求的设备并转为数组存储（IFS=" "指定使用空格作为分隔符）
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | .name' | tr '\n' ' ')"
   IFS=" " read -r -a mountpoints <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | .mountpoint' | tr '\n' ' ')"
 
@@ -94,26 +94,26 @@ function listAction() { # 列出设备
 }
 
 function mountAction() { # 挂载设备
-  # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
+  # 罗列可移动 USB 存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,HOTPLUG,MOUNTPOINT)
-  # 使用jq查找符合要求的设备
+  # 使用 jq 命令查找符合要求的设备
   IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.hotplug == true) | .name' | tr '\n' ' ')"
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint == null) | .name' | tr '\n' ' ')"
 
   if [[ "$1" == 'all' ]]; then
-    # --mount 的参数是'all'，挂载所有part
+    # --mount 的参数是 'all'，挂载所有 part
     for ((index = 0; index < ${#partnames[*]}; index++)); do
       udisksctl mount --no-user-interaction --block-device "${partnames[index]}"
     done
   elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
-      # --mount 的参数是disk，挂载该disk的所有part
+      # --mount 的参数是 disk，挂载该 disk 的所有 part
       IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint == null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
       for ((index = 0; index < ${#disk_parts[*]}; index++)); do
         udisksctl mount --no-user-interaction --block-device "${disk_parts[index]}"
       done
     else
-      # --mount 的参数是part，挂载该part
+      # --mount 的参数是 part，挂载该 part
       udisksctl mount --no-user-interaction --block-device "$1"
     fi
   else
@@ -123,26 +123,26 @@ function mountAction() { # 挂载设备
 }
 
 function umountAction() { # 卸载设备
-  # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
+  # 罗列可移动 USB 存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,HOTPLUG,MOUNTPOINT)
-  # 使用jq查找符合要求的设备
+  # 使用 jq 命令查找符合要求的设备
   IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.hotplug == true) | .name' | tr '\n' ' ')"
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
 
   if [[ "$1" == 'all' ]]; then
-    # --umount 的参数是'all'，卸载所有part
+    # --umount 的参数是 'all'，卸载所有 part
     for ((index = 0; index < ${#partnames[*]}; index++)); do
       udisksctl unmount --no-user-interaction --block-device "${partnames[index]}"
     done
   elif [ -b "$1" ]; then # 检测是否是块设备
     if [[ "${disknames[*]}" =~ $1 ]]; then
-      # --umount 的参数是disk，卸载该disk的所有part
+      # --umount 的参数是 disk，卸载该 disk 的所有 part
       IFS=" " read -r -a disk_parts <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint != null) | .[] | scan("'"$1"'.*")?' | tr '\n' ' ')"
       for ((index = 0; index < ${#disk_parts[*]}; index++)); do
         udisksctl unmount --no-user-interaction --block-device "${disk_parts[index]}"
       done
     else
-      # --umount 的参数是part，卸载该part
+      # --umount 的参数是 part，卸载该 part
       udisksctl unmount --no-user-interaction --block-device "$1"
     fi
   else
@@ -152,9 +152,9 @@ function umountAction() { # 卸载设备
 }
 
 function removeAction() { # 移除设备
-  # 罗列可移动USB存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
+  # 罗列可移动 USB 存储设备的名字(NAME)、类型(TYPE)、是否是可移动/热插拔设备(HOTPLUG)和挂载点(MOUNTPOINT)
   devices=$(lsblk -Jplno NAME,TYPE,HOTPLUG,MOUNTPOINT)
-  # 使用jq查找符合要求的设备
+  # 使用 jq 命令查找符合要求的设备
   IFS=" " read -r -a disknames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "disk") | select(.hotplug == true) | .name' | tr '\n' ' ')"
   IFS=" " read -r -a partnames <<< "$(echo "$devices" | jq -r '.blockdevices[] | select(.type == "part") | select(.hotplug == true) | select(.mountpoint != null) | .name' | tr '\n' ' ')"
 

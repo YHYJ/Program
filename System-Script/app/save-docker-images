@@ -6,11 +6,11 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:47:18
 
-Description: 备份docker镜像
+Description: 备份 Docker 镜像
 
 Attentions:
 - 0. 进行权限认证
-- 1. 判断是否能够取得存储路径参数：能--使用该参数；不能--使用默认存储路径
+- 1. 判断是否能够取得存储路径参数：能——使用该参数；不能——使用默认存储路径
 - 2. 判断参数类型：空文件/非空文件/文件夹/字符串，分别返回不同值
 - 3. 根据返回值进行具体操作
 
@@ -27,27 +27,28 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=1.1.3
-readonly minor_version=20240423
+readonly major_version=1.1.4
+readonly minor_version=20240426
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
+readonly err_file=1         # 文件/路径类错误
 readonly err_param=2        # 参数错误
 readonly err_permission=110 # 权限错误
 readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="是Linux系统用来备份docker镜像的工具"
+readonly desc="是 Linux 系统用来备份 Docker 镜像的工具"
 
 # path variable
-readonly images_savefile="$HOME/Documents/LocalBackups/docker/Mydocker.images" # 默认保存路径
+readonly images_savefile="$HOME/Documents/LocalBackups/docker/Mydocker.images"
 # detection variable
-group_docker=$(grep -E 'docker' /etc/group) # 检索'docker'组
+group_docker=$(grep -E 'docker' /etc/group)
 readonly group_docker
 # time variable
-readonly time_out=60 # 输入超时
+readonly time_out=60
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -76,8 +77,15 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
-function createFolder() {
-  mkdir -p "$1"
+function checkPath() {
+  if [[ -e "$1" ]]; then
+    if [[ ! -d "$1" ]]; then
+      echo -e "指定路径 $1 不是文件夹，已退出"
+      exit $err_file
+    fi
+  else
+    mkdir -p "$1"
+  fi
 }
 
 function userAuthentication() {
@@ -89,12 +97,12 @@ function userAuthentication() {
       return 0
     else
       # 当前用户不在'docker'组
-      echo -e "\x1b[31m[✘]\x1b[0m 用户$USER不是docker组成员，请将其添加到docker组后重试"
+      echo -e "\x1b[31m[✘]\x1b[0m 用户 $USER 不是 docker 组成员，请将其添加到 docker 组后重试"
       return 2
     fi
   else
     # 没有'docker'组
-    echo -e "\x1b[31m[✘]\x1b[0m docker组不存在，请创建并将$USER添加到该组后重试"
+    echo -e "\x1b[31m[✘]\x1b[0m docker 组不存在，请创建并将 $USER 添加到该组后重试"
     return 1
   fi
 }
@@ -104,7 +112,7 @@ function saveImage() {
   if systemctl is-active docker &> /dev/null; then
     docker save $(docker images --format '{{.Repository}}') -o "$1" # 不要使用引号
   else
-    echo -e "\x1b[31m[✘]\x1b[0m docker服务未启动，请在启动后重试"
+    echo -e "\x1b[31m[✘]\x1b[0m docker 服务未启动，请在启动后重试"
   fi
 }
 
@@ -125,9 +133,9 @@ function getDirname() {
   dirname="$(dirname "$1")"
 }
 
-function nonemptyFile() {
+function nonEmptyFile() {
   # 非空文件覆写提示
-  echo -e "$1是一个非空文件! ! !"
+  echo -e "$1 是一个非空文件! ! !"
 }
 
 function askQuestion() {
@@ -175,14 +183,14 @@ function exitProgram() {
 if userAuthentication; then
   if [[ -n $1 ]]; then # 给定一个参数
     getFilename "$1"   # return filename
-    parameterType "$1" # case行到本行之间不能有其他代码
+    parameterType "$1" # case 行到本行之间不能有其他代码
     case $? in
       100) # 参数是一个空文件
         echo -e "备份文件存储在: $1\n"
         echo -e "备份文件名为: $filename\n"
         if askQuestion "是否确认备份 [y/N]: "; then
-          createFolder "$dirname" # create folder
-          echo -e "正在备份docker images，请耐心等待..."
+          checkPath "$dirname"
+          echo -e "正在备份 Docker 镜像，请耐心等待..."
           saveImage "$1"
         else
           exitProgram "退出" $normal
@@ -191,9 +199,9 @@ if userAuthentication; then
       101) # 参数是一个非空文件
         echo -e "备份文件存储在: $1\n"
         echo -e "备份文件名为: $filename\n"
-        nonemptyFile "$filename" # 非空文件覆写提示
+        nonEmptyFile "$filename" # 非空文件覆写提示
         if askQuestion "是否确认覆写（原备份文件内容将丢失）[y/N]: "; then
-          echo -e "正在备份docker images，请耐心等待..."
+          echo -e "正在备份 Docker 镜像，请耐心等待..."
           saveImage "$1"
         else
           exitProgram "退出" $normal
@@ -230,8 +238,8 @@ if userAuthentication; then
     echo -e "备份文件名为: $filename\n"
     if [[ ! -s $images_savefile ]]; then # 默认文件是一个空文件
       if askQuestion "是否确认备份 [y/N]: "; then
-        createFolder "$dirname" # create folder
-        echo -e "正在备份docker images，数据量大，请耐心等待..."
+        checkPath "$dirname"
+        echo -e "正在备份 Docker 镜像，数据量大，请耐心等待..."
         saveImage "$images_savefile"
       else
         exitProgram "退出" $normal
@@ -239,9 +247,9 @@ if userAuthentication; then
     elif [[ -d $images_savefile ]]; then # 默认参数是一个文件夹（一般情况不会出现）
       exitProgram "默认存储路径是一个文件夹，请确认参数是一个文件" $err_param
     elif [[ -s $images_savefile ]]; then # 默认文件是一个非空文件
-      nonemptyFile "$filename"           # 非空文件覆写提示
+      nonEmptyFile "$filename"           # 非空文件覆写提示
       if askQuestion "是否确认覆写（原内容将丢失）[y/N]: "; then
-        echo -e "正在备份docker images，数据量大，请耐心等待..."
+        echo -e "正在备份 Docker 镜像，数据量大，请耐心等待..."
         saveImage "$images_savefile"
       else
         exitProgram "退出" $normal

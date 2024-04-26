@@ -24,7 +24,7 @@ name=$(basename "$0")
 readonly name
 # program version
 readonly major_version=0.0.2
-readonly minor_version=20240423
+readonly minor_version=20240426
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -49,7 +49,7 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -, --app [NAME]   指定应用程序"
+  echo -e "     -a, --app [NAME]  指定应用程序"
   echo -e ""
   echo -e "     -h, --help        显示帮助信息"
   echo -e "     -v, --version     显示版本信息"
