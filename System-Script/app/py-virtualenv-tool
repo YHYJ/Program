@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2023-02-09 11:00:29
 
-Description: Python Virtualenv 工具
+Description: 用于操作 Python Virtualenv 环境的备份、创建和备份文件删除
 
 Attentions:
 -
@@ -35,7 +35,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于操作 Python Virtualenv 环境的备份、创建和备份文件删除"
+readonly desc="backup, creation, and backup file deletion for operating Python Virtualenv environments"
 # environment variable
 readonly storage="$HOME/.cache/SpiderData"
 readonly app_virtualenv_dir="$storage/App/virtualenv"
@@ -59,12 +59,12 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -d, --delete      删除虚拟环境备份文件"
-  echo -e "     -m, --make        使用文件搭建虚拟环境"
-  echo -e "     -s, --save        保存虚拟环境备份文件"
+  echo -e "     -d, --delete      Delete virtual environment backup files"
+  echo -e "     -m, --make        Use files to build a virtual environment"
+  echo -e "     -s, --save        Save virtual environment backup file"
   echo -e ""
-  echo -e "     -h, --help        显示帮助信息"
-  echo -e "     -v, --version     显示版本信息"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
 }
 
 function versionInfo() {
@@ -94,7 +94,7 @@ function initVirtualenv() {
     # shellcheck source=/dev/null
     source "$virtualenvwrapper"
   else
-    echo -e "virtualenv/virtualenvwrapper 未安装"
+    echo -e "Please install 'virtualenv' and 'virtualenvwrapper' first"
     exit $err_no_program
   fi
   venvs=$(workon)
@@ -103,7 +103,7 @@ function initVirtualenv() {
 function checkPath() {
   if [[ -e "$1" ]]; then
     if [[ ! -d "$1" ]]; then
-      echo -e "指定路径 $1 不是文件夹，已退出"
+      echo -e "Path '$1' is not a folder, exit"
       exit $err_file
     fi
   else
@@ -134,7 +134,7 @@ function saveVirtualenv() {
       printf "%s%s Venv: \x1b[37m%s\x1b[0m \x1b[35m%2s\x1b[0m\n" "$space" "$space" "$venv" "✔"
     done
   else
-    echo -e "pip 未安装，无法进行备份"
+    echo -e "Please install 'pip' first"
   fi
 }
 
@@ -156,7 +156,7 @@ function makeVirtualenv() {
       done
     fi
   else
-    echo -e "pip 未安装，无法进行搭建"
+    echo -e "Please install 'pip' first"
   fi
 }
 

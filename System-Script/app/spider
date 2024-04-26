@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2022-10-24 14:48:12
 
-Description: 系统信息搜集工具
+Description: 用于搜集系统信息，支持 Arch Linux 和 macOS
 
 Attentions: 搜集如下信息
 - Package
@@ -41,7 +41,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于搜集系统信息，支持 Arch Linux 和 macOS"
+readonly desc="collect system information, supports Arch Linux and macOS"
 # system variable
 system_type="unknown"
 # path variable
@@ -65,25 +65,25 @@ function helpInfo() {
   echo -e ""
   echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
-  echo -e "\x1b[1;33m搜集结果存储于\x1b[0m: \x1b[34m$storage\x1b[0m"
+  echo -e "\x1b[1;33mThe collection results are stored in\x1b[0m: \x1b[34m$storage\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -g, --get [MODULE]    指定搜集的模块"
+  echo -e "     -g, --get [MODULE]    Specify the module to collect"
   echo -e ""
-  echo -e "     -h, --help            显示帮助信息"
-  echo -e "     -v, --version         显示版本信息"
+  echo -e "     -h, --help            Show help information"
+  echo -e "     -v, --version         Show version information"
   echo -e ""
   echo -e "Modules:"
-  echo -e "     all                   搜集全部模块"
-  echo -e "     app                   搜集特定软件信息"
-  echo -e "     env                   搜集开发工具虚拟环境信息"
-  echo -e "     package               搜集安装包信息"
-  echo -e "     service               搜集服务信息"
-  echo -e "     user                  搜集用户信息"
+  echo -e "     all                   Collect all modules"
+  echo -e "     app                   Collect specific software information"
+  echo -e "     env                   Collect development tool virtual environment information"
+  echo -e "     package               Collect installation package information"
+  echo -e "     service               Collect service information"
+  echo -e "     user                  Collect user information"
 }
 
 function versionInfo() {
@@ -92,7 +92,7 @@ function versionInfo() {
 }
 
 function finish() {
-  echo -e "\n\x1b[35m[✔]\x1b[0m 信息搜集完成"
+  echo -e "\n\x1b[35m[✔]\x1b[0m Information collection completed"
 }
 
 #------------------------- Feature Function
@@ -107,10 +107,10 @@ function checkOS() {
   fi
 }
 
-function checkPath() { # 检查指定路径是否存在，否则创建
+function checkPath() {
   if [[ -e "$1" ]]; then
     if [[ ! -d "$1" ]]; then
-      echo -e "指定路径 $1 不是文件夹，已退出"
+      echo -e "Path '$1' is not a folder, exit"
       exit $err_file
     fi
   else
@@ -169,7 +169,7 @@ function __getGuakeInfo() { # 获取 guake 信息
     checkPath "$app_guake_dir"
     guake_conf="$app_guake_dir/guake.conf"
     printf "%s %-13s \x1b[36m%s\x1b[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
-    guake --save-preferences="$guake_conf" # guake的配置文件
+    guake --save-preferences="$guake_conf"
   fi
 }
 
@@ -331,7 +331,7 @@ else
             break
             ;;
           *)
-            echo -e "\n\x1b[31m[✘]\x1b[0m 无法搜集该内容"
+            echo -e "\n\x1b[31m[✘]\x1b[0m Unable to collect this content"
             ;;
         esac
         shift 1

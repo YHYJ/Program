@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-05-31 00:00:00
 
-Description: 检查系统更新
+Description: 用于检测系统软件包更新
 
 Attentions:
 - 将更新信息写入临时文件
@@ -28,7 +28,7 @@ readonly name
 # program version
 readonly major_version=3.0.4
 readonly minor_version=20240426
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -37,7 +37,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于检测系统软件包更新"
+readonly desc="detect system package updates"
 # path variable
 readonly tmp_file="/tmp/$name.log"
 readonly check_tool="checkupdates"
@@ -55,11 +55,11 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -c, --check       检测软件包更新"
-  echo -e "     -e, --empty       清空临时文件内容"
+  echo -e "     -c, --check       Detect package updates"
+  echo -e "     -e, --empty       Clear temporary file contents"
   echo -e ""
-  echo -e "     -h, --help        显示帮助信息"
-  echo -e "     -v, --version     显示版本信息"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
 }
 
 function versionInfo() {
@@ -83,11 +83,10 @@ function checkCommand() {
 }
 
 function checkUpdate() {
-  if ! checkCommand "$check_tool"; then
-    echo -e "$check_tool 未安装"
-    exit $err_no_program
-  else
+  if checkCommand "$check_tool"; then
     $check_tool > "$tmp_file"
+  else
+    echo -e "Please install '$check_tool' first"
   fi
 }
 

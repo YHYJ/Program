@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 10:38:44
 
-Description: 使用 dtags 为指定文件夹下的子文件夹配置 Tag
+Description: 为指定文件夹下的子文件夹配置 Tag
 - 只使用 -f/--folder 参数指定文件夹：
   - 如果该文件夹的子文件夹里有 .git 文件夹，则为子文件夹创建 Tag = 'repo'
   - 如果该文件夹的子文件夹没有 .git 文件夹，则为子文件夹创建 Tag = '<全小写子文件夹名>'
@@ -31,7 +31,7 @@ readonly name
 # program nversion
 readonly major_version=0.1.5
 readonly minor_version=20240426
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -41,7 +41,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="使用 dtags 为指定文件夹下的子文件夹配置 Tag"
+readonly desc="configure tags for subfolders under the specified folder"
 # path variable
 readonly dtags_path="/usr/bin/dtags-activate"
 
@@ -58,19 +58,19 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -f, --folder          配置该文件夹的内容"
-  echo -e "     -t, --tag             指定 Tag ，一次一个"
+  echo -e "     -f, --folder      Configure the subfolders of this folder"
+  echo -e "     -t, --tag         Specify Tags, one at a time"
   echo -e ""
-  echo -e "     -h, --help            显示帮助信息"
-  echo -e "     -v, --version         显示版本信息"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
   echo -e ""
   echo -e "Notice:"
-  echo -e "    - 只使用 -f/--folder 参数："
-  echo -e "      1. -f/--folder 参数指定的文件夹下的子文件夹里包含 .git 文件夹，则 Tag = 'repo'"
-  echo -e "      2. -f/--folder 参数指定的文件夹下的子文件夹里不含 .git 文件夹，则 Tag = '<全小写子文件夹名>'"
-  echo -e "    - 配合使用 -t/--tag 参数："
-  echo -e "      1. -t/--tag 参数值为0，则 Tag = '<全小写子文件夹名>'"
-  echo -e "      2. -t/--tag 参数值为其他，则 Tag = '<-t/--tag 参数值>'"
+  echo -e "    - Just use the -f/--folder parameter:"
+  echo -e "      1. The subfolder under the folder specified by the -f/--folder parameter contains the .git folder, Tag = 'repo'"
+  echo -e "      2. The subfolder under the folder specified by the -f/--folder parameter does not contain the .git folder, Tag = '<all lowercase subfolder name>'"
+  echo -e "    - Just use the -t/--tag parameter:"
+  echo -e "      1. -t/--tag parameter value is 0, Tag = '<all lowercase subfolder name>'"
+  echo -e "      2. -t/--tag parameter value is other, Tag = '<-t/--tag parameter value>'"
 }
 
 function versionInfo() {
@@ -89,14 +89,14 @@ function askQuestion() {
     elif [[ "$REPLY" =~ ^[Nn] ]]; then
       return 1
     else
-      echo -e "应输入 Y/y 或 N/n\n"
+      echo -e "Please input Y/y or N/n\n"
     fi
   done
 }
 
 function checkUser() {
   if [[ $USER == "$1" ]]; then
-    echo -e "\n\x1b[31m[✘]\x1b[0m 当前用户是 $1，拒绝执行！！！"
+    echo -e "\n\x1b[31m[✘]\x1b[0m Current user is $1, refusal to execute"
     exit $err_permission
   fi
 }
@@ -119,18 +119,18 @@ function addTags() {
         fi
         ((num++))
       elif [[ -f "$folder" ]]; then
-        echo -e "$folder 是文本文件，忽略"
+        echo -e "$folder is a text file, ignore"
       else
-        echo -e "$folder 文件类型未知，忽略"
+        echo -e "$folder unknown file type, ignore"
       fi
       echo -e ""
     done
   else
-    echo -e "\n\x1b[31m路径 $target_folder 不存在\x1b[0m"
+    echo -e "\n\x1b[31mPath $target_folder does not exist\x1b[0m"
     exit $err_file
   fi
 
-  echo -e "\x1b[34m已创建/存在共 \x1b[0m\x1b[32m$num\x1b[0m\x1b[34m 个 Tags\x1b[0m"
+  echo -e "\x1b[34mA total of \x1b[0m\x1b[32m$num\x1b[0m\x1b[34m tags have been created/exist\x1b[0m"
   exit $normal
 }
 
@@ -140,7 +140,7 @@ function main() {
   if [[ -x "$dtags_path" ]]; then
     addTags
   else
-    echo -e "请先安装 dtags"
+    echo -e "Please install 'dtags' first"
   fi
 }
 

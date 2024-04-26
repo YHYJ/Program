@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2022-06-11 16:43:34
 
-Description: 更新 space-vim
+Description: 用于更新手动安装的 space-vim
 
 Attentions:
 -
@@ -35,7 +35,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于更新手动安装的 space-vim"
+readonly desc="update manually installed space-vim"
 # path variable
 readonly install_path="$HOME/.space-vim"
 
@@ -52,8 +52,8 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -h, --help        显示帮助信息"
-  echo -e "     -v, --version     显示版本信息"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
 }
 
 function versionInfo() {
@@ -65,7 +65,7 @@ function versionInfo() {
 function checkPath() {
   if [[ -e "$1" ]]; then
     if [[ ! -d "$1" ]]; then
-      echo -e "指定路径 $1 不是文件夹，已退出"
+      echo -e "Path '$1' is not a folder, exit"
       exit $err_file
     fi
   else
@@ -88,7 +88,7 @@ function makeUpdate() {
     make update
     cd "$current_path" || exit $err_file
   else
-    echo -e "make 未安装，无法更新"
+    echo -e "Please install 'make' first"
   fi
 }
 

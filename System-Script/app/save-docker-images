@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:47:18
 
-Description: 备份 Docker 镜像
+Description: 是 Linux 系统用来备份 Docker 镜像的工具
 
 Attentions:
 - 0. 进行权限认证
@@ -40,7 +40,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="是 Linux 系统用来备份 Docker 镜像的工具"
+readonly desc="is a tool used by Linux to back up Docker images"
 
 # path variable
 readonly images_savefile="$HOME/Documents/LocalBackups/docker/Mydocker.images"
@@ -65,10 +65,10 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "options:"
-  echo -e "     /path/to/save.file     备份文件路径"
+  echo -e "     /path/to/save.file      Specify the path to save the backup file"
   echo -e ""
-  echo -e "     -h, --help             显示帮助选项"
-  echo -e "     -v, --version          显示版本选项"
+  echo -e "     -h, --help              Show help information"
+  echo -e "     -v, --version           Show version information"
 }
 
 function versionInfo() {
@@ -80,7 +80,7 @@ function versionInfo() {
 function checkPath() {
   if [[ -e "$1" ]]; then
     if [[ ! -d "$1" ]]; then
-      echo -e "指定路径 $1 不是文件夹，已退出"
+      echo -e "Path '$1' is not a folder, exit"
       exit $err_file
     fi
   else
@@ -97,12 +97,12 @@ function userAuthentication() {
       return 0
     else
       # 当前用户不在'docker'组
-      echo -e "\x1b[31m[✘]\x1b[0m 用户 $USER 不是 docker 组成员，请将其添加到 docker 组后重试"
+      echo -e "\x1b[31m[✘]\x1b[0m User '$USER' is not a member of the '$group_docker' group. Please add it to the '$group_docker' group and try again"
       return 2
     fi
   else
     # 没有'docker'组
-    echo -e "\x1b[31m[✘]\x1b[0m docker 组不存在，请创建并将 $USER 添加到该组后重试"
+    echo -e "\x1b[31m[✘]\x1b[0m The '$group_docker' group does not exist. Please create it and add $USER to the group and try again"
     return 1
   fi
 }
@@ -112,7 +112,7 @@ function saveImage() {
   if systemctl is-active docker &> /dev/null; then
     docker save $(docker images --format '{{.Repository}}') -o "$1" # 不要使用引号
   else
-    echo -e "\x1b[31m[✘]\x1b[0m docker 服务未启动，请在启动后重试"
+    echo -e "\x1b[31m[✘]\x1b[0m The docker service has not started, please try again after starting"
   fi
 }
 
@@ -135,7 +135,7 @@ function getDirname() {
 
 function nonEmptyFile() {
   # 非空文件覆写提示
-  echo -e "$1 是一个非空文件! ! !"
+  echo -e "$1 file is not empty"
 }
 
 function askQuestion() {
@@ -149,7 +149,7 @@ function askQuestion() {
     elif [[ "$REPLY" =~ ^[Nn] ]]; then
       return 1
     else
-      echo -e "应输入 Y/y 或 N/n\n"
+      echo -e "Please input [Y/y] or [N/n]\n"
     fi
   done
 }
@@ -186,29 +186,29 @@ if userAuthentication; then
     parameterType "$1" # case 行到本行之间不能有其他代码
     case $? in
       100) # 参数是一个空文件
-        echo -e "备份文件存储在: $1\n"
-        echo -e "备份文件名为: $filename\n"
-        if askQuestion "是否确认备份 [y/N]: "; then
+        echo -e "Backup files are stored at: $1\n"
+        echo -e "The backup file name is: $filename\n"
+        if askQuestion "Confirm backup [y/N]: "; then
           checkPath "$dirname"
-          echo -e "正在备份 Docker 镜像，请耐心等待..."
+          echo -e "Backing up the Docker image, please wait..."
           saveImage "$1"
         else
-          exitProgram "退出" $normal
+          exitProgram "Exit" $normal
         fi
         ;;
       101) # 参数是一个非空文件
-        echo -e "备份文件存储在: $1\n"
-        echo -e "备份文件名为: $filename\n"
+        echo -e "Backup files are stored at: $1\n"
+        echo -e "The backup file name is: $filename\n"
         nonEmptyFile "$filename" # 非空文件覆写提示
-        if askQuestion "是否确认覆写（原备份文件内容将丢失）[y/N]: "; then
-          echo -e "正在备份 Docker 镜像，请耐心等待..."
+        if askQuestion "Confirm to overwrite (original backup file content will be lost) [y/N]: "; then
+          echo -e "Backing up the Docker image, please wait..."
           saveImage "$1"
         else
-          exitProgram "退出" $normal
+          exitProgram "Exit" $normal
         fi
         ;;
       102) # 参数是一个文件夹
-        exitProgram "参数是一个文件夹，请将文件作为参数" $err_param
+        exitProgram "The parameter is a folder, please pass the file as the parameter" $err_param
         ;;
       103) # 参数是一个字符串
         case $1 in
@@ -222,40 +222,40 @@ if userAuthentication; then
             ;;
           *)
             helpInfo
-            exitProgram "\n\n使用 help 参数查看帮助信息" $err_unknown
+            exitProgram "\n\nUse the help parameter to view help information" $err_unknown
             ;;
         esac
         ;;
       *)
         helpInfo
-        exitProgram "\n\n使用 help 参数查看帮助信息" $err_unknown
+        exitProgram "\n\nUse the help parameter to view help information" $err_unknown
         ;;
     esac
   else                             # 没有指定备份文件存储位置，使用默认值
     getDirname "$images_savefile"  # return dirname
     getFilename "$images_savefile" # return filename
-    echo -e "未给出存储路径，使用默认值: $images_savefile"
-    echo -e "备份文件名为: $filename\n"
+    echo -e "No storage path is given, use default value: $images_savefile"
+    echo -e "The backup file name is: $filename\n"
     if [[ ! -s $images_savefile ]]; then # 默认文件是一个空文件
-      if askQuestion "是否确认备份 [y/N]: "; then
+      if askQuestion "Confirm backup [y/N]: "; then
         checkPath "$dirname"
-        echo -e "正在备份 Docker 镜像，数据量大，请耐心等待..."
+        echo -e "Backing up the Docker image, please wait..."
         saveImage "$images_savefile"
       else
-        exitProgram "退出" $normal
+        exitProgram "Exit" $normal
       fi
     elif [[ -d $images_savefile ]]; then # 默认参数是一个文件夹（一般情况不会出现）
-      exitProgram "默认存储路径是一个文件夹，请确认参数是一个文件" $err_param
+      exitProgram "The parameter is a folder, please pass the file as the parameter" $err_param
     elif [[ -s $images_savefile ]]; then # 默认文件是一个非空文件
       nonEmptyFile "$filename"           # 非空文件覆写提示
-      if askQuestion "是否确认覆写（原内容将丢失）[y/N]: "; then
-        echo -e "正在备份 Docker 镜像，数据量大，请耐心等待..."
+      if askQuestion "Confirm to overwrite (original backup file content will be lost) [y/N]: "; then
+        echo -e "Backing up the Docker image, please wait..."
         saveImage "$images_savefile"
       else
-        exitProgram "退出" $normal
+        exitProgram "Exit" $normal
       fi
     fi
   fi
 else
-  exitProgram "权限认证失败" $err_permission
+  exitProgram "Permission authentication failed" $err_permission
 fi

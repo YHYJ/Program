@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2024-04-23 12:34:11
 
-Description: 打开本地存储库对应的远端存储库
+Description: 通过默认浏览器打开本地存储库对应的远端存储库
 
 Attentions:
 -
@@ -23,8 +23,8 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.1
-readonly minor_version=20240423
+readonly major_version=0.0.2
+readonly minor_version=20240426
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -35,7 +35,7 @@ readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="通过默认浏览器打开本地存储库对应的远端存储库"
+readonly desc="open the remote repository corresponding to the local repository through the default browser"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -50,8 +50,8 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -h, --help        显示帮助信息"
-  echo -e "     -v, --version     显示版本信息"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
 }
 
 function versionInfo() {

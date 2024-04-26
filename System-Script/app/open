@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:51:05
 
-Description: Open URI -- 以默认程序打开指定的 URI
+Description: 自动识别 URI 类型并以默认程序打开
 
 Attentions:
 -
@@ -25,7 +25,7 @@ readonly name
 # program nversion
 readonly major_version=0.3.2
 readonly minor_version=20240426
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0   # 一切正常
@@ -33,7 +33,7 @@ readonly err_file=1 # 文件/路径类错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="自动识别 URI 类型并以默认程序打开"
+readonly desc="automatically recognize URI type and open with default program"
 
 # command
 open="xdg-open"
@@ -52,8 +52,8 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -h, --help        显示帮助信息"
-  echo -e "     -v, --version     显示版本信息"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
 }
 
 function versionInfo() {
