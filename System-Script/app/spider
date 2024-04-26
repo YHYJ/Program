@@ -92,7 +92,7 @@ function versionInfo() {
 }
 
 function finish() {
-  echo -e "\n\x1b[35m[✔]\x1b[0m Information collection completed"
+  echo -e "\n\x1b[32m[✔]\x1b[0m Information collection completed"
 }
 
 #------------------------- Feature Function
