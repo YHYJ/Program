@@ -23,9 +23,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.1.5
-readonly minor_version=20240426
-readonly rel_version=2
+readonly major_version=0.1.6
+readonly minor_version=20240428
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -97,7 +97,7 @@ function initVirtualenv() {
     echo -e "Please install 'virtualenv' and 'virtualenvwrapper' first"
     exit $err_no_program
   fi
-  venvs=$(workon)
+  venvs=$(lsvirtualenv -b)
 }
 
 function checkPath() {
@@ -145,14 +145,17 @@ function makeVirtualenv() {
       for filepath in "$app_virtualenv_dir"/*.txt; do
         # 获取文件名并切分得到虚拟环境名
         filename=$(basename "$filepath")
-        envname=$(echo "$filename" | cut -d "_" -f 3 | cut -d "." -f 1)
+        envname=$(echo "$filename" | cut -d "_" -f 2 | cut -d "." -f 1)
+        echo -e "\x1b[1m--> Make virtual environment: \x1b[32m$envname\x1b[0m\x1b[0m"
         # 将切分得到的虚拟环境名和现有虚拟环境名做对比
-        if [[ ! "${venvs[*]}" =~ $envname ]]; then
+        if [[ ! $venvs =~ (^|[[:space:]])$envname($|[[:space:]]) ]]; then
           # 名字不同则创建并搭建环境
           mkvirtualenv -p python3 "$envname"
           workon "$envname"
+          echo -e "\x1b[1m--> Install requirements\x1b[0m"
           pip install -r "$filepath"
         fi
+        echo -e "\x1b[1mDone\x1b[0m\n"
       done
     fi
   else
