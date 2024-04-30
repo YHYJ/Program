@@ -6,11 +6,12 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:32:42
 
-Description: 批量安装 packages
-- 需参考该链接重写 https://wiki.archlinuxcn.org/wiki/Pacman/%E6%8F%90%E7%A4%BA%E5%92%8C%E6%8A%80%E5%B7%A7#%E4%BB%8E%E5%88%97%E8%A1%A8%E5%AE%89%E8%A3%85%E8%BD%AF%E4%BB%B6%E5%8C%85
+Description: 基于软件包列表文件批量安装 Arch Linux 官方仓库中的软件包
+- 参考该链接 https://wiki.archlinuxcn.org/wiki/Pacman/%E6%8F%90%E7%A4%BA%E5%92%8C%E6%8A%80%E5%B7%A7#%E4%BB%8E%E5%88%97%E8%A1%A8%E5%AE%89%E8%A3%85%E8%BD%AF%E4%BB%B6%E5%8C%85
 
 Attentions:
-- 需要先添加 archlinuxcn 源
+- 需要先使用 1-manage-pacman 添加 archlinuxcn 源
+- 需要 root 权限
 
 Depends:
 - pacman
@@ -29,16 +30,15 @@ readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0        # 一切正常
 readonly err_file=1      # 文件/路径类错误
-readonly err_ctrl_c=130  # 接收到INT(Ctrl+C)指令
+readonly err_ctrl_c=130  # 接收到 INT(Ctrl+C) 指令
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于批量安装Packages"
+readonly desc="batch installation of software packages in the Arch Linux official repository based on the package list file"
 # path variable
-list_filename="$HOME/Documents/Repos/System/Profile/home/yj/dot_cache/SpiderData/PackageList/Pacman.list"
+package_list_file="$HOME/Documents/Repos/System/Profile/home/yj/dot_cache/SpiderData/PackageList/Pacman.list"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -46,15 +46,15 @@ list_filename="$HOME/Documents/Repos/System/Profile/home/yj/dot_cache/SpiderData
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -h, --help            显示帮助信息"
-  echo -e "     -v, --version         显示版本信息"
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
 }
 
 function versionInfo() {
@@ -70,15 +70,10 @@ function exitProgram() {
 
 function main() {
   while true; do
-    trap 'exitProgram' INT # 捕获到INT(Ctrl+C)信号，程序退出
+    trap 'exitProgram' INT # 捕获到 INT(Ctrl+C) 信号，程序退出
 
-    if [[ -s $list_filename ]]; then
-      packages=$(cat "$list_filename")
-      for package in $packages; do
-        pacman -S "$package"
-        echo -e "\n"
-      done
-      exit $normal
+    if [[ -s $package_list_file ]]; then
+      pacman -S --needed - < "$package_list_file"
     else
       exit $err_file
     fi
