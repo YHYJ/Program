@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 : << !
-Name: 1-init-pacman
+Name: 1-manage-pacman
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:34:04
 
-Description: 管理pacman的可信密匙清单
+Description: 管理 Pacman 源和密匙
 
 Attentions:
-- 需要root权限
+- 需要 root 权限
 
 Depends:
 - pacman
@@ -28,11 +28,15 @@ readonly minor_version=20231013
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
+readonly normal=0        # 一切正常
 readonly err_unknown=255 # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="用于范例管理Pacman的可信密钥清单"
+readonly desc="manage pacman sources and keys"
+# path variable
+readonly pacman_conf="/etc/pacman.conf"
+readonly pacman_d="/etc/pacman.d"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -40,15 +44,18 @@ readonly desc="用于范例管理Pacman的可信密钥清单"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m\x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -h, --help            显示帮助信息"
-  echo -e "     -v, --version         显示版本信息"
+  echo -e "     -i, --init        Init pacman keyring"
+  echo -e "     -a, --add         Add archlinuxcn source"
+  echo -e ""
+  echo -e "     -h, --help        Show help information"
+  echo -e "     -v, --version     Show version information"
 }
 
 function versionInfo() {
@@ -57,22 +64,56 @@ function versionInfo() {
 }
 
 #------------------------- Feature Function
-function main() {
+function askQuestion() {
+  while true; do
+    read -e -r -p "$1"
+    REPLY=${REPLY:-N}
+    echo
+    if [[ "$REPLY" =~ ^[Yy] ]]; then
+      return 0
+    elif [[ "$REPLY" =~ ^[Nn] ]]; then
+      return 1
+    else
+      echo -e "Please input [Y/y] or [N/n]\n"
+    fi
+  done
+}
+
+function initArchLinuxKey() {
   pacman-key --init               # 确保密匙环已正确初始化
-  pacman-key --populate archlinux # 从 (给定的) 密匙环中重新加载默认密匙
+  pacman-key --populate archlinux # 从指定软件仓库的密钥填充到本地密匙环
+}
+
+function addArchLinuxCNKey() {
+  sed -i "\$a\\\n[archlinuxcn]\\nInclude = \\$pacman_d/archlinuxcn-mirrorlist" "$pacman_conf"
+  pacman -Syy                       # 从服务器更新软件包数据库
+  pacman -S archlinuxcn-keyring     # 安装 archlinuxcn 密钥环
+  pacman-key --populate archlinuxcn # 从指定软件仓库的密钥填充到本地密匙环
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
+ARGS=$(getopt --options "iahv" --longoptions "init,add,help,version" -n "$name" -- "$@")
 eval set -- "$ARGS"
 
 if [[ ${#@} -lt 2 ]]; then
-  main
+  helpInfo
 else
   while true; do
     case $1 in
+      -i | --init)
+        initArchLinuxKey
+        shift 1
+        ;;
+      -a | --add)
+        if askQuestion "Have you initialized pacman keyring? [y/N]: "; then
+          addArchLinuxCNKey
+        else
+          exit $normal
+        fi
+        shift 1
+        ;;
       -h | --help)
         helpInfo
         shift 1
