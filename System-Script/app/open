@@ -23,9 +23,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.3.2
-readonly minor_version=20240426
-readonly rel_version=2
+readonly major_version=0.3.3
+readonly minor_version=20240510
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0   # 一切正常
@@ -81,8 +81,15 @@ function main() {
     $open "$uri" > /dev/null 2>&1
     exit $normal
   elif [[ -f $uri ]]; then # 文件
-    $editor "$uri"
-    exit $normal
+    # 判断文件类型
+    file_type=$(file -b --mime-type "$uri")
+    if [[ "$file_type" == text/* ]]; then # 普通文本文件
+      $editor "$uri"
+      exit $normal
+    else
+      $open "$uri" > /dev/null 2>&1
+      exit $normal
+    fi
   elif [[ "$uri" == file://* ]]; then # URL
     if [[ -d "${uri#file://}" ]]; then
       $open "$uri" > /dev/null 2>&1
