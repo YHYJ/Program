@@ -13,6 +13,7 @@
 
 * [outdate](#outdate)
 * [i3wm](#i3wm)
+* [install](#install)
 * [polybar](#polybar)
 
 <!-- vim-markdown-toc -->
@@ -25,24 +26,28 @@
 
 ## outdate
 
-- 'backup'：已被spider + chezmoi的组合取代
-- 'rolling-count'：已被rolling(go)取代
-- 'scleaner'：已被scleaner(go)取代
-- 'ccleaner'：已被scleaner(go)取代
-- 'clone-my-repos'：已被clone-repos(go)取代
-- 'get-system-info'：已被eniac(go)取代
-- 'http-server'：已被skynet(go)取代
-- 'manager'：已被manager(go)取代
-- 'check/*'：已被checker(go)取代
-- 'git/*'：已被git hook取代
-- 'configure/*'：已被manager(go)取代
-- 'trash-manager'：已被trash(go)取代
+- 'backup'：已被 spider + chezmoi 的组合取代
+- 'rolling-count'：已被 rolling(go) 取代
+- 'scleaner'：已被 scleaner(go) 取代
+- 'ccleaner'：已被 scleaner(go) 取代
+- 'clone-my-repos'：已被 clone-repos(go) 取代
+- 'get-system-info'：已被 eniac(go) 取代
+- 'http-server'：已被 skynet(go) 取代
+- 'manager'：已被 manager(go) 取代
+- 'check/\*'：已被 checker(go) 取代
+- 'git/\*'：已被 git hook 取代
+- 'configure/\*'：已被 manager(go) 取代
+- 'trash-manager'：已被 trash(go) 取代
 
 ## i3wm
 
-- 'lock-screen'：基于i3wm的锁屏脚本
+- 'lock-screen'：基于 i3wm 的锁屏脚本
+
+## install
+
+- 'install-rust'：安装 rustup
 
 ## polybar
 
-- 'polybar-launcher'：polybar启动器
-- 'polybar-script_usb-manager'：用于polybar的USB设备管理器
+- 'polybar-launcher'：polybar 启动器
+- 'polybar-script_usb-manager'：用于 polybar 的 USB 设备管理器
