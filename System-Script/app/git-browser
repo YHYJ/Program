@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 : << !
-Name: open-remote-repository
+Name: git-browser
 Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2024-04-23 12:34:11
