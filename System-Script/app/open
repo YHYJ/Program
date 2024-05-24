@@ -23,13 +23,12 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.3.3
-readonly minor_version=20240510
+readonly major_version=0.4.0
+readonly minor_version=20240524
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
-readonly normal=0   # 一切正常
-readonly err_file=1 # 文件/路径类错误
+readonly normal=0 # 一切正常
 
 #------------------------- Parameter Variable
 # description variable
@@ -38,6 +37,9 @@ readonly desc="automatically recognize URI type and open with default program"
 # command
 open="xdg-open"
 editor="nano"
+
+# Unable to open file
+declare -a failed_files
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -73,40 +75,51 @@ function checkCommand() {
   fi
 }
 
+function echoFailedFiles() {
+  # 输出无法打开的文件的信息
+  if [ ${#failed_files[@]} -ne 0 ]; then
+    for failed_file in "${failed_files[@]}"; do
+      echo -e "Can not open: $failed_file"
+    done
+  fi
+}
+
 function main() {
   checkCommand
 
-  uri=$1
-  if [[ -d $uri ]]; then # 文件夹
-    $open "$uri" > /dev/null 2>&1
-    exit $normal
-  elif [[ -f $uri ]]; then # 文件
-    # 判断文件类型
-    file_type=$(file -b --mime-type "$uri")
-    if [[ "$file_type" == text/* ]]; then # 普通文本文件
-      $editor "$uri"
-      exit $normal
-    else
+  # 文件集中到变量中统一打开
+  local texts=()
+
+  for uri in "$@"; do
+    if [[ -d $uri ]]; then # 文件夹
       $open "$uri" > /dev/null 2>&1
-      exit $normal
-    fi
-  elif [[ "$uri" == file://* ]]; then # URL
-    if [[ -d "${uri#file://}" ]]; then
+    elif [[ -f $uri ]]; then # 文件
+      # 判断文件类型
+      file_type=$(file -b --mime-type "$uri")
+      if [[ "$file_type" == text/* ]]; then # 普通文本文件
+        texts+=("$uri")
+      else
+        $open "$uri" > /dev/null 2>&1
+      fi
+    elif [[ "$uri" == file://* ]]; then # URL
+      if [[ -d "${uri#file://}" ]]; then
+        $open "$uri" > /dev/null 2>&1
+      elif [[ -f "${uri#file://}" ]]; then
+        texts+=("$uri")
+      else
+        # 将无法打开的文件名添加到数组中
+        failed_files+=("$file")
+      fi
+    elif [[ "$uri" == http://* || "$uri" == https://* || "$uri" == mailto:* || "$uri" == tel:* ]]; then # URL
       $open "$uri" > /dev/null 2>&1
-      exit $normal
-    elif [[ -f "${uri#file://}" ]]; then
-      $editor "$uri"
-      exit $normal
     else
-      echo -e "\x1b[31m'$uri' is not a file or directory\x1b[0m"
-      exit $err_file
+      # 将无法打开的文件名添加到数组中
+      failed_files+=("$file")
     fi
-  elif [[ "$uri" == http://* || "$uri" == https://* || "$uri" == mailto:* || "$uri" == tel:* ]]; then # URL
-    $open "$uri" > /dev/null 2>&1
-    exit $normal
-  else
-    echo -e "\x1b[31mWhat is '$uri'\x1b[0m"
-    exit $err_file
+  done
+
+  if [ ${#texts[@]} -gt 0 ]; then
+    $editor "${texts[@]}"
   fi
 }
 
@@ -133,7 +146,9 @@ else
         shift 1
         ;;
       *)
-        main "$1"
+        main "$@"
+        echoFailedFiles
+        exit $normal
         ;;
     esac
   done
