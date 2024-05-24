@@ -6,7 +6,7 @@ Author: YJ
 Email: yj1516268@outlook.com
 Created Time: 2020-04-27 13:51:05
 
-Description: 自动识别 URI 类型并以默认程序打开
+Description: 自动识别 URL 类型并以默认程序打开
 
 Attentions:
 -
@@ -23,7 +23,7 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.4.0
+readonly major_version=0.4.1
 readonly minor_version=20240524
 readonly rel_version=1
 
@@ -32,13 +32,15 @@ readonly normal=0 # 一切正常
 
 #------------------------- Parameter Variable
 # description variable
-readonly desc="automatically recognize URI type and open with default program"
+readonly desc="automatically recognize URL type and open with default program"
 
 # command
 open="xdg-open"
 editor="nano"
+catimg="feh"
+player="mpv"
 
-# Unable to open file
+# unable to open file
 declare -a failed_files
 
 ####################################################################
@@ -73,6 +75,30 @@ function checkCommand() {
   elif command -v vi &> /dev/null; then
     editor="vi"
   fi
+
+  # 确定图片查看器
+  if command -v gwenview &> /dev/null; then # KDE Plasma
+    catimg="gwenview"
+  elif command -v eog &> /dev/null; then # GNOME
+    catimg="eog"
+  elif command -v ristretto &> /dev/null; then # XFCE
+    catimg="ristretto"
+  elif command -v sxiv &> /dev/null; then
+    catimg="sxiv"
+  elif command -v imv &> /dev/null; then
+    catimg="imv"
+  fi
+
+  # 确定视频播放器
+  if command -v dragon &> /dev/null; then # KDE Plasma
+    player="dragon"
+  elif command -v totem &> /dev/null; then # GNOME
+    player="totem"
+  elif command -v ristretto &> /dev/null; then # XFCE
+    player="ristretto"
+  elif command -v vlc &> /dev/null; then
+    player="vlc"
+  fi
 }
 
 function echoFailedFiles() {
@@ -89,38 +115,66 @@ function main() {
 
   # 文件集中到变量中统一打开
   local texts=()
+  local pictures=()
+  local videos=()
 
-  for uri in "$@"; do
-    if [[ -d $uri ]]; then # 文件夹
-      $open "$uri" > /dev/null 2>&1
-    elif [[ -f $uri ]]; then # 文件
+  for url in "$@"; do
+    if [[ -d $url ]]; then # 文件夹
+      $open "$url" > /dev/null 2>&1
+    elif [[ -f $url ]]; then # 文件
       # 判断文件类型
-      file_type=$(file -b --mime-type "$uri")
+      file_type=$(file -b --mime-type "$url")
       if [[ "$file_type" == text/* ]]; then # 普通文本文件
-        texts+=("$uri")
+        texts+=("$url")
+      elif [[ "$file_type" == image/* ]]; then # 图片
+        pictures+=("$url")
+      elif [[ "$file_type" == video/* ]]; then # 视频
+        videos+=("$url")
       else
-        $open "$uri" > /dev/null 2>&1
+        $open "$url" > /dev/null 2>&1
       fi
-    elif [[ "$uri" == file://* ]]; then # URL
-      if [[ -d "${uri#file://}" ]]; then
-        $open "$uri" > /dev/null 2>&1
-      elif [[ -f "${uri#file://}" ]]; then
-        texts+=("$uri")
+    elif [[ "$url" == file://* ]]; then  # file://*
+      if [[ -d "${url#file://}" ]]; then # 文件夹
+        $open "$url" > /dev/null 2>&1
+      elif [[ -f "${url#file://}" ]]; then # 文件
+        # 判断文件类型
+        file_type=$(file -b --mime-type "${url#file://}")
+        if [[ "$file_type" == text/* ]]; then # 普通文本文件
+          texts+=("$url")
+        elif [[ "$file_type" == image/* ]]; then # 图片
+          pictures+=("$url")
+        elif [[ "$file_type" == video/* ]]; then # 视频
+          videos+=("$url")
+        else
+          $open "$url" > /dev/null 2>&1
+        fi
       else
         # 将无法打开的文件名添加到数组中
         failed_files+=("$file")
       fi
-    elif [[ "$uri" == http://* || "$uri" == https://* || "$uri" == mailto:* || "$uri" == tel:* ]]; then # URL
-      $open "$uri" > /dev/null 2>&1
+    elif [[ "$url" == http://* || "$url" == https://* || "$url" == mailto:* || "$url" == tel:* ]]; then # URL
+      $open "$url" > /dev/null 2>&1
     else
       # 将无法打开的文件名添加到数组中
       failed_files+=("$file")
     fi
   done
 
+  # 打开普通文本文件
   if [ ${#texts[@]} -gt 0 ]; then
     $editor "${texts[@]}"
   fi
+
+  # 打开图片
+  if [ ${#pictures[@]} -gt 0 ]; then
+    $catimg "${pictures[@]}" > /dev/null 2>&1 &
+  fi
+
+  # 打开视频
+  if [ ${#videos[@]} -gt 0 ]; then
+    $player "${videos[@]}" > /dev/null 2>&1 &
+  fi
+
 }
 
 ####################################################################
