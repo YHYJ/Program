@@ -13,10 +13,10 @@
 
 * [父模块列表](#父模块列表)
 * [各文件夹简介](#各文件夹简介)
-    * [Script](#script)
-    * [Software](#software)
-    * [System-Script](#system-script)
-    * [doc](#doc)
+  * [Script](#script)
+  * [Software](#software)
+  * [System-Script](#system-script)
+  * [doc](#doc)
 
 <!-- vim-markdown-toc -->
 
@@ -36,7 +36,7 @@
 ## 父模块列表
 
 | 父模块                                   | 简介     |
-|------------------------------------------|----------|
+| ---------------------------------------- | -------- |
 | [System](https://github.com/YHYJ/System) | 我的系统 |
 
 ## 各文件夹简介
@@ -46,16 +46,16 @@
 - backup：备份工具
 - check：家测工具
 - configure：软件配置工具
-- git：git工具
+- git：git 工具
 - install： 软件安装工具
 - tool：暂未定义作用的小工具
 - wrapper：其他程序的包装器
 
 ### Software
 
-- http-server：开启Http Server的软件
+- http-server：开启 Http Server 的软件
 - picture_conversion：图片转换软件
-- polybar-script：Polybar的脚本插件
+- polybar-script：Polybar 的脚本插件
 
 ### System-Script
 
