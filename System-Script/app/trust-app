@@ -23,14 +23,14 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program version
-readonly major_version=0.0.2
-readonly minor_version=20240426
+readonly major_version=0.0.3
+readonly minor_version=20240604
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
+readonly normal=0           # 一切正常
 readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
-readonly err_unknown=255    # 未知错误
 
 #------------------------- Parameter Variable
 # description variable
@@ -49,8 +49,6 @@ function helpInfo() {
   echo -e "     $name [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     -a, --app [NAME]  Specify application path"
-  echo -e ""
   echo -e "     -h, --help        Show help information"
   echo -e "     -v, --version     Show version information"
 }
@@ -93,25 +91,20 @@ if [[ ${#@} -lt 2 ]]; then
 else
   while true; do
     case $1 in
-      -a | --app)
-        trustApp "$2"
-        shift 2
-        ;;
       -h | --help)
         helpInfo
-        shift 1
+        exit $normal
         ;;
       -v | --version)
         versionInfo
-        shift 1
+        exit $normal
         ;;
       --)
         shift 1
-        break
         ;;
       *)
-        helpInfo
-        exit $err_unknown
+        trustApp "$2"
+        exit $normal
         ;;
     esac
   done
