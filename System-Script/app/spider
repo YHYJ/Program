@@ -29,9 +29,9 @@ Depends:
 name=$(basename "$0")
 readonly name
 # program nversion
-readonly major_version=0.4.1
-readonly minor_version=20240426
-readonly rel_version=3
+readonly major_version=0.4.2
+readonly minor_version=20240627
+readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -200,20 +200,32 @@ function spiderPackageInfo() { # 搜集已安装软件包列表
 
   if [ $system_type == "Linux" ]; then
     checkPath "$package_dir"
+
     pacman_list="$package_dir/Pacman.list"
     aur_list="$package_dir/AUR.list"
+
+    blacklist="zoom"                  # 需要排除不记录在案的软件包，格式："Package1 Package2 Package3 ..."
+    greplist="^(${blacklist// /\|})$" # 转换为 grep 可以识别的正则表达式
+
     printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
-    pacman -Qenq > "$pacman_list" # 官方源中单独指定安装的软件包
+    pacman -Qenq | grep -v -E "$greplist" > "$pacman_list" # 官方源中单独指定安装的软件包
+
     printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
-    pacman -Qemq > "$aur_list" # AUR中单独指定安装的软件包
+    pacman -Qemq | grep -v -E "$greplist" > "$aur_list" # AUR中单独指定安装的软件包
   elif [ $system_type == "macOS" ]; then
     checkPath "$package_dir"
+
     formulae_list="$package_dir/Formulae.list"
     casks_list="$package_dir/Casks.list"
+
+    blacklist=""                      # 需要排除不记录在案的软件包，格式："Package1 Package2 Package3 ..."
+    greplist="^(${blacklist// /\|})$" # 转换为 grep 可以识别的正则表达式
+
     printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Formulae-Package" "-->" "$formulae_list"
-    brew list --formulae > "$formulae_list" # Homebrew 安装的命令行工具和应用程序
+    brew list --formulae | grep -v -E "$greplist" > "$formulae_list" # Homebrew 安装的命令行工具和应用程序
+
     printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Casks-Package" "-->" "$casks_list"
-    brew list --casks > "$casks_list" # Homebrew 安装的 GUI 应用程序
+    brew list --casks | grep -v -E "$greplist" > "$casks_list" # Homebrew 安装的 GUI 应用程序
   else
     printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
   fi
