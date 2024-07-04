@@ -19,28 +19,26 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-# program name
+# Program name
 name=$(basename "$0")
 readonly name
-# program nversion
+# Program description
+readonly desc="automatically recognize URL type and open with default program"
+# Program nversion
 readonly major_version=0.4.1
-readonly minor_version=20240524
+readonly minor_version=20240704
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0 # 一切正常
 
-#------------------------- Parameter Variable
-# description variable
-readonly desc="automatically recognize URL type and open with default program"
-
-# command
+#------------------------- Other Variable
+# Command
 open="xdg-open"
 editor="nano"
 catimg="feh"
 player="mpv"
-
-# unable to open file
+# Unable to open file
 declare -a failed_files
 
 ####################################################################

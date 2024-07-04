@@ -19,12 +19,14 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-# program name
+# Program name
 name=$(basename "$0")
 readonly name
-# program version
+# Program description
+readonly desc="update manually installed space-vim"
+# Program version
 readonly major_version=0.1.2
-readonly minor_version=20240426
+readonly minor_version=20240704
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -33,10 +35,8 @@ readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
 readonly err_unknown=255    # 未知错误
 
-#------------------------- Parameter Variable
-# description variable
-readonly desc="update manually installed space-vim"
-# path variable
+#------------------------- Other Variable
+# Path
 readonly install_path="$HOME/.space-vim"
 
 ####################################################################

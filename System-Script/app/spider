@@ -25,12 +25,14 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-# program name
+# Program name
 name=$(basename "$0")
 readonly name
-# program nversion
+# Program description
+readonly desc="collect system information, supports Arch Linux and macOS"
+# Program nversion
 readonly major_version=0.4.2
-readonly minor_version=20240627
+readonly minor_version=20240704
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -39,22 +41,20 @@ readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
 readonly err_unknown=255    # 未知错误
 
-#------------------------- Parameter Variable
-# description variable
-readonly desc="collect system information, supports Arch Linux and macOS"
-# system variable
+#------------------------- Other Variable
+# System
 system_type="unknown"
-# path variable
+# Path
 readonly storage="$HOME/.cache/SpiderData"
 readonly package_dir="$storage/PackageList"
 readonly service_dir="$storage/ServiceList"
 readonly app_vim_dir="$storage/App/vim"
 readonly app_guake_dir="$storage/App/guake"
 readonly user_dir="$storage/UserList"
-# app variable
+# App
 readonly vim_conf="$HOME/.space-vim/private/config.vim"
 readonly konsave_dir="$HOME/.config/konsave"
-# printf variable
+# Print
 readonly space='    '
 
 ####################################################################

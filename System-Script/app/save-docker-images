@@ -23,13 +23,15 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-# program name
+# Program name
 name=$(basename "$0")
 readonly name
-# program version
+# Program description
+readonly desc="is a tool used by Linux to back up Docker images"
+# Program version
 readonly major_version=1.1.4
 readonly minor_version=20240704
-readonly rel_version=1
+readonly rel_version=2
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
@@ -38,16 +40,13 @@ readonly err_param=2        # 参数错误
 readonly err_permission=110 # 权限错误
 readonly err_unknown=255    # 未知错误
 
-#------------------------- Parameter Variable
-# description variable
-readonly desc="is a tool used by Linux to back up Docker images"
-
-# path variable
+#------------------------- Other Variable
+# Path
 readonly images_savefile="$HOME/Documents/LocalBackups/docker/Mydocker.images"
-# detection variable
+# Detection
 group_docker=$(grep -E 'docker' /etc/group)
 readonly group_docker
-# time variable
+# Time
 readonly time_out=60
 
 ####################################################################

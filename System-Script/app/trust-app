@@ -19,22 +19,20 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-# program name
+# Program name
 name=$(basename "$0")
 readonly name
-# program version
+# Program description
+readonly desc="make macOS trust a specified program"
+# Program version
 readonly major_version=0.0.3
-readonly minor_version=20240604
+readonly minor_version=20240704
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
 readonly normal=0           # 一切正常
 readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
-
-#------------------------- Parameter Variable
-# description variable
-readonly desc="make macOS trust a specified program"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#

@@ -19,12 +19,14 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-# program name
+# Program name
 name=$(basename "$0")
 readonly name
-# program version
+# Program description
+readonly desc="backup, creation, and backup file deletion for operating Python Virtualenv environments"
+# Program version
 readonly major_version=0.1.6
-readonly minor_version=20240428
+readonly minor_version=20240704
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -33,17 +35,15 @@ readonly err_file=1         # 文件/路径类错误
 readonly err_no_program=127 # 未找到命令
 readonly err_unknown=255    # 未知错误
 
-#------------------------- Parameter Variable
-# description variable
-readonly desc="backup, creation, and backup file deletion for operating Python Virtualenv environments"
-# environment variable
+#------------------------- Other Variable
+# Environment
 readonly storage="$HOME/.cache/SpiderData"
 readonly app_virtualenv_dir="$storage/App/virtualenv"
-# app variable
+# App
 pip="pip"
 virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
 virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
-# printf variable
+# Print
 readonly space='    '
 
 ####################################################################
