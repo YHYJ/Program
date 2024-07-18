@@ -38,6 +38,7 @@
 - 'git/\*'：已被 git hook 取代
 - 'configure/\*'：已被 manager(go) 取代
 - 'trash-manager'：已被 trash(go) 取代
+- 'save-docker-images'：已被 wocker(go) 取代
 
 ## i3wm
 
