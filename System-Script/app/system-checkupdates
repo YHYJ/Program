@@ -28,8 +28,8 @@ readonly name
 # Program description
 readonly desc="detect system package updates"
 # Program version
-readonly major_version=3.0.4
-readonly minor_version=20240704
+readonly major_version=3.0.5
+readonly minor_version=20240827
 readonly rel_version=1
 
 #------------------------- Exit Code Variable
@@ -84,7 +84,9 @@ function checkCommand() {
 
 function checkUpdate() {
   if checkCommand "$check_tool"; then
-    $check_tool > "$tmp_file"
+    date_time=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "$date_time" > "$tmp_file"
+    $check_tool >> "$tmp_file"
   else
     echo -e "Please install '$check_tool' first"
   fi
