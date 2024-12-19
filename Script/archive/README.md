@@ -39,6 +39,7 @@
 - 'configure/\*'：已被 manager(go) 取代
 - 'trash-manager'：已被 trash(go) 取代
 - 'save-docker-images'：已被 wocker(go) 取代
+- 'system-checkupdate'：已被 checker(go) 子命令 'update' 取代
 
 ## i3wm
 
