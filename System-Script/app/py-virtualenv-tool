@@ -130,7 +130,7 @@ function saveVirtualenv() {
     for venv in ${venvs[*]}; do
       workon "$venv"
       filepath="$app_virtualenv_dir"/requirements_"$venv".txt
-      pip freeze --no-python-version-warning > "$filepath"
+      pip freeze > "$filepath"
       printf "%s%s Venv: \x1b[35m%2s\x1b[0m \x1b[37m%s\x1b[0m\n" "$space" "$space" "✔" "$venv"
     done
   else
