@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+: << !
+Name: backup
+Author: YJ
+Email: yj1516268@outlook.com
+Created Time: 2025-08-04 17:41:05
+
+Description: 自动备份指定路径下的文件夹和 docker volume
+
+Attentions:
+- 可能需要 root 权限
+
+Depends:
+- bsdtar
+!
+
+TARGET_USER="yj"
+TARGET_GROUP="yj"
+TIMESTAMP=$(date +%Y%m%d)
+BACKUP_BASENAME="Backup-Files"
+BACKUP_L1_DIR="/home/${TARGET_USER}/Documents"
+BACKUP_L2_DIR="${BACKUP_L1_DIR}/${BACKUP_BASENAME}"
+BACKUP_L3_DIR="${BACKUP_L2_DIR}/Backfile-${TIMESTAMP}"
+
+# 日志函数
+function logger() {
+  logfile="${BACKUP_L3_DIR}/backup.log"
+
+  local line
+
+  # 无参数输出空行
+  if [ $# -eq 0 ]; then
+    # 无参数：输出一个空行
+    printf '%b\n' ""
+    printf '%s\n' "" >>"$logfile"
+    return
+  fi
+
+  printf '%s\n' "$*" | while IFS= read -r line; do
+    # 控制台输出（解析 ANSI 转义）
+    printf '%b\n' "$line"
+    # 日志输出（去除 ANSI 颜色代码）
+    printf '%s\n' "$line" | sed 's/\\x1b\[[0-9;]*[mGK]//g; s/\\033\[[0-9;]*[mGK]//g' >>"$logfile"
+  done
+}
+
+# 获取所有需要备份的目录
+function get_targets() {
+  local targets=()
+
+  # 安全遍历BASE_DIR下的所有子目录
+  while IFS= read -r -d $'\0' dir; do
+    # 获取目录名（不含路径）
+    dir_name=$(basename "${dir}")
+
+    # 排除备份目录自身
+    if [[ "${dir_name}" != "Backup-Files" ]]; then
+      targets+=("${dir_name}")
+    fi
+  done < <(find "${BACKUP_L1_DIR}" -maxdepth 1 -mindepth 1 -type d -print0)
+
+  # 返回数组引用（避免子shell问题）
+  printf "%s\n" "${targets[@]}"
+}
+
+# 清理旧备份
+function clean_old_backups() {
+  # 查找所有 Backfile-* 目录并排序
+  local quantity=${1}
+  local backup_dirs=()
+  while IFS= read -r -d $'\0' dir; do
+    backup_dirs+=("${dir}")
+  done < <(find "${BACKUP_L2_DIR}" -maxdepth 1 -type d -name "Backfile-*" -print0 | sort -z)
+
+  # 计算需要删除的数量
+  local total_dirs=${#backup_dirs[@]}
+  local delete_count=$((total_dirs - quantity))
+
+  if [ ${delete_count} -gt 0 ]; then
+    logger "发现 ${total_dirs} 个备份，保留最近${quantity}个，删除 ${delete_count} 个旧备份..."
+    for ((i = 0; i < delete_count; i++)); do
+      dir_to_remove="${backup_dirs[i]}"
+      if [[ -d "${dir_to_remove}" ]]; then
+        logger "删除旧备份: $(basename "${dir_to_remove}")"
+        rm -rf "${dir_to_remove}"
+      fi
+    done
+  else
+    logger "发现 ${total_dirs} 个备份，保留最近${quantity}个，没有可删除的旧备份"
+  fi
+}
+
+# 文件夹备份函数
+function dir_backuper() {
+  local dir_name=${1}
+  local tgz_filename="${dir_name}_${TIMESTAMP}.tar.gz"
+  bsdtar --exclude='*.log' --exclude='cloudreve/*' --exclude='nginx/tmp/*' \
+    -czpf "${BACKUP_L3_DIR}/${tgz_filename}" \
+    -C "${BACKUP_L1_DIR}" "${dir_name}"
+  logger "📦 Save \x1b[34m${dir_name}\x1b[0m -> \x1b[35m${tgz_filename}\x1b[0m"
+}
+
+# docker volume 备份函数
+function volume_backuper() {
+  local backuper="/usr/local/bin/wocker"
+  if command -v ${backuper} >/dev/null 2>&1; then
+    cd "${BACKUP_L3_DIR}" || return 1
+    wocker volume --save all
+  else
+    logger "\x1b[31m[✘]\x1b[0m 备份 docker volume 需要先安装 wocker"
+  fi
+}
+
+# 设置文件所有权
+function set_owner() {
+  chown -R "${TARGET_USER}:${TARGET_GROUP}" "${BACKUP_L3_DIR}"
+}
+
+# 主函数
+function main() {
+  # 确保备份目录存在
+  mkdir -p "${BACKUP_L3_DIR}"
+
+  # 安全获取目录数组
+  local targets=()
+  while IFS= read -r dir; do
+    [[ -n "$dir" ]] && targets+=("$dir")
+  done < <(get_targets)
+
+  if [ ${#targets[@]} -eq 0 ]; then
+    logger "在 ${BASE_DIR} 下未找到需要备份的目录"
+    exit 0
+  fi
+
+  # 循环执行文件夹备份
+  logger ">>>>>>>>>>>>>>>>>>>> 备份文件夹 <<<<<<<<<<<<<<<<<<<<"
+  logger "在 ${BACKUP_L1_DIR} 下找到 ${#targets[@]} 个备份目标："
+  for target in "${targets[@]}"; do
+    logger "  * ${target}"
+  done
+  logger "-----------------------------------"
+  for target in "${targets[@]}"; do
+    dir_backuper "${target}"
+  done
+
+  logger
+
+  # 备份 docker volume
+  logger ">>>>>>>>>>>>>>>>>>>> 备份 docker volume <<<<<<<<<<<<<<<<<<<<"
+  volume_backuper
+
+  logger
+
+  # 删除旧备份
+  logger ">>>>>>>>>>>>>>>>>>>> 删除旧备份 <<<<<<<<<<<<<<<<<<<<"
+  clean_old_backups 5
+
+  # 修改文件所有权
+  set_owner
+
+  logger
+
+  logger "\x1b[32m[✔]\x1b[0m 备份文件保存在：${BACKUP_L3_DIR}"
+}
+
+main
