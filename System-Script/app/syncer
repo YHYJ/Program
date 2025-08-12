@@ -70,18 +70,15 @@ function syncer() {
   for target in "${targets[@]}"; do
     source_path="${base}/${directory}/${target}" # 源路径
 
-    if [ ! -e "${source_path}" ]; then
-      # 源文件不存在
-      logger "WARN  : 源文件 ${source_path} 不存在，跳过"
-      continue
-    elif [ -f "${source_path}" ]; then
+    if [ -f "${source_path}" ]; then
       # 文件
       storage_path="${storage}/${directory}" # 最终备份路径
     elif [ -d "${source_path}" ]; then
       # 文件夹
       storage_path="${storage}/${directory}/${target}" # 最终备份路径
     else
-      logger "ERROR : ${source_path} 不是文件或文件夹，跳过"
+      logger "WARN : ${source_path} 不是文件或文件夹，跳过"
+      continue
     fi
 
     logger "INFO  : 正在备份 ${source_path} -> ${storage_path}"
