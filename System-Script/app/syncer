@@ -27,8 +27,8 @@ TRANSFER=8
 LOGPATH="/home/${USER}/.local/share/logs/Syncer"
 LOGNAME="${NAME}.log"
 LOGFILE="${LOGPATH}/${LOGNAME}"
-LOGLEVEL="INFO"
-TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S.%3N")
+LOGLEVEL="WARNING"
+TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
 #------------------------- Sync Variable
 # Docker
@@ -54,9 +54,9 @@ function logger() {
 
   printf '%s\n' "${*}" | while IFS= read -r line; do
     # 控制台输出（解析 ANSI 转义）
-    printf '[%s] %b\n' "${TIMESTAMP}" "${line}"
+    printf '%s %b\n' "${TIMESTAMP}" "${line}"
     # 日志输出（去除 ANSI 颜色代码）
-    printf '[%s] %s\n' "${TIMESTAMP}" "${line}" | sed 's/\\x1b\[[0-9;]*[mGK]//g; s/\\033\[[0-9;]*[mGK]//g' >>"${LOGFILE}"
+    printf '%s %s\n' "${TIMESTAMP}" "${line}" | sed 's/\\x1b\[[0-9;]*[mGK]//g; s/\\033\[[0-9;]*[mGK]//g' >>"${LOGFILE}"
   done
 }
 
@@ -73,11 +73,11 @@ function syncer() {
 
     # 检查源文件夹是否存在
     if [ ! -d "${source_path}" ]; then
-      logger "源文件夹不存在，跳过: ${source_path}"
+      logger "WARN  : 源文件夹 ${source_path} 不存在，跳过"
       continue
     fi
 
-    logger "正在备份: ${source_path} -> ${storage_path}"
+    logger "INFO  : 正在备份 ${source_path} -> ${storage_path}"
 
     # 执行备份
     rclone copy --update "${source_path}" "${storage_path}" --transfers=${TRANSFER} --log-file="${LOGFILE}" --log-level ${LOGLEVEL}
@@ -85,9 +85,9 @@ function syncer() {
     # 检查状态
     STATUS=${?}
     if [ ${STATUS} -eq 0 ]; then
-      logger "成功备份: ${source_path}"
+      logger "INFO  : 成功备份 ${source_path}"
     else
-      logger "备份失败: ${source_path}, 错误代码: ${STATUS}"
+      logger "ERROR : 备份失败 ${source_path}, 错误代码 ${STATUS}"
     fi
   done
 }
