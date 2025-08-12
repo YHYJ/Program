@@ -34,7 +34,7 @@ TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 # Docker
 BASE_DOCKER="/home/${USER}/Documents"
 DIRECTORY_DOCKER="Docker"
-TARGETS_DOCKER=("Run" "Volume")
+TARGETS_DOCKER=("backup-docker" "filter-backup" "Run" "Volume")
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
