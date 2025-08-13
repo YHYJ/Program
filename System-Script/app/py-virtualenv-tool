@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: << !
+: <<!
 Name: py-virtualenv-tool
 Author: YJ
 Email: yj1516268@outlook.com
@@ -20,31 +20,31 @@ Depends:
 ####################################################################
 #------------------------- Program Variable
 # Program name
-name=$(basename "$0")
-readonly name
+NAME=$(basename "${0}")
+readonly NAME
 # Program description
-readonly desc="backup, creation, and backup file deletion for operating Python Virtualenv environments"
+readonly DESC="backup, creation, and backup file deletion for operating Python Virtualenv environments"
 # Program version
-readonly major_version=0.1.6
-readonly minor_version=20240704
-readonly rel_version=1
+readonly MAJOR=0.1.6
+readonly MINOR=20240704
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_no_program=127 # 未找到命令
-readonly err_unknown=255    # 未知错误
+readonly NORMAL=0           # 一切正常
+readonly ERR_FILE=1         # 文件/路径类错误
+readonly ERR_NO_PROGRAM=127 # 未找到命令
+readonly ERR_UNKNOWN=255    # 未知错误
 
 #------------------------- Other Variable
 # Environment
-readonly storage="$HOME/.cache/SpiderData"
-readonly app_virtualenv_dir="$storage/App/virtualenv"
+readonly STORAGE="$HOME/.cache/SpiderData"
+readonly VIRTUALENV_DIR="$STORAGE/App/virtualenv"
 # App
-pip="pip"
-virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
-virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
+PIP="pip"
+VIRTUALENVWRAPPER="/usr/bin/virtualenvwrapper.sh"
+VIRTUALENVWRAPPER_LAZY="/usr/bin/virtualenvwrapper_lazy.sh"
 # Print
-readonly space='    '
+readonly SPACE='    '
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -52,11 +52,11 @@ readonly space='    '
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m${NAME}\x1b[0m \x1b[1m${DESC}\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTION]"
+  echo -e "     ${NAME} [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -d, --delete      Delete virtual environment backup files"
@@ -69,69 +69,69 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR}-${MINOR}.${RELEASE}\x1b[0m)"
 }
 
 #------------------------- Feature Function
 function checkOS() {
   # 检测系统类型，确定因系统差异导致的变量或命令不同
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    pip="pip3.11"
-    virtualenvwrapper="/opt/homebrew/bin/virtualenvwrapper.sh"
-    virtualenvwrapper_lazy="/opt/homebrew/bin/virtualenvwrapper_lazy.sh"
-  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    pip="pip"
-    virtualenvwrapper="/usr/bin/virtualenvwrapper.sh"
-    virtualenvwrapper_lazy="/usr/bin/virtualenvwrapper_lazy.sh"
+  if [[ "${OSTYPE}" == "darwin"* ]]; then
+    PIP="pip3.11"
+    VIRTUALENVWRAPPER="/opt/homebrew/bin/virtualenvwrapper.sh"
+    VIRTUALENVWRAPPER_LAZY="/opt/homebrew/bin/virtualenvwrapper_lazy.sh"
+  elif [[ "${OSTYPE}" == "linux-gnu"* ]]; then
+    PIP="pip"
+    VIRTUALENVWRAPPER="/usr/bin/virtualenvwrapper.sh"
+    VIRTUALENVWRAPPER_LAZY="/usr/bin/virtualenvwrapper_lazy.sh"
   fi
 }
 
 function initVirtualenv() {
-  if [ -s "$virtualenvwrapper_lazy" ]; then
+  if [ -s "${VIRTUALENVWRAPPER_LAZY}" ]; then
     # shellcheck source=/dev/null
-    source "$virtualenvwrapper_lazy"
-  elif [ -s "$virtualenvwrapper" ]; then
+    source "${VIRTUALENVWRAPPER_LAZY}"
+  elif [ -s "${VIRTUALENVWRAPPER}" ]; then
     # shellcheck source=/dev/null
-    source "$virtualenvwrapper"
+    source "${VIRTUALENVWRAPPER}"
   else
     echo -e "Please install 'virtualenv' and 'virtualenvwrapper' first"
-    exit $err_no_program
+    exit ${ERR_NO_PROGRAM}
   fi
   venvs=$(lsvirtualenv -b)
 }
 
 function checkPath() {
-  if [[ -e "$1" ]]; then
-    if [[ ! -d "$1" ]]; then
-      echo -e "Path '$1' is not a folder, exit"
-      exit $err_file
+  if [[ -e "${1}" ]]; then
+    if [[ ! -d "${1}" ]]; then
+      echo -e "Path '${1}' is not a folder, exit"
+      exit ${ERR_FILE}
     fi
   else
-    mkdir -p "$1"
+    mkdir -p "${1}"
   fi
 }
 
 function checkCommand() {
-  if command -v "$1" > /dev/null 2>&1; then
-    return $normal
+  if command -v "${1}" >/dev/null 2>&1; then
+    return ${NORMAL}
   else
-    return $err_no_program
+    return ${ERR_NO_PROGRAM}
   fi
 }
 
 function deleteVirtualenvFile() {
   # 删除虚拟环境备份文件
-  rm -rf "${app_virtualenv_dir:?}/"*
+  rm -rf "${VIRTUALENV_DIR:?}/"*
 }
 
 function saveVirtualenv() {
-  if checkCommand "$pip"; then
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Python-Venv" "-->" "$app_virtualenv_dir/*"
+  if checkCommand "${PIP}"; then
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "Python-Venv" "-->" "${VIRTUALENV_DIR}/*"
     for venv in ${venvs[*]}; do
-      workon "$venv"
-      filepath="$app_virtualenv_dir"/requirements_"$venv".txt
-      pip freeze > "$filepath"
-      printf "%s%s Venv: \x1b[35m%2s\x1b[0m \x1b[37m%s\x1b[0m\n" "$space" "$space" "✔" "$venv"
+      workon "${venv}"
+      filepath="${VIRTUALENV_DIR}"/requirements_"${venv}".txt
+      pip freeze >"${filepath}"
+      printf "%s%s Venv: \x1b[35m%2s\x1b[0m \x1b[37m%s\x1b[0m\n" "${SPACE}" "${SPACE}" "✔" "${venv}"
     done
   else
     echo -e "Please install 'pip' first"
@@ -139,21 +139,21 @@ function saveVirtualenv() {
 }
 
 function makeVirtualenv() {
-  if checkCommand "$pip"; then
+  if checkCommand "${PIP}"; then
     # 遍历存储的requirements*.txt，得到绝对路径表示的文件名
-    if [ "$(ls -A "$app_virtualenv_dir")" ]; then
-      for filepath in "$app_virtualenv_dir"/*.txt; do
+    if [ "$(ls -A "${VIRTUALENV_DIR}")" ]; then
+      for filepath in "${VIRTUALENV_DIR}"/*.txt; do
         # 获取文件名并切分得到虚拟环境名
-        filename=$(basename "$filepath")
-        envname=$(echo "$filename" | cut -d "_" -f 2 | cut -d "." -f 1)
-        echo -e "\x1b[1m--> Make virtual environment: \x1b[32m$envname\x1b[0m\x1b[0m"
+        filename=$(basename "${filepath}")
+        envname=$(echo "${filename}" | cut -d "_" -f 2 | cut -d "." -f 1)
+        echo -e "\x1b[1m--> Make virtual environment: \x1b[32m${envname}\x1b[0m\x1b[0m"
         # 将切分得到的虚拟环境名和现有虚拟环境名做对比
-        if [[ ! $venvs =~ (^|[[:space:]])$envname($|[[:space:]]) ]]; then
+        if [[ ! ${venvs} =~ (^|[[:space:]])${envname}($|[[:space:]]) ]]; then
           # 名字不同则创建并搭建环境
-          mkvirtualenv -p python3 "$envname"
-          workon "$envname"
+          mkvirtualenv -p python3 "${envname}"
+          workon "${envname}"
           echo -e "\x1b[1m--> Install requirements\x1b[0m"
-          pip install -r "$filepath"
+          pip install -r "${filepath}"
         fi
         echo -e "\x1b[1mDone\x1b[0m\n"
       done
@@ -168,45 +168,45 @@ function makeVirtualenv() {
 ####################################################################
 checkOS
 initVirtualenv
-mkdir -p "$app_virtualenv_dir"
+mkdir -p "${VIRTUALENV_DIR}"
 
-ARGS=$(getopt --options "dsmhv" --longoptions "delete,save,make,help,version" -n "$name" -- "$@")
-eval set -- "$ARGS"
+ARGS=$(getopt --options "dsmhv" --longoptions "delete,save,make,help,version" -n "${NAME}" -- "${@}")
+eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
 else
   while true; do
-    checkPath "$app_virtualenv_dir"
-    case $1 in
-      -d | --delete)
-        deleteVirtualenvFile
-        shift 1
-        ;;
-      -s | --save)
-        saveVirtualenv
-        shift 1
-        ;;
-      -m | --make)
-        makeVirtualenv
-        shift 1
-        ;;
-      -h | --help)
-        helpInfo
-        shift 1
-        ;;
-      -v | --version)
-        versionInfo
-        shift 1
-        ;;
-      --)
-        shift 1
-        break
-        ;;
-      *)
-        helpInfo
-        exit $err_unknown
-        ;;
+    checkPath "${VIRTUALENV_DIR}"
+    case ${1} in
+    -d | --delete)
+      deleteVirtualenvFile
+      shift 1
+      ;;
+    -s | --save)
+      saveVirtualenv
+      shift 1
+      ;;
+    -m | --make)
+      makeVirtualenv
+      shift 1
+      ;;
+    -h | --help)
+      helpInfo
+      shift 1
+      ;;
+    -v | --version)
+      versionInfo
+      shift 1
+      ;;
+    --)
+      shift 1
+      break
+      ;;
+    *)
+      helpInfo
+      exit ${ERR_UNKNOWN}
+      ;;
     esac
   done
 fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: << !
+: <<!
 Name: configure-tags
 Author: YJ
 Email: yj1516268@outlook.com
@@ -26,24 +26,23 @@ Depends:
 ####################################################################
 #------------------------- Program Variable
 # Program name
-name=$(basename "$0")
-readonly name
+NAME=$(basename "${0}")
+readonly NAME
 # Program description
-readonly desc="configure tags for subfolders under the specified folder"
+readonly DESC="configure tags for subfolders under the specified folder"
 # Program version
-readonly major_version=0.1.5
-readonly minor_version=20240704
-readonly rel_version=1
+readonly MAJOR=0.1.6
+readonly MINOR=20250813
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_permission=110 # 权限错误
-readonly err_unknown=255    # 未知错误
+readonly NORMAL=0           # 一切正常
+readonly ERR_FILE=1         # 文件/路径类错误
+readonly ERR_PERMISSION=110 # 权限错误
+readonly ERR_UNKNOWN=255    # 未知错误
 
-#------------------------- Other Variable
-# Path
-readonly dtags_path="/usr/bin/dtags-activate"
+#------------------------- PATH Variable
+readonly DTAGS_PATH="/usr/bin/dtags-activate"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -51,11 +50,11 @@ readonly dtags_path="/usr/bin/dtags-activate"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m${NAME}\x1b[0m \x1b[1m${DESC}\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTION]"
+  echo -e "     ${NAME} [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -f, --folder      Configure the subfolders of this folder"
@@ -75,18 +74,18 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR}-${MINOR}.${RELEASE}\x1b[0m)"
 }
 
 #------------------------- Feature Function
 function askQuestion() {
   while true; do
-    read -e -r -p "$1"
+    read -e -r -p "${1}"
     REPLY=${REPLY:-N}
     echo
-    if [[ "$REPLY" =~ ^[Yy] ]]; then
+    if [[ "${REPLY}" =~ ^[Yy] ]]; then
       return 0
-    elif [[ "$REPLY" =~ ^[Nn] ]]; then
+    elif [[ "${REPLY}" =~ ^[Nn] ]]; then
       return 1
     else
       echo -e "Please input [Y/y] or [N/n]\n"
@@ -95,49 +94,49 @@ function askQuestion() {
 }
 
 function checkUser() {
-  if [[ $USER == "$1" ]]; then
-    echo -e "\n\x1b[31m[✘]\x1b[0m Current user is $1, refusal to execute"
-    exit $err_permission
+  if [[ ${USER} == "${1}" ]]; then
+    echo -e "\n\x1b[31m[✘]\x1b[0m Current user is ${1}, refusal to execute"
+    exit ${ERR_PERMISSION}
   fi
 }
 
 function addTags() {
   num=0
-  if [[ -d "$target_folder" ]]; then
-    for folder in "$target_folder"/*; do
-      if [[ -d "$folder" ]]; then
-        if [[ "$tagname" == 0 ]]; then
-          tag=$(basename "$folder" | tr '[:upper:]' '[:lower:]')
-          tag -y "$folder" -t "$tag"
-        elif [ "$tagname" ]; then
-          tag -y "$folder" -t "$tagname"
-        elif [[ -d "$folder/.git" ]]; then
-          tag -y "$folder" -t "repo"
+  if [[ -d "${target_folder}" ]]; then
+    for folder in "${target_folder}"/*; do
+      if [[ -d "${folder}" ]]; then
+        if [[ "${tagname}" == 0 ]]; then
+          tag=$(basename "${folder}" | tr '[:upper:]' '[:lower:]')
+          tag -y "${folder}" -t "${tag}"
+        elif [ "${tagname}" ]; then
+          tag -y "${folder}" -t "${tagname}"
+        elif [[ -d "${folder}/.git" ]]; then
+          tag -y "${folder}" -t "repo"
         else
-          tag=$(basename "$folder" | tr '[:upper:]' '[:lower:]')
-          tag -y "$folder" -t "$tag"
+          tag=$(basename "${folder}" | tr '[:upper:]' '[:lower:]')
+          tag -y "${folder}" -t "${tag}"
         fi
         ((num++))
-      elif [[ -f "$folder" ]]; then
-        echo -e "$folder is a text file, ignore"
+      elif [[ -f "${folder}" ]]; then
+        echo -e "${folder} is a text file, ignore"
       else
-        echo -e "$folder unknown file type, ignore"
+        echo -e "${folder} unknown file type, ignore"
       fi
       echo -e ""
     done
   else
-    echo -e "\n\x1b[31mPath $target_folder does not exist\x1b[0m"
-    exit $err_file
+    echo -e "\n\x1b[31mPath ${target_folder} does not exist\x1b[0m"
+    exit ${ERR_FILE}
   fi
 
-  echo -e "\x1b[34mA total of \x1b[0m\x1b[32m$num\x1b[0m\x1b[34m tags have been created/exist\x1b[0m"
-  exit $normal
+  echo -e "\x1b[34mA total of \x1b[0m\x1b[32m${num}\x1b[0m\x1b[34m tags have been created/exist\x1b[0m"
+  exit ${NORMAL}
 }
 
 function main() {
   checkUser "root"
 
-  if [[ -x "$dtags_path" ]]; then
+  if [[ -x "${DTAGS_PATH}" ]]; then
     addTags
   else
     echo -e "Please install 'dtags' first"
@@ -147,44 +146,44 @@ function main() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "f:t:hv" --longoptions "folder:,tag:,help,version" -n "$name" -- "$@")
-eval set -- "$ARGS"
+ARGS=$(getopt --options "f:t:hv" --longoptions "folder:,tag:,help,version" -n "${NAME}" -- "${@}")
+eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
 else
   while true; do
-    case $1 in
-      -f | --folder)
-        target_folder=$2
-        shift 2
-        if [[ ${#@} -le 1 ]]; then
-          main
-        fi
-        ;;
-      -t | --tag)
-        tagname=$2
-        shift 2
-        if [[ ${#@} -le 1 ]]; then
-          main
-        fi
-        ;;
-      -h | --help)
-        helpInfo
-        shift 1
-        ;;
-      -v | --version)
-        versionInfo
-        shift 1
-        ;;
-      --)
-        shift 1
-        break
-        ;;
-      *)
-        helpInfo
-        exit $err_unknown
-        ;;
+    case ${1} in
+    -f | --folder)
+      target_folder=${2}
+      shift 2
+      if [[ ${#@} -le 1 ]]; then
+        main
+      fi
+      ;;
+    -t | --tag)
+      tagname=${2}
+      shift 2
+      if [[ ${#@} -le 1 ]]; then
+        main
+      fi
+      ;;
+    -h | --help)
+      helpInfo
+      shift 1
+      ;;
+    -v | --version)
+      versionInfo
+      shift 1
+      ;;
+    --)
+      shift 1
+      break
+      ;;
+    *)
+      helpInfo
+      exit ${ERR_UNKNOWN}
+      ;;
     esac
   done
 fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: << !
+: <<!
 Name: git-browser
 Author: YJ
 Email: yj1516268@outlook.com
@@ -20,20 +20,20 @@ Depends:
 ####################################################################
 #------------------------- Program Variable
 # Program name
-name=$(basename "$0")
-readonly name
+NAME=$(basename "${0}")
+readonly NAME
 # Program description
-readonly desc="open the remote repository corresponding to the local repository through the default browser"
+readonly DESC="open the remote repository corresponding to the local repository through the default browser"
 # Program version
-readonly major_version=0.0.2
-readonly minor_version=20240704
-readonly rel_version=1
+readonly MAJOR=0.0.2
+readonly MINOR=20240704
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_no_program=127 # 未找到命令
-readonly err_unknown=255    # 未知错误
+readonly NORMAL=0           # 一切正常
+readonly ERR_FILE=1         # 文件/路径类错误
+readonly ERR_NO_PROGRAM=127 # 未找到命令
+readonly ERR_UNKNOWN=255    # 未知错误
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -41,11 +41,11 @@ readonly err_unknown=255    # 未知错误
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m${NAME}\x1b[0m \x1b[1m${DESC}\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTION]"
+  echo -e "     ${NAME} [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -h, --help        Show help information"
@@ -54,27 +54,27 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR}-${MINOR}.${RELEASE}\x1b[0m)"
 }
 
 #------------------------- Feature Function
 function isRepo() {
   # 检测当前目录是否为 git 存储库
-  if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo -e "Not a Git repository"
-    exit $err_file
+    exit ${ERR_FILE}
   fi
 }
 
 function checkOS() {
   # 检测系统类型，确定打开默认浏览器的命令
-  if [[ "$OSTYPE" == "darwin"* ]]; then
+  if [[ "${OSTYPE}" == "darwin"* ]]; then
     open="open"
-  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  elif [[ "${OSTYPE}" == "linux-gnu"* ]]; then
     open="xdg-open"
   else
-    echo "Unsupported OS: $OSTYPE"
-    exit $err_no_program
+    echo "Unsupported OS: ${OSTYPE}"
+    exit ${ERR_NO_PROGRAM}
   fi
 }
 
@@ -85,36 +85,36 @@ function main() {
   # 获取远端仓库地址
   url=$(git remote -v | grep '^origin.*push' | awk '{print $2}' | head -n 1 | sed 's/git@\(.*\):\(.*\).git/https:\/\/\1\/\2/')
 
-  $open "$url" > /dev/null 2>&1
+  ${open} "${url}" >/dev/null 2>&1
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
-eval set -- "$ARGS"
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "${NAME}" -- "${@}")
+eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then
   main
 else
   while true; do
-    case $1 in
-      -h | --help)
-        helpInfo
-        exit $normal
-        ;;
-      -v | --version)
-        versionInfo
-        exit $normal
-        ;;
-      --)
-        helpInfo
-        exit $err_unknown
-        ;;
-      *)
-        helpInfo
-        exit $err_unknown
-        ;;
+    case ${1} in
+    -h | --help)
+      helpInfo
+      exit ${NORMAL}
+      ;;
+    -v | --version)
+      versionInfo
+      exit ${NORMAL}
+      ;;
+    --)
+      helpInfo
+      exit ${ERR_UNKNOWN}
+      ;;
+    *)
+      helpInfo
+      exit ${ERR_UNKNOWN}
+      ;;
     esac
   done
 fi

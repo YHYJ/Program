@@ -58,7 +58,7 @@ function versionInfo() {
 
 #------------------------- Feature Function
 function checkOS() {
-  # 检测系统类型，确定打开默认浏览器的命令
+  # 检测系统类型
   if [[ "$OSTYPE" != "darwin"* ]]; then
     echo "Only supports macOS"
     exit $err_no_program

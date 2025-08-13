@@ -19,7 +19,20 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-NAME=$(basename "${0}") # 脚本名称
+# Program name
+NAME=$(basename "${0}")
+readonly NAME
+# Program description
+readonly DESC="back up files by system"
+# Program nversion
+readonly MAJOR_VERSION=0.0.3
+readonly MINOR_VERSION=20250812
+readonly RELEASE_VERSION=1
+
+#------------------------- Exit Code Variable
+readonly ERR_FILE=1     # 文件/路径类错误
+readonly ERR_PARAM=2    # 参数错误
+readonly ERR_UKNOWN=255 # 未知错误
 
 #------------------------- Rclone Variable
 TRANSFER=8      # 并行传输任务数
@@ -56,7 +69,42 @@ TARGETS_MUSIC=("CloudMusic" "MyMusic")
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
 ####################################################################
+#------------------------- Info Function
+function helpInfo() {
+  echo -e ""
+  echo -e "\x1b[32m${NAME}\x1b[0m \x1b[1m${DESC}\x1b[0m"
+  echo -e "--------------------------------------------------"
+  echo -e "Usage:"
+  echo -e ""
+  echo -e "     ${NAME} [OPTION]"
+  echo -e ""
+  echo -e "Options:"
+  echo -e "     --all            Back up All"
+  echo -e "     --docker         Back up Docker"
+  echo -e "     --music          Back up Music"
+  echo -e ""
+  echo -e "     -h, --help       View this help information"
+  echo -e "     -v, --version    View version information"
+}
+
+function versionInfo() {
+  echo -e ""
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR_VERSION}-${MINOR_VERSION}.${RELEASE_VERSION}\x1b[0m)"
+}
+
 #------------------------- Feature Function
+# 确保指定文件夹存在
+function checkPath() {
+  if [[ -e "${1}" ]]; then
+    if [[ ! -d "${1}" ]]; then
+      echo -e "Path '${1}' is not a folder, exit"
+      exit ${ERR_FILE}
+    fi
+  else
+    mkdir -p "${1}"
+  fi
+}
+
 # 日志函数
 function logger() {
   local line
@@ -77,6 +125,7 @@ function logger() {
   done
 }
 
+# 备份执行器
 function syncer() {
   local storage=${1}
   local storage_type=${2}
@@ -113,7 +162,7 @@ function syncer() {
       fi
     else
       logger "WARN : STORAGE_DEPTH 不是 1 或 2，退出"
-      exit 1
+      exit ${ERR_PARAM}
     fi
 
     logger "INFO  : 正在备份 ${source_path} -> ${storage_path}"
@@ -130,21 +179,56 @@ function syncer() {
     fi
 
     # 检查状态
-    STATUS=${?}
-    if [ ${STATUS} -eq 0 ]; then
+    backup_status=${?}
+    if [ ${backup_status} -eq 0 ]; then
       logger "INFO  : 成功备份 ${source_path}"
     else
-      logger "ERROR : 备份失败 ${source_path}, 错误代码 ${STATUS}"
+      logger "ERROR : 备份失败 ${source_path}, 错误代码 ${backup_status}"
     fi
   done
 }
+
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-# 确保日志目录存在
-mkdir -p "${LOGPATH}"
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "${NAME}" -- "${@}")
+eval set -- "${ARGS}"
 
-# Docker
-syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
-# Music
-syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+if [[ ${#@} -lt 2 ]]; then
+  helpInfo
+else
+  while true; do
+    checkPath "${LOGPATH}"
+    case ${1} in
+    --all)
+      syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+      syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+      shift 1
+      ;;
+    --docker)
+      syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+      shift 1
+      ;;
+    --music)
+      syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+      shift 1
+      ;;
+    -h | --help)
+      helpInfo
+      shift 1
+      ;;
+    -v | --version)
+      versionInfo
+      shift 1
+      ;;
+    --)
+      shift 1
+      break
+      ;;
+    *)
+      helpInfo
+      exit ${ERR_UKNOWN}
+      ;;
+    esac
+  done
+fi
