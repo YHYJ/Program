@@ -19,9 +19,11 @@ Depends:
 #+++++++++++++++++++++++++ Define Variable ++++++++++++++++++++++++#
 ####################################################################
 #------------------------- Program Variable
-NAME=$(basename "${0}")
-STORAGE="YJ-NAS:System/${HOSTNAME}"
-TRANSFER=8
+NAME=$(basename "${0}") # 脚本名称
+
+#------------------------- Rclone Variable
+TRANSFER=8      # 并行传输任务数
+RESOLVE="newer" # 文件冲突处理策略，可选："nonw"、"newer"、"older"、"larger"、"smaller" 等
 
 #------------------------- Log Variable
 LOGPATH="/home/${USER}/.local/share/logs/Syncer"
@@ -32,9 +34,24 @@ TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
 #------------------------- Sync Variable
 # Docker
+# -- 存储端
+SYSTEM_STORAGE="YJ-NAS:System/${HOSTNAME}" # 目标存储地址
+SYSTEM_STORAGE_TYPE="copy"                 # 同步类型，可选："copy"、"sync"、"bisync"
+SYSTEM_STORAGE_DEPTH=2                     # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
+# -- 源端
 BASE_DOCKER="/home/${USER}/Documents"
 DIRECTORY_DOCKER="Docker"
 TARGETS_DOCKER=("backup-docker" "filter-backup" "Run" "Volume")
+
+# Music
+# -- 存储端
+MUSIC_STORAGE="YJ-NAS:music" # 目标存储地址
+MUSIC_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
+MUSIC_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
+# -- 源端
+BASE_MUSIC="/home/${USER}"
+DIRECTORY_MUSIC="Music"
+TARGETS_MUSIC=("CloudMusic" "MyMusic")
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -62,29 +79,55 @@ function logger() {
 
 function syncer() {
   local storage=${1}
-  local base=${2}
-  local directory=${3}
-  shift 3
+  local storage_type=${2}
+  local storage_depth=${3}
+  local base=${4}
+  local directory=${5}
+  shift 5
   local targets=("$@")
 
   for target in "${targets[@]}"; do
     source_path="${base}/${directory}/${target}" # 源路径
 
-    if [ -f "${source_path}" ]; then
-      # 文件
-      storage_path="${storage}/${directory}" # 最终备份路径
-    elif [ -d "${source_path}" ]; then
-      # 文件夹
-      storage_path="${storage}/${directory}/${target}" # 最终备份路径
+    if [ "${storage_depth}" -eq 1 ]; then
+      if [ -f "${source_path}" ]; then
+        # 文件
+        storage_path="${storage}" # 最终备份路径
+      elif [ -d "${source_path}" ]; then
+        # 文件夹
+        storage_path="${storage}/${target}" # 最终备份路径
+      else
+        logger "WARN : ${source_path} 不是文件或文件夹，跳过"
+        continue
+      fi
+    elif [ "${storage_depth}" -eq 2 ]; then
+      if [ -f "${source_path}" ]; then
+        # 文件
+        storage_path="${storage}/${directory}" # 最终备份路径
+      elif [ -d "${source_path}" ]; then
+        # 文件夹
+        storage_path="${storage}/${directory}/${target}" # 最终备份路径
+      else
+        logger "WARN : ${source_path} 不是文件或文件夹，跳过"
+        continue
+      fi
     else
-      logger "WARN : ${source_path} 不是文件或文件夹，跳过"
-      continue
+      logger "WARN : STORAGE_DEPTH 不是 1 或 2，退出"
+      exit 1
     fi
 
     logger "INFO  : 正在备份 ${source_path} -> ${storage_path}"
 
     # 执行备份
-    rclone copy --update "${source_path}" "${storage_path}" --transfers=${TRANSFER} --log-file="${LOGFILE}" --log-level ${LOGLEVEL}
+    if [ "${storage_type}" == "copy" ]; then
+      rclone copy --update "${source_path}" "${storage_path}" --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
+    elif [ "${storage_type}" == "sync" ]; then
+      rclone sync "${source_path}" "${storage_path}" --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
+    elif [ "${storage_type}" == "bisync" ]; then
+      rclone bisync "${source_path}" "${storage_path}" --resync --conflict-resolve="${RESOLVE}" --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
+    else
+      logger "WARN : 暂不支持 ${storage_type} 同步类型"
+    fi
 
     # 检查状态
     STATUS=${?}
@@ -102,4 +145,6 @@ function syncer() {
 mkdir -p "${LOGPATH}"
 
 # Docker
-syncer "${STORAGE}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+# Music
+syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
