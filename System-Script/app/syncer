@@ -13,6 +13,9 @@ Attentions:
 
 Depends:
 - rclone
+  - copy: 备份，目标端不删除源端已删除的文件
+  - sync: 同步，使目标端完全成为源端的镜像
+  - bisync: 双向同步，两端的变化都同步到对端
 !
 
 ####################################################################
@@ -25,9 +28,9 @@ readonly NAME
 # Program description
 readonly DESC="back up files by system"
 # Program nversion
-readonly MAJOR_VERSION=0.0.3
-readonly MINOR_VERSION=20250812
-readonly RELEASE_VERSION=1
+readonly MAJOR=0.0.5
+readonly MINOR=20250814
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
 readonly ERR_FILE=1     # 文件/路径类错误
@@ -49,7 +52,7 @@ TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 # Docker
 # -- 存储端
 SYSTEM_STORAGE="YJ-NAS:System/${HOSTNAME}" # 目标存储地址
-SYSTEM_STORAGE_TYPE="copy"                 # 同步类型，可选："copy"、"sync"、"bisync"
+SYSTEM_STORAGE_TYPE="sync"                 # 同步类型，可选："copy"、"sync"、"bisync"
 SYSTEM_STORAGE_DEPTH=2                     # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 # -- 源端
 BASE_DOCKER="/home/${USER}/Documents"
@@ -89,7 +92,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR_VERSION}-${MINOR_VERSION}.${RELEASE_VERSION}\x1b[0m)"
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR}-${MINOR}.${RELEASE}\x1b[0m)"
 }
 
 #------------------------- Feature Function
@@ -191,7 +194,7 @@ function syncer() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "help,version" -n "${NAME}" -- "${@}")
+ARGS=$(getopt --options "hv" --longoptions "all,docker,music,help,version" -n "${NAME}" -- "${@}")
 eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then

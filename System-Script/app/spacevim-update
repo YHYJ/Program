@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: << !
+: <<!
 Name: spacevim-update
 Author: YJ
 Email: yj1516268@outlook.com
@@ -20,24 +20,24 @@ Depends:
 ####################################################################
 #------------------------- Program Variable
 # Program name
-name=$(basename "$0")
-readonly name
+NAME=$(basename "${0}")
+readonly NAME
 # Program description
-readonly desc="update manually installed space-vim"
+readonly DESC="update manually installed space-vim"
 # Program version
-readonly major_version=0.1.2
-readonly minor_version=20240704
-readonly rel_version=1
+readonly MAJOR=0.1.2
+readonly MINOR=20240704
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_no_program=127 # 未找到命令
-readonly err_unknown=255    # 未知错误
+readonly NORMAL=0           # 一切正常
+readonly ERR_FILE=1         # 文件/路径类错误
+readonly ERR_NO_PROGRAM=127 # 未找到命令
+readonly ERR_UNKNOWN=255    # 未知错误
 
 #------------------------- Other Variable
 # Path
-readonly install_path="$HOME/.space-vim"
+readonly INSTALL_PATH="${HOME}/.space-vim"
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -45,11 +45,11 @@ readonly install_path="$HOME/.space-vim"
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m${NAME}\x1b[0m \x1b[1m${DESC}\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTION]"
+  echo -e "     ${NAME} [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -h, --help        Show help information"
@@ -58,35 +58,35 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR}-${MINOR}.${RELEASE}\x1b[0m)"
 }
 
 #------------------------- Feature Function
 function checkPath() {
-  if [[ -e "$1" ]]; then
-    if [[ ! -d "$1" ]]; then
-      echo -e "Path '$1' is not a folder, exit"
-      exit $err_file
+  if [[ -e "${1}" ]]; then
+    if [[ ! -d "${1}" ]]; then
+      echo -e "Path '${1}' is not a folder, exit"
+      exit ${ERR_FILE}
     fi
   else
-    mkdir -p "$1"
+    mkdir -p "${1}"
   fi
 }
 
 function checkCommand() {
-  if command -v "$1" > /dev/null 2>&1; then
-    return $normal
+  if command -v "${1}" >/dev/null 2>&1; then
+    return ${NORMAL}
   else
-    return $err_no_program
+    return ${ERR_NO_PROGRAM}
   fi
 }
 
 function makeUpdate() {
   if checkCommand "make"; then
     current_path=$(pwd)
-    cd "$install_path" || exit $err_file
+    cd "${INSTALL_PATH}" || exit ${ERR_FILE}
     make update
-    cd "$current_path" || exit $err_file
+    cd "${current_path}" || exit ${ERR_FILE}
   else
     echo -e "Please install 'make' first"
   fi
@@ -95,31 +95,31 @@ function makeUpdate() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "help,version" -n "$name" -- "$@")
-eval set -- "$ARGS"
+ARGS=$(getopt --options "hv" --longoptions "help,version" -n "${NAME}" -- "${@}")
+eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then
-  checkPath "$install_path"
+  checkPath "${INSTALL_PATH}"
   makeUpdate
 else
   while true; do
-    case $1 in
-      -h | --help)
-        helpInfo
-        shift 1
-        ;;
-      -v | --version)
-        versionInfo
-        shift 1
-        ;;
-      --)
-        shift 1
-        break
-        ;;
-      *)
-        helpInfo
-        exit $err_unknown
-        ;;
+    case ${1} in
+    -h | --help)
+      helpInfo
+      shift 1
+      ;;
+    -v | --version)
+      versionInfo
+      shift 1
+      ;;
+    --)
+      shift 1
+      break
+      ;;
+    *)
+      helpInfo
+      exit ${ERR_UNKNOWN}
+      ;;
     esac
   done
 fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: << !
+: <<!
 Name: trust-app
 Author: YJ
 Email: yj1516268@outlook.com
@@ -20,19 +20,19 @@ Depends:
 ####################################################################
 #------------------------- Program Variable
 # Program name
-name=$(basename "$0")
-readonly name
+NAME=$(basename "${0}")
+readonly NAME
 # Program description
-readonly desc="make macOS trust a specified program"
+readonly DESC="make macOS trust a specified program"
 # Program version
-readonly major_version=0.0.3
-readonly minor_version=20240704
-readonly rel_version=1
+readonly MAJOR=0.0.3
+readonly MINOR=20240704
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_no_program=127 # 未找到命令
+readonly NORMAL=0           # 一切正常
+readonly ERR_FILE=1         # 文件/路径类错误
+readonly ERR_NO_PROGRAM=127 # 未找到命令
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -40,11 +40,11 @@ readonly err_no_program=127 # 未找到命令
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m${NAME}\x1b[0m \x1b[1m${DESC}\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTION]"
+  echo -e "     ${NAME} [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -h, --help        Show help information"
@@ -53,57 +53,57 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR}-${MINOR}.${RELEASE}\x1b[0m)"
 }
 
 #------------------------- Feature Function
 function checkOS() {
   # 检测系统类型
-  if [[ "$OSTYPE" != "darwin"* ]]; then
+  if [[ "${OSTYPE}" != "darwin"* ]]; then
     echo "Only supports macOS"
-    exit $err_no_program
+    exit ${ERR_NO_PROGRAM}
   fi
 }
 
 function trustApp() {
   checkOS
 
-  # 如果$1存在，输出1，否则输出错误
-  if [[ -e $1 ]]; then
-    xattr -rd com.apple.quarantine "$1"
-    echo -e "\n\x1b[35m[✔]\x1b[0m \x1b[4;34m$1\x1b[0m is trusted"
+  # 如果${1}存在，输出1，否则输出错误
+  if [[ -e ${1} ]]; then
+    xattr -rd com.apple.quarantine "${1}"
+    echo -e "\n\x1b[35m[✔]\x1b[0m \x1b[4;34m${1}\x1b[0m is trusted"
   else
-    echo -e "\n\x1b[31m[✘]\x1b[0m \x1b[34m$1\x1b[0m does not exist"
-    exit $err_file
+    echo -e "\n\x1b[31m[✘]\x1b[0m \x1b[34m${1}\x1b[0m does not exist"
+    exit ${ERR_FILE}
   fi
 }
 
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "ahv" --longoptions "app:,help,version" -n "$name" -- "$@")
-eval set -- "$ARGS"
+ARGS=$(getopt --options "ahv" --longoptions "app:,help,version" -n "${NAME}" -- "${@}")
+eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
 else
   while true; do
-    case $1 in
-      -h | --help)
-        helpInfo
-        exit $normal
-        ;;
-      -v | --version)
-        versionInfo
-        exit $normal
-        ;;
-      --)
-        shift 1
-        ;;
-      *)
-        trustApp "$2"
-        exit $normal
-        ;;
+    case ${1} in
+    -h | --help)
+      helpInfo
+      exit ${NORMAL}
+      ;;
+    -v | --version)
+      versionInfo
+      exit ${NORMAL}
+      ;;
+    --)
+      shift 1
+      ;;
+    *)
+      trustApp "${2}"
+      exit ${NORMAL}
+      ;;
     esac
   done
 fi

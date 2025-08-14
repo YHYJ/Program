@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-: << !
+: <<!
 Name: spider
 Author: YJ
 Email: yj1516268@outlook.com
@@ -26,36 +26,36 @@ Depends:
 ####################################################################
 #------------------------- Program Variable
 # Program name
-name=$(basename "$0")
-readonly name
+NAME=$(basename "${0}")
+readonly NAME
 # Program description
-readonly desc="collect system information, supports Arch Linux and macOS"
+readonly DESC="collect system information, supports Arch Linux and macOS"
 # Program nversion
-readonly major_version=0.4.2
-readonly minor_version=20240704
-readonly rel_version=1
+readonly MAJOR=0.4.2
+readonly MINOR=20240704
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
-readonly normal=0           # 一切正常
-readonly err_file=1         # 文件/路径类错误
-readonly err_no_program=127 # 未找到命令
-readonly err_unknown=255    # 未知错误
+readonly NORMAL=0           # 一切正常
+readonly ERR_FILE=1         # 文件/路径类错误
+readonly ERR_NO_PROGRAM=127 # 未找到命令
+readonly ERR_UNKNOWN=255    # 未知错误
 
 #------------------------- Other Variable
 # System
-system_type="unknown"
+SYSTEM_TYPE="unknown"
 # Path
-readonly storage="$HOME/.cache/SpiderData"
-readonly package_dir="$storage/PackageList"
-readonly service_dir="$storage/ServiceList"
-readonly app_vim_dir="$storage/App/vim"
-readonly app_guake_dir="$storage/App/guake"
-readonly user_dir="$storage/UserList"
+readonly STORAGE="${HOME}/.cache/SpiderData"
+readonly PACKAGE_DIR="${STORAGE}/PackageList"
+readonly SERVICE_DIR="${STORAGE}/ServiceList"
+readonly APP_VIM_DIR="${STORAGE}/App/vim"
+readonly APP_GUAKE_DIR="${STORAGE}/App/guake"
+readonly USER_DIR="${STORAGE}/UserList"
 # App
-readonly vim_conf="$HOME/.space-vim/private/config.vim"
-readonly konsave_dir="$HOME/.config/konsave"
+readonly VIM_CONF="${HOME}/.space-vim/private/config.vim"
+readonly KONSAVE_DIR="${HOME}/.config/konsave"
 # Print
-readonly space='    '
+readonly SPACE='    '
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -63,13 +63,13 @@ readonly space='    '
 #------------------------- Info Function
 function helpInfo() {
   echo -e ""
-  echo -e "\x1b[32m$name\x1b[0m \x1b[1m$desc\x1b[0m"
+  echo -e "\x1b[32m${NAME}\x1b[0m \x1b[1m${DESC}\x1b[0m"
   echo -e "--------------------------------------------------"
-  echo -e "\x1b[1;33mThe collection results are stored in\x1b[0m: \x1b[34m$storage\x1b[0m"
+  echo -e "\x1b[1;33mThe collection results are stored in\x1b[0m: \x1b[34m${STORAGE}\x1b[0m"
   echo -e "--------------------------------------------------"
   echo -e "Usage:"
   echo -e ""
-  echo -e "     $name [OPTION]"
+  echo -e "     ${NAME} [OPTION]"
   echo -e ""
   echo -e "Options:"
   echo -e "     -g, --get [MODULE]    Specify the module to collect"
@@ -88,7 +88,7 @@ function helpInfo() {
 
 function versionInfo() {
   echo -e ""
-  echo -e "\x1b[1m$name\x1b[0m version (\x1b[1m$major_version-$minor_version.$rel_version\x1b[0m)"
+  echo -e "\x1b[1m${NAME}\x1b[0m version (\x1b[1m${MAJOR}-${MINOR}.${RELEASE}\x1b[0m)"
 }
 
 function finish() {
@@ -98,188 +98,188 @@ function finish() {
 #------------------------- Feature Function
 function checkOS() {
   # 检测系统类型，确定因系统差异导致的变量或命令不同
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    system_type="macOS"
-  elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    system_type="Linux"
+  if [[ "${OSTYPE}" == "darwin"* ]]; then
+    SYSTEM_TYPE="macOS"
+  elif [[ "${OSTYPE}" == "linux-gnu"* ]]; then
+    SYSTEM_TYPE="Linux"
   else
-    system_type="unknown"
+    SYSTEM_TYPE="unknown"
   fi
 }
 
 function checkPath() {
-  if [[ -e "$1" ]]; then
-    if [[ ! -d "$1" ]]; then
-      echo -e "Path '$1' is not a folder, exit"
-      exit $err_file
+  if [[ -e "${1}" ]]; then
+    if [[ ! -d "${1}" ]]; then
+      echo -e "Path '${1}' is not a folder, exit"
+      exit ${ERR_FILE}
     fi
   else
-    mkdir -p "$1"
+    mkdir -p "${1}"
   fi
 }
 
 function checkCommand() {
-  if command -v "$1" > /dev/null 2>&1; then
-    return $normal
+  if command -v "${1}" >/dev/null 2>&1; then
+    return ${NORMAL}
   else
-    return $err_no_program
+    return ${ERR_NO_PROGRAM}
   fi
 }
 
 function __getVimInfo() { # 获取 vim 信息
-  if [[ -e "$vim_conf" ]]; then
-    checkPath "$app_vim_dir"
-    hotkey_doc="$app_vim_dir/Vim-Hotkey.md"
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Vim-Hotkey" "-->" "$hotkey_doc"
+  if [[ -e "${VIM_CONF}" ]]; then
+    checkPath "${APP_VIM_DIR}"
+    hotkey_doc="${APP_VIM_DIR}/Vim-Hotkey.md"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "Vim-Hotkey" "-->" "${hotkey_doc}"
     # 提取快捷键说明
-    grep -r 'Hotkey' "$vim_conf" > "$hotkey_doc"
+    grep -r 'Hotkey' "${VIM_CONF}" >"${hotkey_doc}"
 
     # 文件头
     line1='|	关键字	|	归属	|	快捷键	|	说明	|'
     line2='|---|---|---|---|'
 
-    if [ $system_type == "macOS" ]; then
+    if [ ${SYSTEM_TYPE} == "macOS" ]; then
       # 格式化文档
-      sed -i '' 's/--/|/g' "$hotkey_doc" # 替换'--'为'|'
-      sed -i '' 's/^"//' "$hotkey_doc"   # 删除行首的'"'
-      sed -i '' 's/^/|/' "$hotkey_doc"   # 在行首添加'|'
-      sed -i '' 's/$/|/' "$hotkey_doc"   # 在行尾添加'|'
+      sed -i '' 's/--/|/g' "${hotkey_doc}" # 替换'--'为'|'
+      sed -i '' 's/^"//' "${hotkey_doc}"   # 删除行首的'"'
+      sed -i '' 's/^/|/' "${hotkey_doc}"   # 在行首添加'|'
+      sed -i '' 's/$/|/' "${hotkey_doc}"   # 在行尾添加'|'
       # 添加文件头
       sed -i '' "1i\\
-$line2
-" "$hotkey_doc"
+${line2}
+" "${hotkey_doc}"
       sed -i '' "1i\\
-$line1
-" "$hotkey_doc"
+${line1}
+" "${hotkey_doc}"
     else
       # 格式化文档
-      sed -i 's/--/|/g' "$hotkey_doc" # 替换'--'为'|'
-      sed -i 's/^"//' "$hotkey_doc"   # 删除行首的'"'
-      sed -i 's/^/|/' "$hotkey_doc"   # 在行首添加'|'
-      sed -i 's/$/|/' "$hotkey_doc"   # 在行尾添加'|'
+      sed -i 's/--/|/g' "${hotkey_doc}" # 替换'--'为'|'
+      sed -i 's/^"//' "${hotkey_doc}"   # 删除行首的'"'
+      sed -i 's/^/|/' "${hotkey_doc}"   # 在行首添加'|'
+      sed -i 's/$/|/' "${hotkey_doc}"   # 在行尾添加'|'
       # 添加文件头
-      sed -i "1i\\$line2" "$hotkey_doc"
-      sed -i "1i\\$line1" "$hotkey_doc"
+      sed -i "1i\\${line2}" "${hotkey_doc}"
+      sed -i "1i\\${line1}" "${hotkey_doc}"
     fi
   fi
 }
 
 function __getGuakeInfo() { # 获取 guake 信息
   if checkCommand "guake"; then
-    checkPath "$app_guake_dir"
-    guake_conf="$app_guake_dir/guake.conf"
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Guake-Confile" "-->" "$guake_conf"
-    guake --save-preferences="$guake_conf"
+    checkPath "${APP_GUAKE_DIR}"
+    guake_conf="${APP_GUAKE_DIR}/guake.conf"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "Guake-Confile" "-->" "${guake_conf}"
+    guake --save-preferences="${guake_conf}"
   fi
 }
 
 function __getKonsaveInfo() { # 获取 konsave 信息
   if checkCommand "konsave"; then
-    checkPath "$konsave_dir"
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Plasma-Confile" "-->" "$konsave_dir"
-    konsave --force --save "$(hostname)" &> /dev/null
+    checkPath "${KONSAVE_DIR}"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "Plasma-Confile" "-->" "${KONSAVE_DIR}"
+    konsave --force --save "$(hostname)" &>/dev/null
   fi
 }
 
 function spiderAppInfo() { # 搜集特定 APP 配置文件等
   echo -e "\x1b[1;34mApp\x1b[0m"
 
-  if [ $system_type == "Linux" ]; then
+  if [ ${SYSTEM_TYPE} == "Linux" ]; then
     __getVimInfo
     __getGuakeInfo
     __getKonsaveInfo
-  elif [ $system_type == "macOS" ]; then
+  elif [ ${SYSTEM_TYPE} == "macOS" ]; then
     __getVimInfo
   else
-    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "${SPACE}" "Unsupported OS: ${SYSTEM_TYPE}"
   fi
 }
 
 function spiderPackageInfo() { # 搜集已安装软件包列表
   echo -e "\x1b[1;34mPackage\x1b[0m"
 
-  if [ $system_type == "Linux" ]; then
-    checkPath "$package_dir"
+  if [ ${SYSTEM_TYPE} == "Linux" ]; then
+    checkPath "${PACKAGE_DIR}"
 
-    pacman_list="$package_dir/Pacman.list"
-    aur_list="$package_dir/AUR.list"
+    pacman_list="${PACKAGE_DIR}/Pacman.list"
+    aur_list="${PACKAGE_DIR}/AUR.list"
 
     blacklist="zoom"                  # 需要排除不记录在案的软件包，格式："Package1 Package2 Package3 ..."
     greplist="^(${blacklist// /\|})$" # 转换为 grep 可以识别的正则表达式
 
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Pacman-Package" "-->" "$pacman_list"
-    pacman -Qenq | grep -v -E "$greplist" > "$pacman_list" # 官方源中单独指定安装的软件包
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "Pacman-Package" "-->" "${pacman_list}"
+    pacman -Qenq | grep -v -E "${greplist}" >"${pacman_list}" # 官方源中单独指定安装的软件包
 
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "AUR-Package" "-->" "$aur_list"
-    pacman -Qemq | grep -v -E "$greplist" > "$aur_list" # AUR中单独指定安装的软件包
-  elif [ $system_type == "macOS" ]; then
-    checkPath "$package_dir"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "AUR-Package" "-->" "${aur_list}"
+    pacman -Qemq | grep -v -E "${greplist}" >"${aur_list}" # AUR中单独指定安装的软件包
+  elif [ ${SYSTEM_TYPE} == "macOS" ]; then
+    checkPath "${PACKAGE_DIR}"
 
-    formulae_list="$package_dir/Formulae.list"
-    casks_list="$package_dir/Casks.list"
+    formulae_list="${PACKAGE_DIR}/Formulae.list"
+    casks_list="${PACKAGE_DIR}/Casks.list"
 
     blacklist=""                      # 需要排除不记录在案的软件包，格式："Package1 Package2 Package3 ..."
     greplist="^(${blacklist// /\|})$" # 转换为 grep 可以识别的正则表达式
 
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Formulae-Package" "-->" "$formulae_list"
-    brew list --formulae | grep -v -E "$greplist" > "$formulae_list" # Homebrew 安装的命令行工具和应用程序
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "Formulae-Package" "-->" "${formulae_list}"
+    brew list --formulae | grep -v -E "${greplist}" >"${formulae_list}" # Homebrew 安装的命令行工具和应用程序
 
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "Casks-Package" "-->" "$casks_list"
-    brew list --casks | grep -v -E "$greplist" > "$casks_list" # Homebrew 安装的 GUI 应用程序
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "Casks-Package" "-->" "${casks_list}"
+    brew list --casks | grep -v -E "${greplist}" >"${casks_list}" # Homebrew 安装的 GUI 应用程序
   else
-    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "${SPACE}" "Unsupported OS: ${SYSTEM_TYPE}"
   fi
 }
 
 function spiderServiceInfo() { # 搜集系统服务列表
   echo -e "\x1b[1;34mService\x1b[0m"
 
-  if [ $system_type == "Linux" ]; then
-    checkPath "$service_dir"
-    system_list="$service_dir/System.list"
-    user_list="$service_dir/User.list"
+  if [ ${SYSTEM_TYPE} == "Linux" ]; then
+    checkPath "${SERVICE_DIR}"
+    system_list="${SERVICE_DIR}/System.list"
+    user_list="${SERVICE_DIR}/User.list"
     if checkCommand "systemctl"; then
-      printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "System-Service" "-->" "$system_list"
-      systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$system_list" # System service
-      printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-Service" "-->" "$user_list"
-      systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' > "$user_list" # User service
+      printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "System-Service" "-->" "${system_list}"
+      systemctl list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' >"${system_list}" # System service
+      printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "User-Service" "-->" "${user_list}"
+      systemctl --user list-unit-files | sed '/transient/d' | sed '/generated/d' | sed '/unit files listed/d' >"${user_list}" # User service
     else
-      printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported non-systemd based OS"
+      printf "%s \x1b[31m%-13s\x1b[0m\n" "${SPACE}" "Unsupported non-systemd based OS"
     fi
-  elif [ $system_type == "macOS" ]; then
-    checkPath "$service_dir"
-    user_list="$service_dir/User.list"
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-Launch" "-->" "$user_list"
-    launchctl list | grep -v 'com.apple' | grep -v 'org.openbsd' > "$user_list" # User service
+  elif [ ${SYSTEM_TYPE} == "macOS" ]; then
+    checkPath "${SERVICE_DIR}"
+    user_list="${SERVICE_DIR}/User.list"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "User-Launch" "-->" "${user_list}"
+    launchctl list | grep -v 'com.apple' | grep -v 'org.openbsd' >"${user_list}" # User service
   else
-    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "${SPACE}" "Unsupported OS: ${SYSTEM_TYPE}"
   fi
 }
 
 function spiderUserInfo() { # 搜集用户信息
   echo -e "\x1b[1;34mUser\x1b[0m"
 
-  if [ $system_type == "Linux" ] || [ $system_type == "macOS" ]; then
-    checkPath "$user_dir"
-    id_list="$user_dir/ID.list"
-    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "$space" "User-List" "-->" "$id_list"
-    id root yj -Gn > "$id_list" # $USER 和 root 的 ID 信息
+  if [ ${SYSTEM_TYPE} == "Linux" ] || [ ${SYSTEM_TYPE} == "macOS" ]; then
+    checkPath "${USER_DIR}"
+    id_list="${USER_DIR}/ID.list"
+    printf "%s %-14s \x1b[36m%s\x1b[0m %s\n" "${SPACE}" "User-List" "-->" "${id_list}"
+    id root yj -Gn >"${id_list}" # $USER 和 root 的 ID 信息
   else
-    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "${SPACE}" "Unsupported OS: ${SYSTEM_TYPE}"
   fi
 }
 
 function spiderVirtualenvInfo() { # 搜集虚拟环境信息
   echo -e "\x1b[1;34mVirtualenv\x1b[0m"
 
-  if [ $system_type == "Linux" ] || [ $system_type == "macOS" ]; then
+  if [ ${SYSTEM_TYPE} == "Linux" ] || [ ${SYSTEM_TYPE} == "macOS" ]; then
     if checkCommand "py-virtualenv-tool"; then
       py-virtualenv-tool --save
     else
-      echo -e "$space \x1b[31m!\x1b[0m Please install py-virtualenv-tool"
+      echo -e "${SPACE} \x1b[31m!\x1b[0m Please install py-virtualenv-tool"
     fi
   else
-    printf "%s \x1b[31m%-13s\x1b[0m\n" "$space" "Unsupported OS: $system_type"
+    printf "%s \x1b[31m%-13s\x1b[0m\n" "${SPACE}" "Unsupported OS: ${SYSTEM_TYPE}"
   fi
 }
 
@@ -288,72 +288,54 @@ function spiderVirtualenvInfo() { # 搜集虚拟环境信息
 ####################################################################
 checkOS
 
-ARGS=$(getopt --options "g:hv" --longoptions "get:,help,version" -n "$name" -- "$@")
-eval set -- "$ARGS"
+ARGS=$(getopt --options "g:hv" --longoptions "get:,help,version" -n "${NAME}" -- "${@}")
+eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then
   helpInfo
 else
   while true; do
-    case $1 in
-      -g | --get)
-        case $2 in
-          all)
-            checkPath "$storage"
-            spiderAppInfo
-            spiderPackageInfo
-            spiderServiceInfo
-            spiderUserInfo
-            spiderVirtualenvInfo
-            finish
-            shift 1
-            ;;
-          app)
-            checkPath "$storage"
-            spiderAppInfo
-            finish
-            shift 1
-            ;;
-          env)
-            checkPath "$storage"
-            spiderVirtualenvInfo
-            finish
-            shift 1
-            ;;
-          package)
-            checkPath "$storage"
-            spiderPackageInfo
-            finish
-            shift 1
-            ;;
-          service)
-            checkPath "$storage"
-            spiderServiceInfo
-            finish
-            shift 1
-            ;;
-          user)
-            checkPath "$storage"
-            spiderUserInfo
-            finish
-            shift 1
-            ;;
-          --)
-            shift 1
-            break
-            ;;
-          *)
-            echo -e "\n\x1b[31m[✘]\x1b[0m Unable to collect this content"
-            ;;
-        esac
+    case ${1} in
+    -g | --get)
+      case ${2} in
+      all)
+        checkPath "${STORAGE}"
+        spiderAppInfo
+        spiderPackageInfo
+        spiderServiceInfo
+        spiderUserInfo
+        spiderVirtualenvInfo
+        finish
         shift 1
         ;;
-      -h | --help)
-        helpInfo
+      app)
+        checkPath "${STORAGE}"
+        spiderAppInfo
+        finish
         shift 1
         ;;
-      -v | --version)
-        versionInfo
+      env)
+        checkPath "${STORAGE}"
+        spiderVirtualenvInfo
+        finish
+        shift 1
+        ;;
+      package)
+        checkPath "${STORAGE}"
+        spiderPackageInfo
+        finish
+        shift 1
+        ;;
+      service)
+        checkPath "${STORAGE}"
+        spiderServiceInfo
+        finish
+        shift 1
+        ;;
+      user)
+        checkPath "${STORAGE}"
+        spiderUserInfo
+        finish
         shift 1
         ;;
       --)
@@ -361,9 +343,27 @@ else
         break
         ;;
       *)
-        helpInfo
-        exit $err_unknown
+        echo -e "\n\x1b[31m[✘]\x1b[0m Unable to collect this content"
         ;;
+      esac
+      shift 1
+      ;;
+    -h | --help)
+      helpInfo
+      shift 1
+      ;;
+    -v | --version)
+      versionInfo
+      shift 1
+      ;;
+    --)
+      shift 1
+      break
+      ;;
+    *)
+      helpInfo
+      exit ${ERR_UNKNOWN}
+      ;;
     esac
   done
 fi
