@@ -28,7 +28,7 @@ readonly NAME
 # Program description
 readonly DESC="back up files by system"
 # Program nversion
-readonly MAJOR=0.0.5
+readonly MAJOR=0.0.6
 readonly MINOR=20250814
 readonly RELEASE=1
 
@@ -82,12 +82,15 @@ function helpInfo() {
   echo -e "     ${NAME} [OPTION]"
   echo -e ""
   echo -e "Options:"
-  echo -e "     --all            Back up All"
-  echo -e "     --docker         Back up Docker"
-  echo -e "     --music          Back up Music"
+  echo -e "     -s, --start [MODULE]    Specify the module to back up"
   echo -e ""
-  echo -e "     -h, --help       View this help information"
-  echo -e "     -v, --version    View version information"
+  echo -e "     -h, --help              View this help information"
+  echo -e "     -v, --version           View version information"
+  echo -e ""
+  echo -e "Modules:"
+  echo -e "     all                     Back up all modules"
+  echo -e "     docker                  Back up Docker"
+  echo -e "     music                   Back up Music"
 }
 
 function versionInfo() {
@@ -194,7 +197,7 @@ function syncer() {
 ####################################################################
 #++++++++++++++++++++++++++++++ Main ++++++++++++++++++++++++++++++#
 ####################################################################
-ARGS=$(getopt --options "hv" --longoptions "all,docker,music,help,version" -n "${NAME}" -- "${@}")
+ARGS=$(getopt --options "s:hv" --longoptions "start:,help,version" -n "${NAME}" -- "${@}")
 eval set -- "${ARGS}"
 
 if [[ ${#@} -lt 2 ]]; then
@@ -203,17 +206,29 @@ else
   while true; do
     checkPath "${LOGPATH}"
     case ${1} in
-    --all)
-      syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
-      syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
-      shift 1
-      ;;
-    --docker)
-      syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
-      shift 1
-      ;;
-    --music)
-      syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+    -s | --start)
+      case ${2} in
+      all)
+        syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+        syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+        shift 1
+        ;;
+      docker)
+        syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+        shift 1
+        ;;
+      music)
+        syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+        shift 1
+        ;;
+      --)
+        shift 1
+        break
+        ;;
+      *)
+        echo -e "\n\x1b[31m[✘]\x1b[0m Unable to back up this content"
+        ;;
+      esac
       shift 1
       ;;
     -h | --help)
