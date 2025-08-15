@@ -29,7 +29,7 @@ readonly NAME
 readonly DESC="back up files by system"
 # Program nversion
 readonly MAJOR=0.0.6
-readonly MINOR=20250814
+readonly MINOR=20250815
 readonly RELEASE=1
 
 #------------------------- Exit Code Variable
@@ -69,6 +69,16 @@ BASE_MUSIC="/home/${USER}"
 DIRECTORY_MUSIC="Music"
 TARGETS_MUSIC=("CloudMusic" "MyMusic")
 
+# Pictures
+# -- 存储端
+PICTURES_STORAGE="YJ-NAS:photo" # 目标存储地址
+PICTURES_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
+PICTURES_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
+# -- 源端
+BASE_PICTURES="/home/${USER}"
+DIRECTORY_PICTURES="Pictures"
+TARGETS_PICTURES=("Camera" "HP" "Wallpapers" "青娥")
+
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
 ####################################################################
@@ -91,6 +101,7 @@ function helpInfo() {
   echo -e "     all                     Back up all modules"
   echo -e "     docker                  Back up Docker"
   echo -e "     music                   Back up Music"
+  echo -e "     pictures                Back up Pictures"
 }
 
 function versionInfo() {
@@ -219,6 +230,10 @@ else
         ;;
       music)
         syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+        shift 1
+        ;;
+      pictures)
+        syncer "${PICTURES_STORAGE}" "${PICTURES_STORAGE_TYPE}" "${PICTURES_STORAGE_DEPTH}" "${BASE_PICTURES}" "${DIRECTORY_PICTURES}" "${TARGETS_PICTURES[@]}"
         shift 1
         ;;
       --)
