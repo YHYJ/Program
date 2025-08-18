@@ -50,34 +50,44 @@ TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
 #------------------------- Sync Variable
 # Docker
-# -- 存储端
-SYSTEM_STORAGE="YJ-NAS:System/${HOSTNAME}" # 目标存储地址
-SYSTEM_STORAGE_TYPE="sync"                 # 同步类型，可选："copy"、"sync"、"bisync"
-SYSTEM_STORAGE_DEPTH=2                     # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 # -- 源端
 BASE_DOCKER="/home/${USER}/Documents"
 DIRECTORY_DOCKER="Docker"
 TARGETS_DOCKER=("backup-docker" "filter-backup" "Run" "Volume")
+# -- 存储端
+DOCKER_STORAGE="YJ-NAS:System/${HOSTNAME}" # 目标存储地址
+DOCKER_STORAGE_TYPE="sync"                 # 同步类型，可选："copy"、"sync"、"bisync"
+DOCKER_STORAGE_DEPTH=2                     # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 
 # Music
-# -- 存储端
-MUSIC_STORAGE="YJ-NAS:music" # 目标存储地址
-MUSIC_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
-MUSIC_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 # -- 源端
 BASE_MUSIC="/home/${USER}"
 DIRECTORY_MUSIC="Music"
 TARGETS_MUSIC=("CloudMusic" "MyMusic")
+# -- 存储端
+MUSIC_STORAGE="YJ-NAS:music" # 目标存储地址
+MUSIC_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
+MUSIC_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 
 # Pictures
-# -- 存储端
-PICTURES_STORAGE="YJ-NAS:photo" # 目标存储地址
-PICTURES_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
-PICTURES_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 # -- 源端
 BASE_PICTURES="/home/${USER}"
 DIRECTORY_PICTURES="Pictures"
 TARGETS_PICTURES=("Camera" "HP" "Wallpapers" "青娥")
+# -- 存储端
+PICTURES_STORAGE="YJ-NAS:photo" # 目标存储地址
+PICTURES_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
+PICTURES_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
+
+# YJ-Cloud
+# -- 源端
+BASE_CLOUD="/home/${USER}/Documents/FileStation"
+DIRECTORY_CLOUD="YJ-Cloud"
+TARGETS_CLOUD=("Backup-Files" "puller.sh")
+# -- 存储端
+CLOUD_STORAGE="YJ-NAS:System/YJ-Cloud" # 目标存储地址
+CLOUD_STORAGE_TYPE="sync"              # 同步类型，可选："copy"、"sync"、"bisync"
+CLOUD_STORAGE_DEPTH=1                  # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -99,6 +109,7 @@ function helpInfo() {
   echo -e ""
   echo -e "Modules:"
   echo -e "     all                     Back up all modules"
+  echo -e "     cloud                   Back up Cloud files"
   echo -e "     docker                  Back up Docker"
   echo -e "     music                   Back up Music"
   echo -e "     pictures                Back up Pictures"
@@ -220,12 +231,18 @@ else
     -s | --start)
       case ${2} in
       all)
-        syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+        syncer "${CLOUD_STORAGE}" "${CLOUD_STORAGE_TYPE}" "${CLOUD_STORAGE_DEPTH}" "${BASE_CLOUD}" "${DIRECTORY_CLOUD}" "${TARGETS_CLOUD[@]}"
+        syncer "${DOCKER_STORAGE}" "${DOCKER_STORAGE_TYPE}" "${DOCKER_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
         syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
+        syncer "${PICTURES_STORAGE}" "${PICTURES_STORAGE_TYPE}" "${PICTURES_STORAGE_DEPTH}" "${BASE_PICTURES}" "${DIRECTORY_PICTURES}" "${TARGETS_PICTURES[@]}"
+        shift 1
+        ;;
+      cloud)
+        syncer "${CLOUD_STORAGE}" "${CLOUD_STORAGE_TYPE}" "${CLOUD_STORAGE_DEPTH}" "${BASE_CLOUD}" "${DIRECTORY_CLOUD}" "${TARGETS_CLOUD[@]}"
         shift 1
         ;;
       docker)
-        syncer "${SYSTEM_STORAGE}" "${SYSTEM_STORAGE_TYPE}" "${SYSTEM_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
+        syncer "${DOCKER_STORAGE}" "${DOCKER_STORAGE_TYPE}" "${DOCKER_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
         shift 1
         ;;
       music)
