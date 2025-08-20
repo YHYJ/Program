@@ -90,7 +90,7 @@ PICTURES_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目
 
 # Storage
 # -- 源端
-BASE_STORAGE="/"
+BASE_STORAGE=""
 DIRECTORY_STORAGE="storage"
 TARGETS_STORAGE=("Bilibili" "MyFile" "Star")
 # -- 存储端
