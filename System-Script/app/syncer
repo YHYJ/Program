@@ -158,7 +158,6 @@ function checkPath() {
 function logger() {
   local line
   timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-  local timestamp
 
   # 无参数输出空行
   if [ $# -eq 0 ]; then
