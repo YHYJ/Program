@@ -30,7 +30,7 @@ readonly DESC="back up files by system"
 # Program nversion
 readonly MAJOR=0.0.8
 readonly MINOR=20250820
-readonly RELEASE=1
+readonly RELEASE=2
 
 #------------------------- Exit Code Variable
 readonly ERR_FILE=1     # 文件/路径类错误
@@ -209,11 +209,11 @@ function syncer() {
 
     # 执行备份
     if [ "${storage_type}" == "copy" ]; then
-      rclone copy --update "${source_path}" "${storage_path}" --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
+      rclone copy --update "${source_path}" "${storage_path}" --create-empty-src-dirs --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
     elif [ "${storage_type}" == "sync" ]; then
-      rclone sync "${source_path}" "${storage_path}" --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
+      rclone sync "${source_path}" "${storage_path}" --create-empty-src-dirs --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
     elif [ "${storage_type}" == "bisync" ]; then
-      rclone bisync "${source_path}" "${storage_path}" --resync --conflict-resolve="${RESOLVE}" --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
+      rclone bisync "${source_path}" "${storage_path}" --resync --conflict-resolve="${RESOLVE}" --create-empty-src-dirs --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
     else
       logger "WARN : 暂不支持 ${storage_type} 同步类型"
     fi
