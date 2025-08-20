@@ -30,7 +30,7 @@ readonly DESC="back up files by system"
 # Program nversion
 readonly MAJOR=0.0.8
 readonly MINOR=20250820
-readonly RELEASE=2
+readonly RELEASE=3
 
 #------------------------- Exit Code Variable
 readonly ERR_FILE=1     # 文件/路径类错误
@@ -88,6 +88,16 @@ PICTURES_STORAGE="YJ-NAS:photo" # 目标存储地址
 PICTURES_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
 PICTURES_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 
+# Storage
+# -- 源端
+BASE_STORAGE="/"
+DIRECTORY_STORAGE="storage"
+TARGETS_STORAGE=("Bilibili" "MyFile" "Star")
+# -- 存储端
+STORAGE_STORAGE="YJ-NAS:home/Storage" # 目标存储地址
+STORAGE_STORAGE_TYPE="copy"           # 同步类型，可选："copy"、"sync"、"bisync"
+STORAGE_STORAGE_DEPTH=1               # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
+
 # Videos
 # -- 源端
 BASE_VIDEOS="/home/${USER}"
@@ -122,7 +132,8 @@ function helpInfo() {
   echo -e "     docker                  Back up Docker"
   echo -e "     music                   Back up Music"
   echo -e "     pictures                Back up Pictures"
-  echo -e "     Videos                  Back up Videos"
+  echo -e "     storage                 Back up My Storage"
+  echo -e "     videos                  Back up Videos"
 }
 
 function versionInfo() {
@@ -247,6 +258,7 @@ else
         syncer "${DOCKER_STORAGE}" "${DOCKER_STORAGE_TYPE}" "${DOCKER_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
         syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
         syncer "${PICTURES_STORAGE}" "${PICTURES_STORAGE_TYPE}" "${PICTURES_STORAGE_DEPTH}" "${BASE_PICTURES}" "${DIRECTORY_PICTURES}" "${TARGETS_PICTURES[@]}"
+        syncer "${STORAGE_STORAGE}" "${STORAGE_STORAGE_TYPE}" "${STORAGE_STORAGE_DEPTH}" "${BASE_STORAGE}" "${DIRECTORY_STORAGE}" "${TARGETS_STORAGE[@]}"
         syncer "${VIDEOS_STORAGE}" "${VIDEOS_STORAGE_TYPE}" "${VIDEOS_STORAGE_DEPTH}" "${BASE_VIDEOS}" "${DIRECTORY_VIDEOS}" "${TARGETS_VIDEOS[@]}"
         shift 1
         ;;
@@ -264,6 +276,10 @@ else
         ;;
       pictures)
         syncer "${PICTURES_STORAGE}" "${PICTURES_STORAGE_TYPE}" "${PICTURES_STORAGE_DEPTH}" "${BASE_PICTURES}" "${DIRECTORY_PICTURES}" "${TARGETS_PICTURES[@]}"
+        shift 1
+        ;;
+      storage)
+        syncer "${STORAGE_STORAGE}" "${STORAGE_STORAGE_TYPE}" "${STORAGE_STORAGE_DEPTH}" "${BASE_STORAGE}" "${DIRECTORY_STORAGE}" "${TARGETS_STORAGE[@]}"
         shift 1
         ;;
       videos)
