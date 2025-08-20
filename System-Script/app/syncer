@@ -28,8 +28,8 @@ readonly NAME
 # Program description
 readonly DESC="back up files by system"
 # Program nversion
-readonly MAJOR=0.0.6
-readonly MINOR=20250815
+readonly MAJOR=0.0.7
+readonly MINOR=20250820
 readonly RELEASE=1
 
 #------------------------- Exit Code Variable
@@ -49,6 +49,16 @@ LOGLEVEL="WARNING"
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
 #------------------------- Sync Variable
+# YJ-Cloud
+# -- 源端
+BASE_CLOUD="/home/${USER}/Documents/FileStation"
+DIRECTORY_CLOUD="YJ-Cloud"
+TARGETS_CLOUD=("Backup-Files" "puller.sh")
+# -- 存储端
+CLOUD_STORAGE="YJ-NAS:System/YJ-Cloud" # 目标存储地址
+CLOUD_STORAGE_TYPE="sync"              # 同步类型，可选："copy"、"sync"、"bisync"
+CLOUD_STORAGE_DEPTH=1                  # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
+
 # Docker
 # -- 源端
 BASE_DOCKER="/home/${USER}/Documents"
@@ -79,15 +89,15 @@ PICTURES_STORAGE="YJ-NAS:photo" # 目标存储地址
 PICTURES_STORAGE_TYPE="bisync"  # 同步类型，可选："copy"、"sync"、"bisync"
 PICTURES_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 
-# YJ-Cloud
+# Videos
 # -- 源端
-BASE_CLOUD="/home/${USER}/Documents/FileStation"
-DIRECTORY_CLOUD="YJ-Cloud"
-TARGETS_CLOUD=("Backup-Files" "puller.sh")
+BASE_VIDEOS="/home/${USER}"
+DIRECTORY_VIDEOS="Videos"
+TARGETS_VIDEOS=("Camera" "Game" "MV" "电影" "电视剧")
 # -- 存储端
-CLOUD_STORAGE="YJ-NAS:System/YJ-Cloud" # 目标存储地址
-CLOUD_STORAGE_TYPE="sync"              # 同步类型，可选："copy"、"sync"、"bisync"
-CLOUD_STORAGE_DEPTH=1                  # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
+VIDEOS_STORAGE="YJ-NAS:video" # 目标存储地址
+VIDEOS_STORAGE_TYPE="copy"    # 同步类型，可选："copy"、"sync"、"bisync"
+VIDEOS_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
 
 ####################################################################
 #+++++++++++++++++++++++++ Define Function ++++++++++++++++++++++++#
@@ -113,6 +123,7 @@ function helpInfo() {
   echo -e "     docker                  Back up Docker"
   echo -e "     music                   Back up Music"
   echo -e "     pictures                Back up Pictures"
+  echo -e "     Videos                  Back up Videos"
 }
 
 function versionInfo() {
@@ -235,6 +246,7 @@ else
         syncer "${DOCKER_STORAGE}" "${DOCKER_STORAGE_TYPE}" "${DOCKER_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
         syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
         syncer "${PICTURES_STORAGE}" "${PICTURES_STORAGE_TYPE}" "${PICTURES_STORAGE_DEPTH}" "${BASE_PICTURES}" "${DIRECTORY_PICTURES}" "${TARGETS_PICTURES[@]}"
+        syncer "${VIDEOS_STORAGE}" "${VIDEOS_STORAGE_TYPE}" "${VIDEOS_STORAGE_DEPTH}" "${BASE_VIDEOS}" "${DIRECTORY_VIDEOS}" "${TARGETS_VIDEOS[@]}"
         shift 1
         ;;
       cloud)
@@ -251,6 +263,10 @@ else
         ;;
       pictures)
         syncer "${PICTURES_STORAGE}" "${PICTURES_STORAGE_TYPE}" "${PICTURES_STORAGE_DEPTH}" "${BASE_PICTURES}" "${DIRECTORY_PICTURES}" "${TARGETS_PICTURES[@]}"
+        shift 1
+        ;;
+      videos)
+        syncer "${VIDEOS_STORAGE}" "${VIDEOS_STORAGE_TYPE}" "${VIDEOS_STORAGE_DEPTH}" "${BASE_VIDEOS}" "${DIRECTORY_VIDEOS}" "${TARGETS_VIDEOS[@]}"
         shift 1
         ;;
       --)
