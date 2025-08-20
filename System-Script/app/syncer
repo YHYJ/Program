@@ -30,7 +30,7 @@ readonly DESC="back up files by system"
 # Program nversion
 readonly MAJOR=0.0.8
 readonly MINOR=20250820
-readonly RELEASE=3
+readonly RELEASE=4
 
 #------------------------- Exit Code Variable
 readonly ERR_FILE=1     # 文件/路径类错误
@@ -90,7 +90,7 @@ PICTURES_STORAGE_DEPTH=1        # 需要在存储端创建源端 DIRECTORY_* 目
 
 # Storage
 # -- 源端
-BASE_STORAGE=""
+BASE_STORAGE="/"
 DIRECTORY_STORAGE="storage"
 TARGETS_STORAGE=("Bilibili" "MyFile" "Star")
 # -- 存储端
@@ -184,6 +184,10 @@ function syncer() {
   local directory=${5}
   shift 5
   local targets=("$@")
+
+  if [ "${base}" = "/" ]; then
+    base=""
+  fi
 
   for target in "${targets[@]}"; do
     source_path="${base}/${directory}/${target}" # 源路径
