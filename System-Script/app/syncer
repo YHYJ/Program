@@ -29,8 +29,8 @@ readonly NAME
 readonly DESC="back up files by system"
 # Program nversion
 readonly MAJOR=0.0.8
-readonly MINOR=20250820
-readonly RELEASE=4
+readonly MINOR=20250821
+readonly RELEASE=5
 
 #------------------------- Exit Code Variable
 readonly ERR_FILE=1     # 文件/路径类错误
@@ -157,7 +157,7 @@ function checkPath() {
 # 日志函数
 function logger() {
   local line
-  timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  timestamp=$(date +"%Y/%m/%d %H:%M:%S")
 
   # 无参数输出空行
   if [ $# -eq 0 ]; then
