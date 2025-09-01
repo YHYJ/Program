@@ -28,9 +28,9 @@ readonly NAME
 # Program description
 readonly DESC="back up files by system"
 # Program nversion
-readonly MAJOR=0.0.8
-readonly MINOR=20250821
-readonly RELEASE=5
+readonly MAJOR=0.0.9
+readonly MINOR=20250901
+readonly RELEASE=1
 
 #------------------------- Exit Code Variable
 readonly ERR_FILE=1     # 文件/路径类错误
@@ -54,6 +54,7 @@ BASE_CLOUD="/home/${USER}/Documents/FileStation"
 DIRECTORY_CLOUD="YJ-Cloud"
 TARGETS_CLOUD=("Backup-Files" "puller.sh")
 # -- 存储端
+CLOUD_NAME="yj-nas.local"              # 存储端名称
 CLOUD_STORAGE="YJ-NAS:System/YJ-Cloud" # 目标存储地址
 CLOUD_STORAGE_TYPE="sync"              # 同步类型，可选："copy"、"sync"、"bisync"
 CLOUD_STORAGE_DEPTH=1                  # 需要在存储端创建源端 DIRECTORY_* 目录则设为2，否则为1
@@ -175,6 +176,16 @@ function logger() {
   done
 }
 
+# 检测 NAS 是否启动
+function pager() {
+  if ping -c 3 "${1}" &>/dev/null; then
+    logger "INFO : 已启动 NAS - ${1}，开始备份"
+  else
+    logger "ERROR : 未启动 NAS - ${1}，无法备份"
+    exit ${ERR_FILE}
+  fi
+}
+
 # 备份执行器
 function syncer() {
   local storage=${1}
@@ -257,6 +268,7 @@ else
     -s | --start)
       case ${2} in
       all)
+        pager ${CLOUD_NAME}
         syncer "${CLOUD_STORAGE}" "${CLOUD_STORAGE_TYPE}" "${CLOUD_STORAGE_DEPTH}" "${BASE_CLOUD}" "${DIRECTORY_CLOUD}" "${TARGETS_CLOUD[@]}"
         syncer "${DOCKER_STORAGE}" "${DOCKER_STORAGE_TYPE}" "${DOCKER_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
         syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
@@ -266,26 +278,32 @@ else
         shift 1
         ;;
       cloud)
+        pager ${CLOUD_NAME}
         syncer "${CLOUD_STORAGE}" "${CLOUD_STORAGE_TYPE}" "${CLOUD_STORAGE_DEPTH}" "${BASE_CLOUD}" "${DIRECTORY_CLOUD}" "${TARGETS_CLOUD[@]}"
         shift 1
         ;;
       docker)
+        pager ${CLOUD_NAME}
         syncer "${DOCKER_STORAGE}" "${DOCKER_STORAGE_TYPE}" "${DOCKER_STORAGE_DEPTH}" "${BASE_DOCKER}" "${DIRECTORY_DOCKER}" "${TARGETS_DOCKER[@]}"
         shift 1
         ;;
       music)
+        pager ${CLOUD_NAME}
         syncer "${MUSIC_STORAGE}" "${MUSIC_STORAGE_TYPE}" "${MUSIC_STORAGE_DEPTH}" "${BASE_MUSIC}" "${DIRECTORY_MUSIC}" "${TARGETS_MUSIC[@]}"
         shift 1
         ;;
       pictures)
+        pager ${CLOUD_NAME}
         syncer "${PICTURES_STORAGE}" "${PICTURES_STORAGE_TYPE}" "${PICTURES_STORAGE_DEPTH}" "${BASE_PICTURES}" "${DIRECTORY_PICTURES}" "${TARGETS_PICTURES[@]}"
         shift 1
         ;;
       storage)
+        pager ${CLOUD_NAME}
         syncer "${STORAGE_STORAGE}" "${STORAGE_STORAGE_TYPE}" "${STORAGE_STORAGE_DEPTH}" "${BASE_STORAGE}" "${DIRECTORY_STORAGE}" "${TARGETS_STORAGE[@]}"
         shift 1
         ;;
       videos)
+        pager ${CLOUD_NAME}
         syncer "${VIDEOS_STORAGE}" "${VIDEOS_STORAGE_TYPE}" "${VIDEOS_STORAGE_DEPTH}" "${BASE_VIDEOS}" "${DIRECTORY_VIDEOS}" "${TARGETS_VIDEOS[@]}"
         shift 1
         ;;
