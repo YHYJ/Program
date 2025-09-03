@@ -29,7 +29,7 @@ readonly NAME
 readonly DESC="back up files by system"
 # Program nversion
 readonly MAJOR=0.0.9
-readonly MINOR=20250901
+readonly MINOR=20250903
 readonly RELEASE=1
 
 #------------------------- Exit Code Variable
@@ -179,9 +179,9 @@ function logger() {
 # 检测 NAS 是否启动
 function pager() {
   if ping -c 3 "${1}" &>/dev/null; then
-    logger "INFO : 已启动 NAS - ${1}，开始备份"
+    logger "INFO : 目标 NAS - ${1} 已启动，开始备份"
   else
-    logger "ERROR : 未启动 NAS - ${1}，无法备份"
+    logger "WARN : 目标 NAS - ${1} 未启动，无法备份"
     exit ${ERR_FILE}
   fi
 }
