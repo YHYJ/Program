@@ -30,7 +30,7 @@ readonly DESC="back up files by system"
 # Program nversion
 readonly MAJOR=0.0.9
 readonly MINOR=20250903
-readonly RELEASE=1
+readonly RELEASE=2
 
 #------------------------- Exit Code Variable
 readonly ERR_FILE=1     # 文件/路径类错误
@@ -179,9 +179,9 @@ function logger() {
 # 检测 NAS 是否启动
 function pager() {
   if ping -c 3 "${1}" &>/dev/null; then
-    logger "INFO : 目标 NAS - ${1} 已启动，开始备份"
+    logger "INFO  : 目标 NAS - ${1} 已启动，开始备份"
   else
-    logger "WARN : 目标 NAS - ${1} 未启动，无法备份"
+    logger "WARN  : 目标 NAS - ${1} 未启动，无法备份"
     exit ${ERR_FILE}
   fi
 }
@@ -211,7 +211,7 @@ function syncer() {
         # 文件夹
         storage_path="${storage}/${target}" # 最终备份路径
       else
-        logger "WARN : ${source_path} 不是文件或文件夹，跳过"
+        logger "WARN  : ${source_path} 不是文件或文件夹，跳过"
         continue
       fi
     elif [ "${storage_depth}" -eq 2 ]; then
@@ -222,11 +222,11 @@ function syncer() {
         # 文件夹
         storage_path="${storage}/${directory}/${target}" # 最终备份路径
       else
-        logger "WARN : ${source_path} 不是文件或文件夹，跳过"
+        logger "WARN  : ${source_path} 不是文件或文件夹，跳过"
         continue
       fi
     else
-      logger "WARN : STORAGE_DEPTH 不是 1 或 2，退出"
+      logger "WARN  : STORAGE_DEPTH 不是 1 或 2，退出"
       exit ${ERR_PARAM}
     fi
 
@@ -240,7 +240,7 @@ function syncer() {
     elif [ "${storage_type}" == "bisync" ]; then
       rclone bisync "${source_path}" "${storage_path}" --resync --conflict-resolve="${RESOLVE}" --create-empty-src-dirs --transfers="${TRANSFER}" --log-file="${LOGFILE}" --log-level="${LOGLEVEL}"
     else
-      logger "WARN : 暂不支持 ${storage_type} 同步类型"
+      logger "WARN  : 暂不支持 ${storage_type} 同步类型"
     fi
 
     # 检查状态
